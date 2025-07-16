@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "478463837582",
+    "project_id": "wcas-39ffa",
+    "storage_bucket": "wcas-39ffa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478463837582:android:7923ddbf88dd09ac0dd0df",
+        "android_client_info": {
+          "package_name": "com.example.main"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY_IL0d-7eL10App0NGUjrEGR1IM2lY2c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478463837582:android:bdee1b0c547605080dd0df",
+        "android_client_info": {
+          "package_name": "com.example.streak"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY_IL0d-7eL10App0NGUjrEGR1IM2lY2c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
