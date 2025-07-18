@@ -1,54 +1,44 @@
-// lib/features/main/domain/task.dart
-class Task {
-  final String id;
-  final String title;
-  final String description;
-  final DateTime createdAt;
-  bool isCompleted;
+// models/task.dart
+import 'package:hive/hive.dart';
+
+part 'task.g.dart';
+
+@HiveType(typeId: 1)
+class Task extends HiveObject {
+  @HiveField(0)
+  String title;
+
+  @HiveField(1)
+  String description;
+
+  @HiveField(2)
+  List<int> goalIds; // Changed from List<String> to List<int>
 
   Task({
-    required this.id,
     required this.title,
     required this.description,
-    required this.createdAt,
-    this.isCompleted = false,
-  });
-
-  // Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'createdAt': createdAt.toIso8601String(),
-      'isCompleted': isCompleted,
-    };
-  }
-
-  // Create from JSON
-  factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      createdAt: DateTime.parse(json['createdAt']),
-      isCompleted: json['isCompleted'],
-    );
-  }
+    List<int>? goalIds,
+  }) : goalIds = goalIds ?? [];
 
   Task copyWith({
-    String? id,
     String? title,
     String? description,
-    DateTime? createdAt,
-    bool? isCompleted,
+    List<int>? goalIds,
   }) {
     return Task(
-      id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      createdAt: createdAt ?? this.createdAt,
-      isCompleted: isCompleted ?? this.isCompleted,
+      goalIds: goalIds ?? List<int>.from(this.goalIds),
     );
+  }
+
+  void addGoal(int goalId) {
+    if (!goalIds.contains(goalId)) {
+      goalIds.add(goalId);
+    }
+  }
+
+  void removeGoal(int goalId) {
+    goalIds.remove(goalId);
   }
 }

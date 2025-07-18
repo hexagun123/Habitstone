@@ -1,14 +1,17 @@
+// lib/features/main/presentation/widgets/task_list.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/provider/task.dart';
+import '../../../../../core/provider/goal.dart';
 import '../../../../../core/model/task.dart';
+import '../../../../../core/model/goal.dart';
 
 class TaskList extends ConsumerWidget {
   const TaskList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tasks = ref.watch(tasksProvider);
+    final tasks = ref.watch(taskProvider);
 
     return Card(
       child: Padding(
@@ -20,7 +23,7 @@ class TaskList extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'All Tasks',
+                  'Tasks',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -41,7 +44,7 @@ class TaskList extends ConsumerWidget {
                 ? const _EmptyTasksIndicator()
                 : Column(
                     children:
-                        tasks.map((task) => _TaskListItem(task: task)).toList(),
+                        tasks.map((task) => TaskListItem(task: task)).toList(),
                   ),
           ],
         ),
@@ -50,54 +53,135 @@ class TaskList extends ConsumerWidget {
   }
 }
 
-class _TaskListItem extends ConsumerWidget {
+class TaskListItem extends ConsumerWidget {
   final Task task;
 
-  const _TaskListItem({required this.task});
+  const TaskListItem({super.key, required this.task});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Card(
-        elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-          ),
+    final goals = ref.watch(goalProvider);
+
+    return Card(
+      elevation: 1,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
         ),
-        child: ListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          title: Text(
-            task.title,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-          subtitle: task.description.isNotEmpty
-              ? Text(
-                  task.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.7),
-                      ),
-                )
-              : null,
-          trailing: Checkbox(
-            value: task.isCompleted,
-            onChanged: (value) {
-              ref.read(tasksProvider.notifier).updateTask(
-                    task.copyWith(isCompleted: value ?? false),
+      ),
+      child: ExpansionTile(
+        tilePadding: const EdgeInsets.symmetric(horizontal: 16.0),
+        title: Text(
+          task.title,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+        ),
+        subtitle: task.description.isNotEmpty
+            ? Text(
+                task.description,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.7),
+                    ),
+              )
+            : null,
+        children: [
+          // Linked goals section
+          if (task.goalIds.isNotEmpty)
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: task.goalIds.map((goalId) {
+                  final goal = goals.firstWhere(
+                    (g) => g.key == goalId,
+                    orElse: () => Goal(
+                      title: 'Deleted Goal',
+                      description: '',
+                      streak: 0,
+                    ),
                   );
-            },
+                  return Chip(
+                    label: Text(goal.title),
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                  );
+                }).toList(),
+              ),
+            ),
+
+          // Action buttons
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _showEditDialog(context, ref, task),
+                  tooltip: 'Edit Task',
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () =>
+                      ref.read(taskProvider.notifier).deleteTask(task),
+                  tooltip: 'Delete Task',
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.check),
+                  label: const Text('Mark Done'),
+                  onPressed: () => {
+                    ref.read(taskProvider.notifier).markTaskDone(task, ref),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Task created successfully!'),
+                        duration: Duration(seconds: 2),
+                        backgroundColor: Colors.green,
+                      ),
+                    ),
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, WidgetRef ref, Task task) {
+    // Implement your edit dialog here
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Task'),
+        content: const Text('Task editing functionality would go here'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }
@@ -111,11 +195,24 @@ class _EmptyTasksIndicator extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 32.0),
-        child: Text(
-          'No tasks created yet',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              ),
+        child: Column(
+          children: [
+            Icon(
+              Icons.checklist,
+              size: 48,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No tasks created yet',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
+                  ),
+            )
+          ],
         ),
       ),
     );

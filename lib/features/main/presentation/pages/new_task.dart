@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/provider/task.dart';
-import '../../../../core/model/task.dart';
+import '../../../../core/provider/task.dart'; // Add this import
+import '../../../../core/model/task.dart'; // Add this import
 
 class NewTaskPage extends ConsumerWidget {
   const NewTaskPage({super.key});
@@ -12,10 +12,6 @@ class NewTaskPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Task'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
-        ),
       ),
       body: const Padding(
         padding: EdgeInsets.all(16.0),
@@ -25,23 +21,78 @@ class NewTaskPage extends ConsumerWidget {
   }
 }
 
-class NewTaskForm extends StatefulWidget {
+class NewTaskForm extends ConsumerStatefulWidget {
   const NewTaskForm({super.key});
 
   @override
-  State<NewTaskForm> createState() => _NewTaskFormState();
+  ConsumerState<NewTaskForm> createState() => _NewTaskFormState();
 }
 
-class _NewTaskFormState extends State<NewTaskForm> {
+class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  bool _isSubmitting = false; // Track submission state
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _createTask() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Unfocus keyboard first
+    FocusScope.of(context).unfocus();
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final newTask = Task(
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+      );
+
+      await ref.read(taskProvider.notifier).createTask(newTask);
+
+      if (mounted) {
+        // Show success snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Task created successfully!'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Reset the form state
+        _formKey.currentState?.reset();
+
+        // Clear controllers in the next frame
+        Future.delayed(Duration.zero, () {
+          if (mounted) {
+            setState(() {
+              _titleController.clear();
+              _descriptionController.clear();
+            });
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -91,35 +142,20 @@ class _NewTaskFormState extends State<NewTaskForm> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () => context.go('/'),
+                        onPressed: _isSubmitting ? null : () => context.go('/'),
                         child: const Text('Cancel'),
                       ),
                       const SizedBox(width: 16),
                       ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            final newTask = Task(
-                              id: DateTime.now()
-                                  .millisecondsSinceEpoch
-                                  .toString(),
-                              title: _titleController.text,
-                              description: _descriptionController.text,
-                              createdAt: DateTime.now(),
-                            );
-
-                            final ref = ProviderScope.containerOf(context);
-                            await ref
-                                .read(tasksProvider.notifier)
-                                .addTask(newTask);
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Task created successfully!')),
-                            );
-                            context.go('/');
-                          }
-                        },
-                        child: const Text('Create Task'),
+                        onPressed: _isSubmitting ? null : _createTask,
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('Create Task'),
                       ),
                     ],
                   ),

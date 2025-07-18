@@ -1,42 +1,86 @@
-// lib/core/providers/task_provider.dart
+// providers/task_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/local.dart';
+import '../data/hive.dart';
 import '../model/task.dart';
+import 'goal.dart';
+import '../data/util.dart';
 
-final dataRepositoryProvider = Provider<DataRepository>((ref) {
-  return DataRepository();
+final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
+  return TaskNotifier(ref.read(hiveRepositoryProvider));
 });
 
-final tasksProvider = StateNotifierProvider<TasksNotifier, List<Task>>((ref) {
-  final repository = ref.watch(dataRepositoryProvider);
-  return TasksNotifier(repository);
-});
+class TaskNotifier extends StateNotifier<List<Task>> {
+  final HiveRepository _repository;
+  int _tasksCompletedToday = 0;
 
-class TasksNotifier extends StateNotifier<List<Task>> {
-  final DataRepository _repository;
+  TaskNotifier(this._repository) : super(_repository.getTasks());
 
-  TasksNotifier(this._repository) : super([]) {
-    _loadTasks();
+  int get tasksCompletedToday => _tasksCompletedToday;
+
+  Future<void> _refresh() async {
+    state = [..._repository.getTasks()];
   }
 
-  Future<void> _loadTasks() async {
-    state = await _repository.loadTasks();
+  Future<void> createTask(Task task) async {
+    await _repository.addTask(task);
+    await _refresh();
   }
 
-  Future<void> addTask(Task newTask) async {
-    state = [...state, newTask];
-    await _repository.saveTasks(state);
+  Future<void> updateTask(Task task) async {
+    final key = task.key;
+    if (key != null) {
+      await _repository.updateTask(key, task);
+      await _refresh();
+    }
   }
 
-  Future<void> updateTask(Task updatedTask) async {
-    state = state
-        .map((task) => task.id == updatedTask.id ? updatedTask : task)
-        .toList();
-    await _repository.saveTasks(state);
+  Future<void> deleteTask(Task task) async {
+    final key = task.key;
+    if (key != null) {
+      await _repository.deleteTask(key);
+      await _refresh();
+    }
   }
 
-  Future<void> deleteTask(String taskId) async {
-    state = state.where((task) => task.id != taskId).toList();
-    await _repository.saveTasks(state);
+// In markTaskDone method:
+  Future<void> markTaskDone(Task task, WidgetRef ref) async {
+    // Update linked goals
+    final goalNotifier = ref.read(goalProvider.notifier);
+    final goals = ref.read(goalProvider);
+
+    for (int goalId in task.goalIds) {
+      // Changed to int
+      final goalIndex = goals.indexWhere((goal) => goal.key == goalId);
+      if (goalIndex != -1) {
+        await goalNotifier.markGoalAsUpdated(goals[goalIndex]);
+      }
+    }
+
+    // Record daily completion
+    final today = DateUtils.toMidnight(DateTime.now()).toString();
+    await _repository.recordTaskCompletion(today);
+
+    await deleteTask(task);
   }
+
+  Future<void> addGoalToTask(Task task, int goalId) async {
+    task.addGoal(goalId);
+    await updateTask(task);
+  }
+
+  Future<void> removeGoalFromTask(Task task, int goalId) async {
+    task.removeGoal(goalId);
+    await updateTask(task);
+  }
+
+  void resetDailyCounters() => _tasksCompletedToday = 0;
 }
+
+// Derived providers
+final tasksCompletedTodayProvider = Provider<int>((ref) {
+  return ref.watch(taskProvider.notifier).tasksCompletedToday;
+});
+
+final tasksNotCompletedCountProvider = Provider<int>((ref) {
+  return ref.watch(taskProvider).length;
+});

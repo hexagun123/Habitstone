@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../../core/provider/theme.dart';
 
-class NavigationMenu extends StatelessWidget {
+class NavigationMenu extends ConsumerWidget {
   final Function(String) onNavigate;
-  
+
   const NavigationMenu({
     super.key,
     required this.onNavigate,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -19,8 +21,8 @@ class NavigationMenu extends StatelessWidget {
             Text(
               'Navigation',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -35,7 +37,7 @@ class NavigationMenu extends StatelessWidget {
                   _buildMenuItem(
                     context,
                     icon: Icons.display_settings_outlined,
-                    title: 'Display',
+                    title: 'My Tasks',
                     onTap: () => onNavigate('/display'),
                   ),
                   const SizedBox(height: 16),
@@ -43,10 +45,20 @@ class NavigationMenu extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildMenuItem(
                     context,
+                    icon: getThemeIcon(
+                        ref.watch(themeProvider)), // Use the new icon function
+                    title: 'Change Theme',
+                    onTap: () {
+                      final current = ref.read(themeProvider);
+                      final nextTheme = getNextTheme(current);
+                      ref.read(themeProvider.notifier).state = nextTheme;
+                    },
+                  ),
+                  _buildMenuItem(
+                    context,
                     icon: Icons.settings_outlined,
                     title: 'Settings',
-                    onTap: () {
-                    },
+                    onTap: () {},
                   ),
                 ],
               ),
@@ -79,8 +91,8 @@ class NavigationMenu extends StatelessWidget {
             Text(
               title,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
           ],
         ),
