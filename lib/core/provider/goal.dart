@@ -30,10 +30,10 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
     await _refresh();
   }
 
-  Future<void> updateGoal(Goal goal) async {
+  Future<void> updateGoal(Goal goal, Goal updatedGoal) async {
     final key = goal.key;
     if (key != null) {
-      await _repository.updateGoal(key, goal);
+      await _repository.updateGoal(key, updatedGoal);
       await _refresh();
     }
   }
@@ -68,7 +68,6 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
       updated: true,
       lastUpdate: now,
     );
-
     if (lastUpdate.isBefore(today)) {
       if (goal.updated && lastUpdate == yesterday) {
         updatedGoal = updatedGoal.copyWith(streak: goal.streak + 1);
@@ -76,36 +75,27 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
         updatedGoal = updatedGoal.copyWith(streak: 1);
       }
     }
+    print(updatedGoal.toString() + " " + goal.toString());
 
-    await updateGoal(updatedGoal);
+    await updateGoal(goal, updatedGoal);
   }
 
   Future<void> checkStreaksOnStartup() async {
     final now = DateTime.now().toUtc();
     final today = DateUtil.toMidnight(now);
-    final yesterday = today.subtract(const Duration(days: 1));
 
     for (final goal in state) {
       final lastUpdate = DateUtil.toMidnight(goal.lastUpdate);
-      Goal updatedGoal = goal.copyWith();
+      Goal updatedGoal;
 
-      if (goal.updated) {
-        if (lastUpdate == today) {
-          // Already updated today - no change
-        } else if (lastUpdate == yesterday) {
-          // Updated yesterday - reset for today
-          updatedGoal = updatedGoal.copyWith(updated: false);
-        } else {
-          // Missed days - reset streak
-          updatedGoal = updatedGoal.copyWith(streak: 0, updated: false);
-        }
-      } else if (lastUpdate.isBefore(today)) {
-        // Not updated and date passed - ensure reset
-        updatedGoal = updatedGoal.copyWith(updated: false);
+      if (lastUpdate.isBefore(today)) {
+        updatedGoal = goal.copyWith(updated: false);
+      } else {
+        updatedGoal = goal.copyWith(streak: 0, updated: false);
       }
 
       if (updatedGoal != goal) {
-        await updateGoal(updatedGoal);
+        await updateGoal(goal, updatedGoal);
       }
     }
   }

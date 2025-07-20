@@ -55,7 +55,6 @@ class GoalList extends ConsumerWidget {
     );
   }
 
-
   void _showEditDialog(BuildContext context, WidgetRef ref, Goal goal) {
     final titleController = TextEditingController(text: goal.title);
     final descriptionController = TextEditingController(text: goal.description);
@@ -96,7 +95,7 @@ class GoalList extends ConsumerWidget {
                 title: titleController.text,
                 description: descriptionController.text,
               );
-              ref.read(goalProvider.notifier).updateGoal(updatedGoal);
+              ref.read(goalProvider.notifier).updateGoal(goal, updatedGoal);
               Navigator.pop(context);
             },
             child: const Text('Save'),
@@ -228,8 +227,7 @@ class _EmptyGoalsIndicator extends StatelessWidget {
           children: [
             Icon(Icons.flag_outlined,
                 size: 64,
-                color:
-                    Theme.of(context).colorScheme.onSurface.withAlpha(102)),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(102)),
             const SizedBox(height: 16),
             Text('No goals created yet',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(

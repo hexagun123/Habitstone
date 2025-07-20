@@ -27,7 +27,10 @@ class Goal extends HiveObject {
     this.streak = 0,
     DateTime? lastUpdate,
     this.updated = false,
-  }) : lastUpdate = lastUpdate ?? DateTime.now().toUtc(); // Use UTC
+  }) : lastUpdate = lastUpdate ??
+            DateTime.now()
+                .toUtc()
+                .subtract(const Duration(days: 10)); // Use UTC
 
   Goal copyWith({
     String? title,
@@ -50,5 +53,11 @@ class Goal extends HiveObject {
     final today = DateUtil.toMidnight(now);
     final lastUpdateDate = DateUtil.toMidnight(lastUpdate);
     return lastUpdateDate.isBefore(today) || !updated;
+  }
+
+  // models/goal.dart
+  @override
+  String toString() {
+    return 'Goal{title: $title, streak: $streak, lastUpdate: $lastUpdate, updated: $updated}';
   }
 }
