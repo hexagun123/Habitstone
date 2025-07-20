@@ -91,7 +91,7 @@ class NavigationMenu extends ConsumerWidget {
             Icon(
               icon,
               size: 20,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(178),
             ),
             const SizedBox(width: 12),
             Text(

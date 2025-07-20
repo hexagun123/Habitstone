@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/provider/task.dart';
 import '../../../../../core/provider/goal.dart';
 import '../../../../../core/model/task.dart';
-  
+
 class TaskList extends ConsumerWidget {
   const TaskList({super.key});
 
@@ -33,7 +33,7 @@ class TaskList extends ConsumerWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.6),
+                            .withAlpha(153),
                       ),
                 ),
               ],
@@ -67,7 +67,7 @@ class TaskListItem extends ConsumerWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
         side: BorderSide(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withAlpha(26),
         ),
       ),
       child: ExpansionTile(
@@ -87,7 +87,7 @@ class TaskListItem extends ConsumerWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.7),
+                          .withAlpha(178),
                     ),
               )
             : null,
@@ -195,7 +195,7 @@ class _EmptyTasksIndicator extends StatelessWidget {
             Icon(
               Icons.checklist,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(102),
             ),
             const SizedBox(height: 16),
             Text(
@@ -204,7 +204,7 @@ class _EmptyTasksIndicator extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.6),
+                        .withAlpha(153),
                   ),
             )
           ],

@@ -171,7 +171,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                               selectedColor: Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withOpacity(0.2),
+                                  .withAlpha(51),
                               checkmarkColor:
                                   Theme.of(context).colorScheme.primary,
                               showCheckmark: true,

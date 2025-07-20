@@ -33,7 +33,7 @@ class GoalList extends ConsumerWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.6),
+                              .withAlpha(153),
                         )),
               ],
             ),
@@ -133,7 +133,7 @@ class GoalListItem extends ConsumerWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
           side: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.outline.withAlpha(26),
           ),
         ),
         child: ListTile(
@@ -157,7 +157,7 @@ class GoalListItem extends ConsumerWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.7),
+                              .withAlpha(178),
                         ),
                   ),
                 ),
@@ -179,8 +179,8 @@ class GoalListItem extends ConsumerWidget {
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: needsUpdate
-                          ? Colors.orange.withOpacity(0.2)
-                          : Colors.green.withOpacity(0.2),
+                          ? Colors.orange.withAlpha(51)
+                          : Colors.green.withAlpha(51),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -229,14 +229,14 @@ class _EmptyGoalsIndicator extends StatelessWidget {
             Icon(Icons.flag_outlined,
                 size: 64,
                 color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+                    Theme.of(context).colorScheme.onSurface.withAlpha(102)),
             const SizedBox(height: 16),
             Text('No goals created yet',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.6),
+                          .withAlpha(153),
                     )),
             const SizedBox(height: 8),
             Text('Create your first goal to start tracking progress',
@@ -244,7 +244,7 @@ class _EmptyGoalsIndicator extends StatelessWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.4),
+                          .withAlpha(102),
                     )),
           ],
         ),

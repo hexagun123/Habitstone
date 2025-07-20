@@ -29,7 +29,7 @@ class ChartSection extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .outline
-                        .withOpacity(0.2),
+                        .withAlpha(51),
                   ),
                 ),
                 child: Center(
@@ -51,7 +51,7 @@ class ChartSection extends StatelessWidget {
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSurface
-                                  .withOpacity(0.6),
+                                  .withAlpha(153),
                             ),
                       ),
                       const SizedBox(height: 8),
@@ -64,7 +64,7 @@ class ChartSection extends StatelessWidget {
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSurface
-                                  .withOpacity(0.4),
+                                  .withAlpha(102),
                             ),
                       ),
                     ],
