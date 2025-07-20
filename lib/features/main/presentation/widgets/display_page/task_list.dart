@@ -4,8 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/provider/task.dart';
 import '../../../../../core/provider/goal.dart';
 import '../../../../../core/model/task.dart';
-import '../../../../../core/model/goal.dart';
-
+  
 class TaskList extends ConsumerWidget {
   const TaskList({super.key});
 
