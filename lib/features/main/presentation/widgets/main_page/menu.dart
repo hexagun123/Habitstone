@@ -43,7 +43,7 @@ class NavigationMenu extends ConsumerWidget {
                   _buildMenuItem(
                     context,
                     icon: Icons.display_settings_outlined,
-                    title: 'My Tasks',
+                    title: 'My Lists',
                     onTap: () => onNavigate('display'),
                   ),
                   const SizedBox(height: 16),

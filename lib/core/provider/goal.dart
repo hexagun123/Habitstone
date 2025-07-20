@@ -75,7 +75,6 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
         updatedGoal = updatedGoal.copyWith(streak: 1);
       }
     }
-    print(updatedGoal.toString() + " " + goal.toString());
 
     await updateGoal(goal, updatedGoal);
   }
