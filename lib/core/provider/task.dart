@@ -49,7 +49,6 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     final goals = ref.read(goalProvider);
 
     for (int goalId in task.goalIds) {
-      // Changed to int
       final goalIndex = goals.indexWhere((goal) => goal.key == goalId);
       if (goalIndex != -1) {
         await goalNotifier.markGoalAsUpdated(goals[goalIndex]);
@@ -57,7 +56,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     }
 
     // Record daily completion
-    final today = DateUtils.toMidnight(DateTime.now()).toString();
+    final today = DateUtil.toMidnight(DateTime.now()).toString();
     await _repository.recordTaskCompletion(today);
 
     await deleteTask(task);

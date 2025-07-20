@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-enum AppThemeMode { light, dark, sciFi, soloLeveling }
+enum AppThemeMode { light, dark, sciFi, warm }
 
 class AppTheme {
   static ThemeData getTheme(AppThemeMode mode) {
@@ -11,10 +11,9 @@ class AppTheme {
         return _darkTheme;
       case AppThemeMode.sciFi:
         return _sciFiTheme;
-      case AppThemeMode.soloLeveling:
-        return _soloLevelingTheme;
+      case AppThemeMode.warm:
+        return _warmTheme;
       case AppThemeMode.light:
-      default:
         return _lightTheme;
     }
   }
@@ -27,8 +26,8 @@ class AppTheme {
         return 'Dark';
       case AppThemeMode.sciFi:
         return 'Sci-Fi';
-      case AppThemeMode.soloLeveling:
-        return 'Solo Leveling';
+      case AppThemeMode.warm:
+        return 'Warm';
     }
   }
 
@@ -87,7 +86,6 @@ class AppTheme {
       primary: Color(0xFF3B82F6),
       secondary: Color(0xFF94A3B8),
       surface: Color(0xFF1E293B),
-      background: Color(0xFF0F172A),
       error: Color(0xFFEF4444),
     ),
     textTheme: _TextTheme.apply(
@@ -115,7 +113,6 @@ class AppTheme {
       primary: Color(0xFF00FFE0),
       secondary: Color(0xFFFF00FF),
       surface: Color(0xFF0A0A2A),
-      background: Color(0xFF00001A),
       error: Color(0xFFFF4D4D),
     ),
     textTheme: _TextTheme.apply(
@@ -145,14 +142,13 @@ class AppTheme {
     ),
   );
 
-  // Solo Leveling Theme
-  static final ThemeData _soloLevelingTheme = ThemeData(
+  // warm Theme
+  static final ThemeData _warmTheme = ThemeData(
     useMaterial3: true,
     colorScheme: const ColorScheme.dark(
       primary: Color(0xFFFFA500),
       secondary: Color(0xFFFFD700),
       surface: Color(0xFF1A1A1A),
-      background: Color(0xFF0D0D0D),
       error: Color(0xFFFF3333),
     ),
     textTheme: _TextTheme.apply(

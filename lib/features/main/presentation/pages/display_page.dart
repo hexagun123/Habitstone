@@ -1,6 +1,7 @@
 // Update display_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../widgets/display_page/goal_list.dart';
 import '../widgets/display_page/chart_section.dart';
 import '../widgets/display_page/task_list.dart'; // Add this import
 
@@ -24,6 +25,8 @@ class DisplayContent extends ConsumerWidget {
       child: Column(
         children: [
           const ChartSection(),
+          const SizedBox(height: 24),
+          const GoalList(),
           const SizedBox(height: 24),
           const TaskList(), // Add the TaskList widget here
         ],

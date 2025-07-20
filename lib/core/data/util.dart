@@ -1,5 +1,5 @@
 // util.dart
-class DateUtils {
+class DateUtil {
   static DateTime toMidnight(DateTime date) =>
       DateTime(date.year, date.month, date.day).toUtc();
 

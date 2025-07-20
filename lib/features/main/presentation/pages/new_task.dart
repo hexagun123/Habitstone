@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/provider/task.dart'; // Add this import
-import '../../../../core/model/task.dart'; // Add this import
+import '../../../../core/provider/task.dart';
+import '../../../../core/model/task.dart';
+import '../../../../core/provider/goal.dart'; // Added import
 
 class NewTaskPage extends ConsumerWidget {
   const NewTaskPage({super.key});
@@ -32,7 +33,8 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  bool _isSubmitting = false; // Track submission state
+  bool _isSubmitting = false;
+  List<int> _selectedGoalIds = []; // Track selected goal IDs
 
   @override
   void dispose() {
@@ -44,21 +46,19 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   Future<void> _createTask() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Unfocus keyboard first
     FocusScope.of(context).unfocus();
-
     setState(() => _isSubmitting = true);
 
     try {
       final newTask = Task(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
+        goalIds: _selectedGoalIds, // Assign selected goals
       );
 
       await ref.read(taskProvider.notifier).createTask(newTask);
 
       if (mounted) {
-        // Show success snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Task created successfully!'),
@@ -67,17 +67,12 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
           ),
         );
 
-        // Reset the form state
+        // Clear form and selection
         _formKey.currentState?.reset();
-
-        // Clear controllers in the next frame
-        Future.delayed(Duration.zero, () {
-          if (mounted) {
-            setState(() {
-              _titleController.clear();
-              _descriptionController.clear();
-            });
-          }
+        setState(() {
+          _titleController.clear();
+          _descriptionController.clear();
+          _selectedGoalIds = [];
         });
       }
     } catch (e) {
@@ -95,8 +90,21 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     }
   }
 
+  // Toggle goal selection
+  void _toggleGoalSelection(int goalId) {
+    setState(() {
+      if (_selectedGoalIds.contains(goalId)) {
+        _selectedGoalIds.remove(goalId);
+      } else {
+        _selectedGoalIds.add(goalId);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final goals = ref.watch(goalProvider);
+
     return Form(
       key: _formKey,
       child: Column(
@@ -138,11 +146,48 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                     maxLines: 4,
                   ),
                   const SizedBox(height: 24),
+
+                  // Goal Selection Section
+                  if (goals.isNotEmpty) ...[
+                    Text(
+                      'Link to Goals (optional)',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: goals.map((goal) {
+                            final isSelected =
+                                _selectedGoalIds.contains(goal.key);
+                            return FilterChip(
+                              label: Text(goal.title),
+                              selected: isSelected,
+                              onSelected: (_) =>
+                                  _toggleGoalSelection(goal.key!),
+                              selectedColor: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.2),
+                              checkmarkColor:
+                                  Theme.of(context).colorScheme.primary,
+                              showCheckmark: true,
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: _isSubmitting ? null : () => context.go('/'),
+                        onPressed: _isSubmitting ? null : () => context.pop(),
                         child: const Text('Cancel'),
                       ),
                       const SizedBox(width: 16),
@@ -163,6 +208,39 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
               ),
             ),
           ),
+
+          // Goal creation prompt
+          if (goals.isEmpty) ...[
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'No Goals Available',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Create goals first to link them to tasks',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        icon: const Icon(Icons.add),
+                        label: const Text('Create Goal'),
+                        onPressed: () => context.push('/new-goal'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

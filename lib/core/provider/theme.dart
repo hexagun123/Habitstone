@@ -26,7 +26,7 @@ IconData getThemeIcon(AppThemeMode mode) {
       return Icons.dark_mode;
     case AppThemeMode.sciFi:
       return Icons.rocket_launch;
-    case AppThemeMode.soloLeveling:
+    case AppThemeMode.warm:
       return Icons.auto_awesome;
   }
 }

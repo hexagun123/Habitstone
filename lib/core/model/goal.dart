@@ -47,8 +47,8 @@ class Goal extends HiveObject {
 
   bool get needsUpdate {
     final now = DateTime.now().toUtc();
-    final today = DateUtils.toMidnight(now);
-    final lastUpdateDate = DateUtils.toMidnight(lastUpdate);
+    final today = DateUtil.toMidnight(now);
+    final lastUpdateDate = DateUtil.toMidnight(lastUpdate);
     return lastUpdateDate.isBefore(today) || !updated;
   }
 }

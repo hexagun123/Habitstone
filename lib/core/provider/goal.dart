@@ -60,8 +60,8 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
 
   Future<void> markGoalAsUpdated(Goal goal) async {
     final now = DateTime.now().toUtc();
-    final today = DateUtils.toMidnight(now);
-    final lastUpdate = DateUtils.toMidnight(goal.lastUpdate);
+    final today = DateUtil.toMidnight(now);
+    final lastUpdate = DateUtil.toMidnight(goal.lastUpdate);
     final yesterday = today.subtract(const Duration(days: 1));
 
     Goal updatedGoal = goal.copyWith(
@@ -82,11 +82,11 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
 
   Future<void> checkStreaksOnStartup() async {
     final now = DateTime.now().toUtc();
-    final today = DateUtils.toMidnight(now);
+    final today = DateUtil.toMidnight(now);
     final yesterday = today.subtract(const Duration(days: 1));
 
     for (final goal in state) {
-      final lastUpdate = DateUtils.toMidnight(goal.lastUpdate);
+      final lastUpdate = DateUtil.toMidnight(goal.lastUpdate);
       Goal updatedGoal = goal.copyWith();
 
       if (goal.updated) {

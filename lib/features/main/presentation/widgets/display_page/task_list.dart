@@ -104,12 +104,8 @@ class TaskListItem extends ConsumerWidget {
                 children: task.goalIds.map((goalId) {
                   final goal = goals.firstWhere(
                     (g) => g.key == goalId,
-                    orElse: () => Goal(
-                      title: 'Deleted Goal',
-                      description: '',
-                      streak: 0,
-                    ),
                   );
+
                   return Chip(
                     label: Text(goal.title),
                     backgroundColor:

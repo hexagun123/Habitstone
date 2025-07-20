@@ -31,14 +31,20 @@ class NavigationMenu extends ConsumerWidget {
                   _buildMenuItem(
                     context,
                     icon: Icons.add_task_outlined,
+                    title: 'New goal',
+                    onTap: () => onNavigate('new-goal'),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    icon: Icons.checklist_outlined,
                     title: 'New Task',
-                    onTap: () => onNavigate('/new-task'),
+                    onTap: () => onNavigate('new-task'),
                   ),
                   _buildMenuItem(
                     context,
                     icon: Icons.display_settings_outlined,
                     title: 'My Tasks',
-                    onTap: () => onNavigate('/display'),
+                    onTap: () => onNavigate('display'),
                   ),
                   const SizedBox(height: 16),
                   const Divider(),

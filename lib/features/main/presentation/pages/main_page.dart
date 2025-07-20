@@ -39,7 +39,7 @@ class MainPage extends ConsumerWidget {
                     Expanded(
                       flex: 3,
                       child: NavigationMenu(
-                        onNavigate: (route) => context.push(route),
+                        onNavigate: (route) => context.pushNamed(route),
                       ),
                     ),
                   ],

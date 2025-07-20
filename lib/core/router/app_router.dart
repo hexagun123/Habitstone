@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../features/main/presentation/pages/new_goal.dart';
 import '../../../features/main/presentation/pages/main_page.dart';
 import '../../../features/main/presentation/pages/new_task.dart';
 import '../../../features/main/presentation/pages/display_page.dart';
@@ -14,6 +15,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/',
         name: 'main',
         builder: (context, state) => const MainPage(),
+      ),
+      GoRoute(
+        path: '/new-goal',
+        name: 'new-goal',
+        builder: (context, state) => const NewGoalPage(),
       ),
       GoRoute(
         path: '/new-task',
