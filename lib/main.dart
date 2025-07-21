@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:window_manager/window_manager.dart';
 import 'core/router/app_router.dart';
-import 'core/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/provider/theme.dart';
@@ -15,7 +13,6 @@ import 'core/provider/task.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(GoalAdapter());
   Hive.registerAdapter(TaskAdapter());
@@ -24,7 +21,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  WindowManager.instance.setMinimumSize(const Size(1280, 900));
   runApp(ProviderScope(
     overrides: [
       hiveRepositoryProvider.overrideWithValue(repository),
