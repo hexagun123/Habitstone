@@ -5,11 +5,7 @@ import '../provider/task.dart';
 import '../data/hive.dart';
 import '../model/goal.dart';
 import '../data/util.dart';
-
-// providers/goal_provider.dart
-final hiveRepositoryProvider = Provider<HiveRepository>((ref) {
-  throw UnimplementedError('Repository should be initialized in main');
-});
+import '../provider/hive.dart';
 
 final goalProvider = StateNotifierProvider<GoalNotifier, List<Goal>>((ref) {
   return GoalNotifier(ref.read(hiveRepositoryProvider), ref);
@@ -98,5 +94,4 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
       }
     }
   }
-  
 }

@@ -6,6 +6,7 @@ class StatCard extends StatelessWidget {
   final IconData icon;
 
   const StatCard({
+    super.key,
     required this.title,
     required this.value,
     required this.icon,
@@ -42,7 +43,7 @@ class StatCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color:
                         Theme.of(context).colorScheme.onSurface.withAlpha(70),
-                ),
+                  ),
             ),
           ],
         ),

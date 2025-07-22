@@ -7,6 +7,27 @@ import '../../../../../core/provider/task.dart';
 class ChartSection extends ConsumerWidget {
   const ChartSection({super.key});
 
+  String _getShortWeekday(int weekday) {
+    switch (weekday) {
+      case 1:
+        return 'M';
+      case 2:
+        return 'T';
+      case 3:
+        return 'W';
+      case 4:
+        return 'Th';
+      case 5:
+        return 'F';
+      case 6:
+        return 'Sa';
+      case 7:
+        return 'Su';
+      default:
+        return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weeklyDataAsync = ref.watch(weeklyCompletionsProvider);
@@ -38,19 +59,18 @@ class ChartSection extends ConsumerWidget {
                             sideTitles: SideTitles(
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
-                                const days = [
-                                  'M',
-                                  'T',
-                                  'W',
-                                  'T',
-                                  'F',
-                                  'S',
-                                  'S'
-                                ];
+                                final now = DateTime.now();
+                                final targetDate = now.subtract(
+                                    Duration(days: 6 - value.toInt()));
+
+                                // Get short day name (Mon, Tue, etc)
+                                final dayName =
+                                    _getShortWeekday(targetDate.weekday);
+
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
-                                    days[value.toInt()],
+                                    dayName,
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 );
@@ -74,20 +94,20 @@ class ChartSection extends ConsumerWidget {
                         borderData: FlBorderData(show: false),
                         barGroups: weeklyData.asMap().entries.map((e) {
                           final index = e.key;
-                          final count = e.value;
+                          final daily = e.value;
                           return BarChartGroupData(
                             x: index,
                             barRods: [
                               BarChartRodData(
-                                toY: count.toDouble(),
+                                toY: daily.count.toDouble(),
                                 color: Theme.of(context).colorScheme.primary,
-                                width: 16,
+                                width: 64,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ],
                           );
                         }).toList(),
-                        gridData: const FlGridData(show: true),
+                        gridData: const FlGridData(show: false),
                       ),
                     ),
                   );

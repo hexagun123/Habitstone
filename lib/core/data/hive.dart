@@ -2,21 +2,27 @@
 import 'package:hive/hive.dart';
 import '../model/goal.dart';
 import '../model/task.dart';
+import 'util.dart';
+import '../theme/app_theme.dart';
 
 class HiveRepository {
   static const String _goalsBoxName = 'goals_box';
   static const String _tasksBoxName = 'tasks_box';
   static const String _dailyBoxName = 'daily_box';
+  static const String _settingsBoxName = 'settings_box'; // New settings box
 
   Box<Goal>? _goalsBox;
   Box<Task>? _tasksBox;
-  Box<Map>? _dailyBox; // Changed to Map instead of Map<String, dynamic>
+  Box<Map>? _dailyBox;
+  Box<Map>? _settingsBox; // New settings box
 
   // Initialize all boxes
   Future<void> init() async {
     _goalsBox = await Hive.openBox<Goal>(_goalsBoxName);
     _tasksBox = await Hive.openBox<Task>(_tasksBoxName);
-    _dailyBox = await Hive.openBox<Map>(_dailyBoxName); // Changed to Map
+    _dailyBox = await Hive.openBox<Map>(_dailyBoxName);
+    _settingsBox =
+        await Hive.openBox<Map>(_settingsBoxName); // Initialize settings box
   }
 
   // Add null checks for all box accesses
@@ -47,17 +53,31 @@ class HiveRepository {
 
     await _dailyBox!.put(date, {'count': count + 1});
   }
-  // hive.dart
-// Add this method to HiveRepository
 
-  int getTaskCompletionCount(String date) {
+  int getTaskCompletionCount(String? date) {
     if (_dailyBox == null) return 0;
-
+    date ??= DateUtil.toMidnight(DateTime.now().toUtc()).toString();
     final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
     final Map data = dynamicData is Map ? dynamicData : {'count': 0};
 
     return (data['count'] is int)
         ? data['count'] as int
         : int.tryParse(data['count'].toString()) ?? 0;
+  }
+
+  Future<void> saveThemeMode(AppThemeMode mode) async {
+    await _settingsBox?.put('theme', {'mode': mode.index});
+  }
+
+  AppThemeMode? getThemeMode() {
+    final data = _settingsBox?.get('theme');
+    if (data != null && data['mode'] is int) {
+      final index = data['mode'] as int;
+      if (index < AppThemeMode.values.length) {
+        final mode = AppThemeMode.values[index];
+        return mode;
+      }
+    }
+    return null;
   }
 }

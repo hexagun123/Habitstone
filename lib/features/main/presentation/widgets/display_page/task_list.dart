@@ -141,7 +141,7 @@ class TaskListItem extends ConsumerWidget {
                     ref.read(taskProvider.notifier).markTaskDone(task, ref),
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Task created successfully!'),
+                        content: Text('Task Done!'),
                         duration: Duration(seconds: 2),
                         backgroundColor: Colors.green,
                       ),
@@ -201,10 +201,8 @@ class _EmptyTasksIndicator extends StatelessWidget {
             Text(
               'No tasks created yet',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withAlpha(153),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(153),
                   ),
             )
           ],

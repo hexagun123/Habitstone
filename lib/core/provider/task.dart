@@ -4,6 +4,7 @@ import '../data/hive.dart';
 import '../model/task.dart';
 import 'goal.dart';
 import '../data/util.dart';
+import '../provider/hive.dart';
 
 final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
   return TaskNotifier(ref.read(hiveRepositoryProvider));
@@ -11,11 +12,8 @@ final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
 
 class TaskNotifier extends StateNotifier<List<Task>> {
   final HiveRepository _repository;
-  int _tasksCompletedToday = 0;
 
   TaskNotifier(this._repository) : super(_repository.getTasks());
-
-  int get tasksCompletedToday => _tasksCompletedToday;
 
   Future<void> _refresh() async {
     state = [..._repository.getTasks()];
@@ -58,7 +56,8 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     // Record daily completion
     final today = DateUtil.toMidnight(DateTime.now()).toString();
     await _repository.recordTaskCompletion(today);
-
+    ref.invalidate(tasksCompletedTodayProvider);
+    ref.invalidate(weeklyCompletionsProvider);
     await deleteTask(task);
   }
 
@@ -71,31 +70,23 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     task.removeGoal(goalId);
     await updateTask(task);
   }
-
-  void resetDailyCounters() => _tasksCompletedToday = 0;
 }
-
-// Derived providers
-final tasksCompletedTodayProvider = Provider<int>((ref) {
-  return ref.watch(taskProvider.notifier).tasksCompletedToday;
-});
 
 final tasksNotCompletedCountProvider = Provider<int>((ref) {
   return ref.watch(taskProvider).length;
 });
 
-// task_provider.dart
-// Add this after existing providers
-
-final weeklyCompletionsProvider = FutureProvider<List<int>>((ref) async {
+final weeklyCompletionsProvider =
+    FutureProvider<List<DailyCompletion>>((ref) async {
   final repository = ref.read(hiveRepositoryProvider);
   final now = DateTime.now().toUtc();
   final today = DateUtil.toMidnight(now);
-  List<int> completions = [];
+  List<DailyCompletion> completions = [];
 
   for (int i = 6; i >= 0; i--) {
-    final date = today.subtract(Duration(days: i)).toString();
-    completions.add(repository.getTaskCompletionCount(date));
+    final date = today.subtract(Duration(days: i));
+    completions.add(DailyCompletion(
+        date: date, count: repository.getTaskCompletionCount(date.toString())));
   }
 
   return completions;
@@ -110,3 +101,15 @@ final longestStreakProvider = Provider<int>((ref) {
   if (goals.isEmpty) return 0;
   return goals.map((g) => g.streak).reduce((a, b) => a > b ? a : b);
 });
+
+final tasksCompletedTodayProvider = Provider<int>((ref) {
+  final repository = ref.read(hiveRepositoryProvider);
+  return repository.getTaskCompletionCount(null);
+});
+
+class DailyCompletion {
+  final DateTime date;
+  final int count;
+
+  DailyCompletion({required this.date, required this.count});
+}

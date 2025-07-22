@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/provider/theme.dart';
+import '../../../../../core/theme/app_theme.dart';
 
 class NavigationMenu extends ConsumerWidget {
   final Function(String) onNavigate;
@@ -12,6 +13,7 @@ class NavigationMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentTheme = ref.watch(themeProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -51,13 +53,11 @@ class NavigationMenu extends ConsumerWidget {
                   const SizedBox(height: 16),
                   _buildMenuItem(
                     context,
-                    icon: getThemeIcon(
-                        ref.watch(themeProvider)), // Use the new icon function
-                    title: 'Change Theme',
+                    icon: getThemeIcon(currentTheme),
+                    title: 'Theme: ${AppTheme.getThemeName(currentTheme)}',
                     onTap: () {
-                      final current = ref.read(themeProvider);
-                      final nextTheme = getNextTheme(current);
-                      ref.read(themeProvider.notifier).state = nextTheme;
+                      final nextTheme = getNextTheme(currentTheme);
+                      ref.read(themeProvider.notifier).setTheme(nextTheme);
                     },
                   ),
                   _buildMenuItem(

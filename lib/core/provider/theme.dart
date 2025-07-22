@@ -1,23 +1,39 @@
 // theme.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../provider/hive.dart';
+import '../data/hive.dart';
 import '../theme/app_theme.dart';
 
-final themeProvider = StateProvider<AppThemeMode>((ref) => AppThemeMode.light);
-
-final currentThemeProvider = Provider<ThemeData>((ref) {
-  final themeMode = ref.watch(themeProvider);
-  return AppTheme.getTheme(themeMode);
+final themeProvider = StateNotifierProvider<ThemeNotifier, AppThemeMode>((ref) {
+  final repository = ref.watch(hiveRepositoryProvider);
+  return ThemeNotifier(repository);
 });
 
-// Add this function to get the next theme
+class ThemeNotifier extends StateNotifier<AppThemeMode> {
+  final HiveRepository _repository;
+
+  ThemeNotifier(this._repository)
+      : super(_repository.getThemeMode() ?? AppThemeMode.light);
+  Future<void> setTheme(AppThemeMode mode) async {
+    if (state != mode) {
+      state = mode;
+      await _repository.saveThemeMode(mode);
+    }
+  }
+}
+
+final currentThemeProvider = Provider<ThemeData>((ref) {
+  final mode = ref.watch(themeProvider);
+  return AppTheme.getTheme(mode);
+});
+
 AppThemeMode getNextTheme(AppThemeMode current) {
   final themes = AppThemeMode.values;
   final nextIndex = (themes.indexOf(current) + 1) % themes.length;
   return themes[nextIndex];
 }
 
-// Add this function to get the icon for a theme mode
 IconData getThemeIcon(AppThemeMode mode) {
   switch (mode) {
     case AppThemeMode.light:
@@ -27,6 +43,10 @@ IconData getThemeIcon(AppThemeMode mode) {
     case AppThemeMode.sciFi:
       return Icons.rocket_launch;
     case AppThemeMode.warm:
-      return Icons.auto_awesome;
+      return Icons.wb_sunny;
+    case AppThemeMode.lightBlue:
+      return Icons.water_drop;
+    case AppThemeMode.greenLight:
+      return Icons.eco;
   }
 }

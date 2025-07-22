@@ -8,8 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'core/model/goal.dart';
 import 'core/model/task.dart';
 import 'core/data/hive.dart';
-import 'core/provider/goal.dart';
-import 'core/provider/task.dart';
+import 'core/provider/hive.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +22,8 @@ void main() async {
   );
   runApp(ProviderScope(
     overrides: [
-      hiveRepositoryProvider.overrideWithValue(repository),
+      hiveRepositoryProvider
+          .overrideWithValue(repository), // Use the new provider
     ],
     child: const MyApp(),
   ));
@@ -36,12 +36,12 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final theme = ref.watch(currentThemeProvider);
-    ref.read(goalProvider.notifier);
-    ref.read(taskProvider.notifier);
 
     return MaterialApp.router(
       title: 'My App',
       theme: theme,
+      // Remove darkTheme to prevent conflict with custom themes
+      themeMode: ThemeMode.light, // Force our custom theme to always be used
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
