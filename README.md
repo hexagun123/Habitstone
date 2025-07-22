@@ -17,4 +17,5 @@ A productivity app to track your goals and tasks.
 
 ## Other methods
 See release for read made windows binary: [https://github.com/hexagun123/csia/releases/tag/v0.0.1-beta]
+
 link to web version: [https://wcas-39ffa.web.app]
