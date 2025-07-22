@@ -47,22 +47,6 @@ class InfoText extends StatelessWidget {
                   child: const Text('Login'),
                 ),
               ),
-              const SizedBox(height: 16),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(30),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  'Active',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-              ),
             ],
           ),
         ),
