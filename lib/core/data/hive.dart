@@ -47,4 +47,17 @@ class HiveRepository {
 
     await _dailyBox!.put(date, {'count': count + 1});
   }
+  // hive.dart
+// Add this method to HiveRepository
+
+  int getTaskCompletionCount(String date) {
+    if (_dailyBox == null) return 0;
+
+    final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
+    final Map data = dynamicData is Map ? dynamicData : {'count': 0};
+
+    return (data['count'] is int)
+        ? data['count'] as int
+        : int.tryParse(data['count'].toString()) ?? 0;
+  }
 }

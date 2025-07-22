@@ -83,3 +83,30 @@ final tasksCompletedTodayProvider = Provider<int>((ref) {
 final tasksNotCompletedCountProvider = Provider<int>((ref) {
   return ref.watch(taskProvider).length;
 });
+
+// task_provider.dart
+// Add this after existing providers
+
+final weeklyCompletionsProvider = FutureProvider<List<int>>((ref) async {
+  final repository = ref.read(hiveRepositoryProvider);
+  final now = DateTime.now().toUtc();
+  final today = DateUtil.toMidnight(now);
+  List<int> completions = [];
+
+  for (int i = 6; i >= 0; i--) {
+    final date = today.subtract(Duration(days: i)).toString();
+    completions.add(repository.getTaskCompletionCount(date));
+  }
+
+  return completions;
+});
+
+final totalGoalsProvider = Provider<int>((ref) {
+  return ref.watch(goalProvider).length;
+});
+
+final longestStreakProvider = Provider<int>((ref) {
+  final goals = ref.watch(goalProvider);
+  if (goals.isEmpty) return 0;
+  return goals.map((g) => g.streak).reduce((a, b) => a > b ? a : b);
+});

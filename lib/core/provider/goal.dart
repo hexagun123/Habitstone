@@ -98,4 +98,5 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
       }
     }
   }
+  
 }
