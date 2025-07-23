@@ -1,4 +1,4 @@
-// providers/goal_provider.dart
+// core/provider/goal.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/task.dart';

@@ -1,3 +1,5 @@
+// core/model/user.dart
+// dont touch this yet
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AppUser {

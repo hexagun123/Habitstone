@@ -1,3 +1,5 @@
+// main.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
@@ -10,14 +12,15 @@ import 'core/model/task.dart';
 import 'core/data/hive.dart';
 import 'core/provider/hive.dart';
 
+// main function, get called when ran
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(GoalAdapter());
-  Hive.registerAdapter(TaskAdapter());
-  final repository = HiveRepository();
-  await repository.init();
-  await Firebase.initializeApp(
+  WidgetsFlutterBinding.ensureInitialized(); // init flutter
+  await Hive.initFlutter(); // init hive
+  Hive.registerAdapter(GoalAdapter()); // init hive with goal
+  Hive.registerAdapter(TaskAdapter()); // init hive with task
+  final repository = HiveRepository(); // define of hive repo, see core/data/hive.dart
+  await repository.init(); // init the repo
+  await Firebase.initializeApp( // firebase stuff
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(ProviderScope(
@@ -29,6 +32,7 @@ void main() async {
   ));
 }
 
+// the builder of the app
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -37,7 +41,7 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     final theme = ref.watch(currentThemeProvider);
 
-    return MaterialApp.router(
+    return MaterialApp.router( // return the router so display correctly
       title: 'My App',
       theme: theme,
       // Remove darkTheme to prevent conflict with custom themes
