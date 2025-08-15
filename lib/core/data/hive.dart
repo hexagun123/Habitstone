@@ -1,16 +1,22 @@
-// lib/core/data/hive_repository.dart
+// core/data/hive.dart
+// the hive repository for local data storage
 import 'package:hive/hive.dart';
 import '../model/goal.dart';
 import '../model/task.dart';
 import 'util.dart';
 import '../theme/app_theme.dart';
 
+// the repo class
 class HiveRepository {
+    // three boxes to be opened
+    // goal task and daily - daily checks for statistics of daily completion
+    // id to the box
   static const String _goalsBoxName = 'goals_box';
   static const String _tasksBoxName = 'tasks_box';
   static const String _dailyBoxName = 'daily_box';
   static const String _settingsBoxName = 'settings_box'; // New settings box
 
+// boxes attribute
   Box<Goal>? _goalsBox;
   Box<Task>? _tasksBox;
   Box<Map>? _dailyBox;
@@ -25,10 +31,11 @@ class HiveRepository {
         await Hive.openBox<Map>(_settingsBoxName); // Initialize settings box
   }
 
-  // Add null checks for all box accesses
+  // getters
   List<Goal> getGoals() => _goalsBox?.values.toList() ?? [];
   List<Task> getTasks() => _tasksBox?.values.toList() ?? [];
 
+  // crud for goal and task
   Future<void> addGoal(Goal goal) async => await _goalsBox?.add(goal);
   Future<void> updateGoal(int key, Goal goal) async =>
       await _goalsBox?.put(key, goal);
@@ -38,23 +45,30 @@ class HiveRepository {
   Future<void> updateTask(int key, Task task) async =>
       await _tasksBox?.put(key, task);
   Future<void> deleteTask(int key) async => await _tasksBox?.delete(key);
-
+  
+  // function to call then task is completed
+  // to record stats
+  // can be on what ever date for later impletmentation of delayed task?
   Future<void> recordTaskCompletion(String date) async {
     if (_dailyBox == null) return;
 
-    // Get data as dynamic map and convert to proper types
+    // Get data 
     final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
     final Map data = dynamicData is Map ? dynamicData : {'count': 0};
 
-    // Safely extract count value
+    // extract value
     final count = (data['count'] is int)
         ? data['count'] as int
         : int.tryParse(data['count'].toString()) ?? 0;
-
+    
+    // update the new value
     await _dailyBox!.put(date, {'count': count + 1});
   }
+ 
 
-  int getTaskCompletionCount(String? date) {
+ // function to get the statistics
+ // basically the same procedure
+  int getTaskCompletionCount(String date) {
     if (_dailyBox == null) return 0;
     date ??= DateUtil.toMidnight(DateTime.now().toUtc()).toString();
     final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
