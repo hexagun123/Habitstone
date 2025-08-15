@@ -1,18 +1,31 @@
-# wCas 
+# Habitstone 
 
-A productivity app to track your goals and tasks.
+#### Every step carves the stone. Make it count
+
+## The Vision
+Just as a sculptor reveals statues from marble, your habits carve greatness from raw potential. Habitstone turns discipline into legacy – one strike at a time.
 
 ## Current Features 
-- 📝 Create and manage goals with streak tracking
-- ✅ Add daily tasks linked to goals
-- 📊 Interactive radar chart visualization (3+ goals)
-- 🌈 Multiple theme options (Light, Dark, Sci-Fi, Warm, etc.)
-- 📅 Daily task completion tracking
-- 📱 Responsive layout for all screen sizes
+- Create goals, track task, the fundimental of all
+- Burn the streak
+- Be proud of what you've achieved, and show the graphs to others
 
-## Getting Started 
-1. Clone this repository
-2. Run `flutter pub get`
-3. Start with `flutter run`
+## Future updates
+- The stone
+- Online accounts
+
+## Try not to do
+- Feed the stone to spiderwebs
+
+## Getting Started by Cloning
+
+1. Clone this repository using git - git clone https://github.com/hexagun123/csia/
+2. Install the flutter sdk
+3. Run flutter pub get
+4. Start with flutter run (your device) -> eg: flutter run windows
+
+## Other methods
+See release for read made windows binary: [https://github.com/hexagun123/csia/releases/tag/v0.0.1-beta]
 
 link to web version: [https://wcas-39ffa.web.app]
+

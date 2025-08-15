@@ -42,12 +42,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyCvmY4ZiOHh1pQVMaeW65osvM71iYdw0TM',
-    appId: '1:478463837582:web:afc5117e70a0f0e90dd0df',
+    appId: '1:478463837582:web:a53fa140438c44a60dd0df',
     messagingSenderId: '478463837582',
     projectId: 'wcas-39ffa',
     authDomain: 'wcas-39ffa.firebaseapp.com',
     storageBucket: 'wcas-39ffa.firebasestorage.app',
-    measurementId: 'G-F7P5R5FDLE',
+    measurementId: 'G-87X9BX6Q6G',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '478463837582',
     projectId: 'wcas-39ffa',
     storageBucket: 'wcas-39ffa.firebasestorage.app',
+    iosClientId: '478463837582-8m2cu5jkfkl69bu5s4ngo40htggs70oo.apps.googleusercontent.com',
     iosBundleId: 'com.example.streak',
   );
 
@@ -73,17 +74,18 @@ class DefaultFirebaseOptions {
     messagingSenderId: '478463837582',
     projectId: 'wcas-39ffa',
     storageBucket: 'wcas-39ffa.firebasestorage.app',
+    iosClientId: '478463837582-8m2cu5jkfkl69bu5s4ngo40htggs70oo.apps.googleusercontent.com',
     iosBundleId: 'com.example.streak',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyCvmY4ZiOHh1pQVMaeW65osvM71iYdw0TM',
-    appId: '1:478463837582:web:a53fa140438c44a60dd0df',
+    appId: '1:478463837582:web:4de00e61fad239930dd0df',
     messagingSenderId: '478463837582',
     projectId: 'wcas-39ffa',
     authDomain: 'wcas-39ffa.firebaseapp.com',
     storageBucket: 'wcas-39ffa.firebasestorage.app',
-    measurementId: 'G-87X9BX6Q6G',
+    measurementId: 'G-SZPY8688LX',
   );
 
 }

@@ -38,9 +38,8 @@ class MyApp extends ConsumerWidget {
     final theme = ref.watch(currentThemeProvider);
 
     return MaterialApp.router(
-      title: 'My App',
+      title: 'Habitstone',
       theme: theme,
-      // Remove darkTheme to prevent conflict with custom themes
       themeMode: ThemeMode.light, // Force our custom theme to always be used
       routerConfig: router,
       debugShowCheckedModeBanner: false,
