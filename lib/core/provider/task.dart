@@ -49,12 +49,14 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     for (int goalId in task.goalIds) {
       final goalIndex = goals.indexWhere((goal) => goal.key == goalId);
       if (goalIndex != -1) {
-        await goalNotifier.markGoalAsUpdated(goals[goalIndex]);
+        if (!goals[goalIndex].updated) {
+          await goalNotifier.addStreak(goals[goalIndex]);
+        }
       }
     }
 
     // Record daily completion
-    final today = DateUtil.toMidnight(DateTime.now()).toString();
+    final today = DateUtil.now().toString();
     await _repository.recordTaskCompletion(today);
     ref.invalidate(tasksCompletedTodayProvider);
     ref.invalidate(weeklyCompletionsProvider);
@@ -79,12 +81,11 @@ final tasksNotCompletedCountProvider = Provider<int>((ref) {
 final weeklyCompletionsProvider =
     FutureProvider<List<DailyCompletion>>((ref) async {
   final repository = ref.read(hiveRepositoryProvider);
-  final now = DateTime.now().toUtc();
-  final today = DateUtil.toMidnight(now);
+  final now = DateUtil.now();
   List<DailyCompletion> completions = [];
 
   for (int i = 6; i >= 0; i--) {
-    final date = today.subtract(Duration(days: i));
+    final date = now.subtract(Duration(days: i));
     completions.add(DailyCompletion(
         date: date, count: repository.getTaskCompletionCount(date.toString())));
   }

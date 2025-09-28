@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/provider/task.dart';
+import '../../../../../core/data/util.dart';
 
 class ChartSection extends ConsumerWidget {
   const ChartSection({super.key});
@@ -59,7 +60,7 @@ class ChartSection extends ConsumerWidget {
                             sideTitles: SideTitles(
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
-                                final now = DateTime.now();
+                                final now = DateUtil.now();
                                 final targetDate = now.subtract(
                                     Duration(days: 6 - value.toInt()));
 

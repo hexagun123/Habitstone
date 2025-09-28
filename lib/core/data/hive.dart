@@ -8,9 +8,9 @@ import '../theme/app_theme.dart';
 
 // the repo class
 class HiveRepository {
-    // three boxes to be opened
-    // goal task and daily - daily checks for statistics of daily completion
-    // id to the box
+  // three boxes to be opened
+  // goal task and daily - daily checks for statistics of daily completion
+  // id to the box
   static const String _goalsBoxName = 'goals_box';
   static const String _tasksBoxName = 'tasks_box';
   static const String _dailyBoxName = 'daily_box';
@@ -45,14 +45,14 @@ class HiveRepository {
   Future<void> updateTask(int key, Task task) async =>
       await _tasksBox?.put(key, task);
   Future<void> deleteTask(int key) async => await _tasksBox?.delete(key);
-  
+
   // function to call then task is completed
   // to record stats
   // can be on what ever date for later impletmentation of delayed task?
   Future<void> recordTaskCompletion(String date) async {
     if (_dailyBox == null) return;
 
-    // Get data 
+    // Get data
     final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
     final Map data = dynamicData is Map ? dynamicData : {'count': 0};
 
@@ -60,17 +60,16 @@ class HiveRepository {
     final count = (data['count'] is int)
         ? data['count'] as int
         : int.tryParse(data['count'].toString()) ?? 0;
-    
+
     // update the new value
     await _dailyBox!.put(date, {'count': count + 1});
   }
- 
 
- // function to get the statistics
- // basically the same procedure
-  int getTaskCompletionCount(String date) {
+  // function to get the statistics
+  // basically the same procedure
+  int getTaskCompletionCount(String? date) {
     if (_dailyBox == null) return 0;
-    date ??= DateUtil.toMidnight(DateTime.now().toUtc()).toString();
+    date ??= DateUtil.now.toString();
     final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
     final Map data = dynamicData is Map ? dynamicData : {'count': 0};
 

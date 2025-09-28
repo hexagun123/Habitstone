@@ -86,7 +86,7 @@ class MainPanel extends ConsumerWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 24),
-          ...goals.map((goal) => _buildGoalStreakItem(goal, context)).toList(),
+          ...goals.map((goal) => _buildGoalStreakItem(goal, context)),
         ],
       ),
     );

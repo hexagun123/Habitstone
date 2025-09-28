@@ -54,43 +54,47 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
     }
   }
 
-  Future<void> markGoalAsUpdated(Goal goal) async {
-    final now = DateTime.now().toUtc();
-    final today = DateUtil.toMidnight(now);
-    final lastUpdate = DateUtil.toMidnight(goal.lastUpdate);
-    final yesterday = today.subtract(const Duration(days: 1));
+  Future<void> addStreak(Goal goal) async {
+    if (!goal.updated) {
+      Goal updatedGoal = goal.copyWith(
+        streak: goal.streak + 1,
+        updated: true,
+        lastUpdate: DateUtil.now(),
+      );
 
-    Goal updatedGoal = goal.copyWith(
-      updated: true,
-      lastUpdate: now,
-    );
-    if (lastUpdate.isBefore(today)) {
-      if (goal.updated && lastUpdate == yesterday) {
-        updatedGoal = updatedGoal.copyWith(streak: goal.streak + 1);
-      } else {
-        updatedGoal = updatedGoal.copyWith(streak: 1);
-      }
+      await updateGoal(goal, updatedGoal);
     }
-
-    await updateGoal(goal, updatedGoal);
   }
 
-  Future<void> checkStreaksOnStartup() async {
-    final now = DateTime.now().toUtc();
-    final today = DateUtil.toMidnight(now);
+  Future<void> streakCheck() async {
+    final now = DateUtil.now();
 
     for (final goal in state) {
-      final lastUpdate = DateUtil.toMidnight(goal.lastUpdate);
+      final lastUpdate = goal.lastUpdate;
       Goal updatedGoal;
 
-      if (lastUpdate.isBefore(today)) {
-        updatedGoal = goal.copyWith(updated: false);
+      if (!lastUpdate.isAtSameMomentAs(now)) {
+        if (!goal.updated) {
+          updatedGoal = goal.copyWith(
+            lastUpdate: now,
+            updated: false,
+            streak: 0, // you failed the streak ... time to get haunted
+          );
+        } else {
+          updatedGoal = goal.copyWith(
+            lastUpdate: now,
+            updated: false,
+          );
+          print("wtf");
+        }
       } else {
-        updatedGoal = goal.copyWith(streak: 0, updated: false);
+        updatedGoal = goal; // dont spam the button please
+        print("wtf!!!");
       }
 
       if (updatedGoal != goal) {
         await updateGoal(goal, updatedGoal);
+        print(goal.toString());
       }
     }
   }

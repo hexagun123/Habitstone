@@ -176,7 +176,6 @@ class AppTheme {
       primary: Color(0xFFFFA500),
       secondary: Color(0xFFFFD700),
       surface: Color(0xFF1A1A1A),
-      background: Color(0xFF121212),
       error: Color(0xFFFF3333),
     ),
     textTheme: _baseTextTheme.apply(

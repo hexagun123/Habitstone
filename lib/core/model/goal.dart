@@ -1,6 +1,6 @@
 // core/model/goal.dart
 import 'package:hive/hive.dart';
-import '../data/util.dart'; 
+import '../data/util.dart';
 
 // prompt auto generation
 part 'goal.g.dart';
@@ -11,9 +11,8 @@ part 'goal.g.dart';
 // that one is willing to give consistent effort creating tasks to work on
 
 @HiveType(typeId: 0)
-class Goal extends HiveObject { 
-
-    // fields
+class Goal extends HiveObject {
+  // fields
   @HiveField(0)
   String title;
 
@@ -29,18 +28,17 @@ class Goal extends HiveObject {
   @HiveField(4)
   bool updated;
 
-    // constructor
+  // constructor
   Goal({
     // attributes
     required this.title,
     required this.description,
     this.streak = 0, // streak is automaticlly set to zero
-    DateTime? lastUpdate,      
+    DateTime? lastUpdate,
     this.updated = false,
-
   }) : lastUpdate = lastUpdate ??
-    DateUtil.now() // straight into utc
-    .subtract(const Duration(days: 10));
+            DateUtil.now() // straight into utc
+                .subtract(const Duration(days: 10));
 
   // copywith
   Goal copyWith({
@@ -57,14 +55,6 @@ class Goal extends HiveObject {
       lastUpdate: lastUpdate ?? this.lastUpdate,
       updated: updated ?? this.updated,
     );
-  }
-
-  // check if streak needs update
-  bool get needsUpdate {
-    final now = DateUtil.now();
-    final today = DateUtil.toMidnight(now);
-    final lastUpdateDate = DateUtil.toMidnight(lastUpdate);
-    return lastUpdateDate.isBefore(today) || !updated;
   }
 
   // to string for easy debug

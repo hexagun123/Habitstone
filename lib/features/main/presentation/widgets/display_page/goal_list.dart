@@ -120,9 +120,8 @@ class GoalListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final now = DateTime.now().toUtc();
-    final today = DateUtil.toMidnight(now);
-    final lastUpdateDate = DateUtil.toMidnight(goal.lastUpdate);
+    final today = DateUtil.now();
+    final lastUpdateDate = goal.lastUpdate;
     final needsUpdate = lastUpdateDate.isBefore(today) || !goal.updated;
 
     return Padding(
