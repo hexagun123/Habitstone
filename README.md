@@ -10,6 +10,14 @@ Just as a sculptor reveals statues from marble, your habits carve greatness from
 - Burn the streak
 - Be proud of what you've achieved, and show the graphs to others
 
+## Current TODO
+- fix some bugs on graphs
+- fix some color palette issues
+- configure android and linux release
+- implement account: username and password
+- generation of random tasks
+- <del>lure some beta testers</del>
+
 ## Future updates
 - The stone
 - Online accounts
