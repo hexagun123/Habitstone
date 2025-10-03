@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/provider/theme.dart';
 import '../../../../../core/theme/app_theme.dart';
-import '../../../../../core/provider/goal.dart';
 
 class NavigationMenu extends ConsumerWidget {
   final Function(String) onNavigate;
@@ -48,24 +47,6 @@ class NavigationMenu extends ConsumerWidget {
                     icon: Icons.display_settings_outlined,
                     title: 'My Lists',
                     onTap: () => onNavigate('display'),
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  //temp
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.display_settings_outlined,
-                    title: 'Manual Streak Check',
-                    onTap: () async {
-                      await ref.watch(goalProvider.notifier).streakCheck();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content:
-                                Text('Streak check completed! Check logs.')),
-                      );
-                      print("hello");
-                    },
                   ),
                   const SizedBox(height: 16),
                   const Divider(),

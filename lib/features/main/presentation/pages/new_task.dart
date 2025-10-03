@@ -105,7 +105,8 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   Widget build(BuildContext context) {
     final goals = ref.watch(goalProvider);
 
-    return Form(
+    return SingleChildScrollView(
+        child: Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,6 +244,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
           ],
         ],
       ),
-    );
+    ));
   }
 }

@@ -11,14 +11,15 @@ class NewGoalPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('New Goal'),
-      ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: NewGoalForm(),
-      ),
-    );
+        appBar: AppBar(
+          title: const Text('New Goal'),
+        ),
+        body: const SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: NewGoalForm(),
+          ),
+        ));
   }
 }
 
