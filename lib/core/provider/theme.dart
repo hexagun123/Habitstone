@@ -14,7 +14,7 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
   final HiveRepository _repository;
 
   ThemeNotifier(this._repository)
-      : super(_repository.getThemeMode() ?? AppThemeMode.light);
+      : super(_repository.getThemeMode() ?? AppThemeMode.lightBlue);
   Future<void> setTheme(AppThemeMode mode) async {
     if (state != mode) {
       state = mode;
@@ -36,17 +36,19 @@ AppThemeMode getNextTheme(AppThemeMode current) {
 
 IconData getThemeIcon(AppThemeMode mode) {
   switch (mode) {
-    case AppThemeMode.light:
-      return Icons.light_mode;
-    case AppThemeMode.dark:
-      return Icons.dark_mode;
-    case AppThemeMode.sciFi:
-      return Icons.rocket_launch;
-    case AppThemeMode.warm:
-      return Icons.wb_sunny;
     case AppThemeMode.lightBlue:
       return Icons.water_drop;
-    case AppThemeMode.greenLight:
-      return Icons.eco;
+    case AppThemeMode.darkGreen:
+      return Icons.forest;
+    case AppThemeMode.sciFiBlue:
+      return Icons.rocket_launch;
+    case AppThemeMode.warmOrange:
+      return Icons.lightbulb_outline;
+    case AppThemeMode.lightGreen:
+      return Icons.grass;
+    case AppThemeMode.modernGrey:
+      return Icons.circle_outlined;
+    case AppThemeMode.deepPurple:
+      return Icons.auto_awesome;
   }
 }

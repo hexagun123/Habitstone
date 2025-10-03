@@ -2,283 +2,316 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Add new themes
-enum AppThemeMode { light, dark, sciFi, warm, lightBlue, greenLight }
+enum AppThemeMode {
+  lightBlue,
+  darkGreen,
+  sciFiBlue,
+  warmOrange, // Now a dark/neutral warm theme, more distinctly orange
+  lightGreen,
+  modernGrey, // Now a dark theme
+  deepPurple, // New dark theme
+}
 
 class AppTheme {
-  static ThemeData getTheme(AppThemeMode mode) {
-    switch (mode) {
-      case AppThemeMode.dark:
-        return _darkTheme;
-      case AppThemeMode.sciFi:
-        return _sciFiTheme;
-      case AppThemeMode.warm:
-        return _warmTheme;
-      case AppThemeMode.light:
-        return _lightTheme;
-      case AppThemeMode.lightBlue: // New
-        return _lightBlueTheme;
-      case AppThemeMode.greenLight: // New
-        return _greenLightTheme;
-    }
-  }
-
-  static String getThemeName(AppThemeMode mode) {
-    switch (mode) {
-      case AppThemeMode.light:
-        return 'Light';
-      case AppThemeMode.dark:
-        return 'Dark';
-      case AppThemeMode.sciFi:
-        return 'Sci-Fi';
-      case AppThemeMode.warm:
-        return 'Warm';
-      case AppThemeMode.lightBlue: // New
-        return 'Light Blue';
-      case AppThemeMode.greenLight: // New
-        return 'Green Light';
-    }
-  }
+  // --- Common Component Styles (Dynamic - refer to ColorScheme properties) ---
 
   // Base text theme
-  static final TextTheme _baseTextTheme = GoogleFonts.robotoTextTheme();
-
-  // Common styles
-  static final ButtonStyle _elevatedButtonStyle = ElevatedButton.styleFrom(
-    elevation: 6,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-  );
-
-  static final InputDecorationTheme _inputDecorationTheme =
-      InputDecorationTheme(
-    filled: true,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide.none,
-    ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  );
-
-  // Light Theme
-  static final ThemeData _lightTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme.light(
-      primary: Color(0xFF2563EB),
-      secondary: Color(0xFF64748B),
-      surface: Color(0xFFFFFFFF),
-      error: Color(0xFFDC2626),
-    ),
-    textTheme: _baseTextTheme.apply(
-      displayColor: Color(0xFF0F172A),
-      bodyColor: Color(0xFF334155),
-    ),
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: false,
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: _elevatedButtonStyle),
-    inputDecorationTheme: _inputDecorationTheme,
-    cardTheme: CardThemeData(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.all(8),
-      color: Colors.white,
-    ),
-  );
-
-  // Dark Theme
-  static final ThemeData _darkTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xFF3B82F6),
-      secondary: Color(0xFF94A3B8),
-      surface: Color(0xFF1E293B),
-      error: Color(0xFFEF4444),
-    ),
-    textTheme: _baseTextTheme.apply(
-      displayColor: Color(0xFFE2E8F0),
-      bodyColor: Color(0xFFCBD5E1),
-    ),
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: false,
-      backgroundColor: Color(0xFF1E293B),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: _elevatedButtonStyle),
-    inputDecorationTheme: _inputDecorationTheme,
-    cardTheme: CardThemeData(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.all(8),
-      color: Color(0xFF1E293B),
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFF3B82F6),
-    ),
-  );
-
-  // Sci-Fi Theme - Improved
-  static final ThemeData _sciFiTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xFF00FFE0),
-      secondary: Color(0xFFFF00FF),
-      surface: Color(0xFF0A0A2A),
-      error: Color(0xFFFF4D4D),
-    ),
-    textTheme: GoogleFonts.orbitronTextTheme().apply(
-      displayColor: Color(0xFF00FFE0),
-      bodyColor: Color(0xFFA0F0FF),
-    ),
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: false,
-      backgroundColor: Color(0xFF0A0A3A),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: _elevatedButtonStyle.copyWith(
-        backgroundColor: WidgetStateProperty.all(Color(0xFFFF00FF)),
-        foregroundColor: WidgetStateProperty.all(Colors.black),
+  static TextTheme _baseTextTheme(ColorScheme colorScheme, String fontName) {
+    return GoogleFonts.getTextTheme(
+      fontName,
+      TextTheme(
+        displayLarge: TextStyle(color: colorScheme.onSurface),
+        displayMedium: TextStyle(color: colorScheme.onSurface),
+        displaySmall: TextStyle(color: colorScheme.onSurface),
+        headlineLarge: TextStyle(color: colorScheme.onSurface),
+        headlineMedium: TextStyle(color: colorScheme.onSurface),
+        headlineSmall: TextStyle(color: colorScheme.onSurface),
+        titleLarge: TextStyle(color: colorScheme.onSurface),
+        titleMedium: TextStyle(color: colorScheme.onSurface),
+        titleSmall: TextStyle(color: colorScheme.onSurface),
+        bodyLarge: TextStyle(color: colorScheme.onSurface),
+        bodyMedium: TextStyle(color: colorScheme.onSurface),
+        bodySmall: TextStyle(color: colorScheme.onSurface),
+        labelLarge: TextStyle(color: colorScheme.onPrimary),
+        labelMedium: TextStyle(color: colorScheme.onSurface),
+        labelSmall: TextStyle(color: colorScheme.onSurface),
       ),
-    ),
-    cardTheme: CardThemeData(
-      elevation: 6,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Color(0xFF00FFE0), width: 1),
+    );
+  }
+
+  // Elevated Button Style
+  static ElevatedButtonThemeData _elevatedButtonTheme(ColorScheme colorScheme) {
+    return ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
       ),
-      margin: const EdgeInsets.all(8),
-      color: Color(0xFF0A0A3A),
-      shadowColor: Color(0x6600FFE0),
-    ),
-    inputDecorationTheme: _inputDecorationTheme.copyWith(
+    );
+  }
+
+  // Input Decoration Theme
+  static InputDecorationTheme _inputDecorationTheme(ColorScheme colorScheme) {
+    return InputDecorationTheme(
+      filled: true,
+      fillColor: colorScheme.surfaceContainerHigh,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Color(0xFF00FFE0)),
+        borderSide: BorderSide(color: colorScheme.outline),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Color(0xFF5555AA)),
+        borderSide: BorderSide(color: colorScheme.outlineVariant),
       ),
-      filled: false,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFFFF00FF),
-      foregroundColor: Colors.black,
-    ),
-  );
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colorScheme.error, width: 2),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: colorScheme.error, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      hintStyle: TextStyle(
+          color: colorScheme.onSurface.withAlpha((255 * 0.6).round())),
+    );
+  }
 
-  // Warm Theme - Improved
-  static final ThemeData _warmTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xFFFFA500),
-      secondary: Color(0xFFFFD700),
-      surface: Color(0xFF1A1A1A),
-      error: Color(0xFFFF3333),
-    ),
-    textTheme: _baseTextTheme.apply(
-      displayColor: Color(0xFFFFA500),
-      bodyColor: Color(0xFFFFD700),
-    ),
-    appBarTheme: const AppBarTheme(
+  // App Bar Theme
+  static AppBarTheme _appBarTheme(ColorScheme colorScheme) {
+    return AppBarTheme(
       elevation: 0,
       centerTitle: false,
-      backgroundColor: Color(0xFF222222),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: _elevatedButtonStyle.copyWith(
-        backgroundColor: WidgetStateProperty.all(Color(0xFFFFA500)),
-        foregroundColor: WidgetStateProperty.all(Colors.black),
+      backgroundColor: colorScheme.surface,
+      foregroundColor: colorScheme.onSurface,
+      titleTextStyle: TextStyle(
+        color: colorScheme.onSurface,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
       ),
-    ),
-    cardTheme: CardThemeData(
+    );
+  }
+
+  // Card Theme
+  static CardThemeData _cardTheme(ColorScheme colorScheme) {
+    return CardThemeData(
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Color(0xFFFFA500), width: 1),
+        side: BorderSide(color: colorScheme.outlineVariant, width: 0.5),
       ),
       margin: const EdgeInsets.all(8),
-      color: Color(0xFF222222),
-      shadowColor: Color(0x66FFA500),
-    ),
-    inputDecorationTheme: _inputDecorationTheme.copyWith(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Color(0xFFFFA500)),
+      color: colorScheme.surfaceContainerHigh,
+      shadowColor: colorScheme.shadow.withAlpha((255 * 0.3).round()),
+    );
+  }
+
+  // Floating Action Button Theme
+  static FloatingActionButtonThemeData _fabTheme(ColorScheme colorScheme) {
+    return FloatingActionButtonThemeData(
+      backgroundColor: colorScheme.secondary,
+      foregroundColor: colorScheme.onSecondary,
+    );
+  }
+
+  // Bottom Navigation Bar Theme
+  static BottomNavigationBarThemeData _bottomNavBarTheme(
+      ColorScheme colorScheme) {
+    return BottomNavigationBarThemeData(
+      backgroundColor: colorScheme.surface,
+      selectedItemColor: colorScheme.primary,
+      unselectedItemColor: colorScheme.onSurface.withAlpha((255 * 0.6).round()),
+    );
+  }
+
+  // --- Theme Definitions (Only ColorScheme and Font) ---
+
+  static const Map<AppThemeMode, Map<String, dynamic>> _themeData = {
+    AppThemeMode.lightBlue: {
+      'colorScheme': ColorScheme.light(
+        primary: Color(0xFF64B5F6), // Sky blue
+        onPrimary: Colors.white,
+        secondary: Color(0xFFBBDEFB), // Lighter blue
+        onSecondary: Colors.black,
+        surface: Color(0xFFE3F2FD), // Very light blue surface
+        onSurface: Color(0xFF2196F3), // Darker blue text
+        error: Color(0xFFEF5350), // Standard red error
+        onError: Colors.white,
+        outline: Color(0xFFA7D9F8),
+        outlineVariant: Color(0xFFC7EBFD),
+        shadow: Color(0xFF64B5F6),
+        surfaceContainerHigh: Color(0xFFCFE8FC), // Added for fill color
       ),
-      filled: false,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFFFFA500),
-      foregroundColor: Colors.black,
-    ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF222222),
-      selectedItemColor: Color(0xFFFFA500),
-    ),
-  );
+      'fontName': 'Roboto', // A clean, widely used font
+    },
+    AppThemeMode.darkGreen: {
+      'colorScheme': ColorScheme.dark(
+        primary: Color(0xFF66BB6A), // Medium Green
+        onPrimary: Colors.black,
+        secondary: Color(0xFF81C784), // Lighter Green
+        onSecondary: Colors.black,
+        surface: Color(0xFF2E3D34), // Dark Forest Green
+        onSurface: Color(0xFFE8F5E9), // Lightest Green for text
+        error: Color(0xFFEF5350), // Standard Red
+        onError: Colors.white,
+        outline: Color(0xFF4CAF50), // Green outline
+        outlineVariant: Color(0xFF66BB6A), // Lighter green outline
+        shadow: Color(0xFF66BB6A), // Green shadow
+        surfaceContainerHigh:
+            Color(0xFF3C4B42), // Slightly lighter dark green for fill
+      ),
+      'fontName': 'Open Sans', // Readable and pleasant
+    },
+    AppThemeMode.sciFiBlue: {
+      'colorScheme': ColorScheme.dark(
+        primary: Color(0xFF00B0FF), // Bright Blue
+        onPrimary: Colors.black,
+        secondary: Color(0xFF82B1FF), // Luminous lighter blue
+        onSecondary: Colors.black,
+        surface: Color(0xFF0F1B2A), // Deep dark blue
+        onSurface: Color(0xFFE0F7FA), // Light cyan text
+        error: Color(0xFFFF5252), // Vibrant red
+        onError: Colors.black,
+        outline: Color(0xFF00B0FF),
+        outlineVariant: Color(0xFF4DD0E1),
+        shadow: Color(0xFF00B0FF),
+        surfaceContainerHigh:
+            Color(0xFF1A2A3A), // Slightly lighter deep blue for fill
+      ),
+      'fontName': 'Orbitron', // Sci-Fi inspired font
+    },
+    AppThemeMode.warmOrange: {
+      'colorScheme': ColorScheme.dark(
+        primary: Color(0xFFFFA726), // More vibrant Orange
+        onPrimary: Colors.black,
+        secondary: Color(0xFFFFCC80), // Softer, light orange
+        onSecondary: Colors.black,
+        surface: Color(0xFF421C00), // Very Dark Brown/Orange for deep contrast
+        onSurface: Color(0xFFFFE0B2), // Light, warm cream text
+        error: Color(0xFFEF5350), // Standard red error
+        onError: Colors.white,
+        outline: Color(0xFFFB8C00), // Distinct orange outline
+        outlineVariant: Color(0xFFFFB74D), // Lighter orange outline
+        shadow: Color(0xFFFFA726), // Orange shadow
+        surfaceContainerHigh: Color(0xFF5A2A00), // Darker orange-brown for fill
+      ),
+      'fontName': 'Cabin', // Friendly and warm, yet modern
+    },
+    AppThemeMode.lightGreen: {
+      'colorScheme': ColorScheme.light(
+        primary: Color(0xFF81C784), // Soft green
+        onPrimary: Colors.black,
+        secondary: Color(0xFFC8E6C9), // Lighter green
+        onSecondary: Colors.black,
+        surface: Color(0xFFE8F5E9), // Very light green surface
+        onSurface: Color(0xFF4CAF50), // Darker green text
+        error: Color(0xFFE57373), // Red error
+        onError: Colors.white,
+        outline: Color(0xFFA5D6A7),
+        outlineVariant: Color(0xFFC8E6C9),
+        shadow: Color(0xFF81C784),
+        surfaceContainerHigh: Color(0xFFD4EDD6), // Added for fill color
+      ),
+      'fontName': 'Nunito', // Soft and rounded, fits light green
+    },
+    AppThemeMode.modernGrey: {
+      'colorScheme': ColorScheme.dark(
+        primary: Color(0xFF90A4AE), // Lighter Blue Grey primary
+        onPrimary: Colors.black,
+        secondary: Color(0xFFB0BEC5), // Even lighter Blue Grey
+        onSecondary: Colors.black,
+        surface: Color(0xFF263238), // Dark Blue Grey surface
+        onSurface: Color(0xFFECEFF1), // Lightest Grey for text
+        error: Color(0xFFE57373), // Red error
+        onError: Colors.white,
+        outline: Color(0xFF455A64), // Dark grey outline
+        outlineVariant: Color(0xFF607D8B), // Medium grey outline
+        shadow: Color(0xFF90A4AE), // Blue Grey shadow
+        surfaceContainerHigh: Color(0xFF37474F), // Medium dark grey for fill
+      ),
+      'fontName': 'Montserrat', // Modern and clean
+    },
+    AppThemeMode.deepPurple: {
+      'colorScheme': ColorScheme.dark(
+        primary: Color(0xFFAB47BC), // Medium Purple
+        onPrimary: Colors.white,
+        secondary: Color(0xFFCE93D8), // Lighter Purple
+        onSecondary: Colors.black,
+        surface: Color(0xFF210033), // Very Dark Purple
+        onSurface: Color(0xFFF3E5F5), // Lightest Lavender for text
+        error: Color(0xFFEF5350), // Standard Red
+        onError: Colors.white,
+        outline: Color(0xFF7B1FA2), // Darker Purple outline
+        outlineVariant: Color(0xFFA567E1), // Medium Purple outline
+        shadow: Color(0xFFAB47BC), // Purple shadow
+        surfaceContainerHigh: Color(0xFF330055), // Darker purple for fill
+      ),
+      'fontName': 'Lato', // A clean, readable font for this theme
+    },
+  };
 
-  // New Light Blue Theme
-  static final ThemeData _lightBlueTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme.light(
-      primary: Color(0xFF1E88E5),
-      secondary: Color(0xFF4FC3F7),
-      surface: Color(0xFFE3F2FD),
-      error: Color(0xFFE53935),
-    ),
-    textTheme: _baseTextTheme.apply(
-      displayColor: Color(0xFF0D47A1),
-      bodyColor: Color(0xFF1976D2),
-    ),
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: false,
-      backgroundColor: Color(0xFFE3F2FD),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: _elevatedButtonStyle),
-    inputDecorationTheme: _inputDecorationTheme,
-    cardTheme: CardThemeData(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.all(8),
-      color: Color(0xFFE1F5FE),
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFF1E88E5),
-    ),
-  );
+  // --- Get Theme Method ---
+  static ThemeData getTheme(AppThemeMode mode) {
+    final theme = _themeData[mode]!;
+    final colorScheme = theme['colorScheme'] as ColorScheme;
+    final fontName = theme['fontName'] as String;
 
-  // New Green Light Theme
-  static final ThemeData _greenLightTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme.light(
-      primary: Color(0xFF2E7D32),
-      secondary: Color(0xFF66BB6A),
-      surface: Color(0xFFE8F5E9),
-      error: Color(0xFFC62828),
-    ),
-    textTheme: _baseTextTheme.apply(
-      displayColor: Color(0xFF1B5E20),
-      bodyColor: Color(0xFF388E3C),
-    ),
-    appBarTheme: const AppBarTheme(
-      elevation: 0,
-      centerTitle: false,
-      backgroundColor: Color(0xFFE8F5E9),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: _elevatedButtonStyle),
-    inputDecorationTheme: _inputDecorationTheme,
-    cardTheme: CardThemeData(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.all(8),
-      color: Color(0xFFDCEDC8),
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFF2E7D32),
-    ),
-  );
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      textTheme: _baseTextTheme(colorScheme, fontName),
+      appBarTheme: _appBarTheme(colorScheme),
+      elevatedButtonTheme: _elevatedButtonTheme(colorScheme),
+      inputDecorationTheme: _inputDecorationTheme(colorScheme),
+      cardTheme: _cardTheme(colorScheme),
+      floatingActionButtonTheme: _fabTheme(colorScheme),
+      bottomNavigationBarTheme: _bottomNavBarTheme(colorScheme),
+    );
+  }
+
+  // --- Get Theme Name Method ---
+  static String getThemeName(AppThemeMode mode) {
+    switch (mode) {
+      case AppThemeMode.lightBlue:
+        return 'Light Blue';
+      case AppThemeMode.darkGreen:
+        return 'Dark Green';
+      case AppThemeMode.sciFiBlue:
+        return 'Sci-Fi Blue';
+      case AppThemeMode.warmOrange:
+        return 'Warm Orange';
+      case AppThemeMode.lightGreen:
+        return 'Light Green';
+      case AppThemeMode.modernGrey:
+        return 'Modern Grey';
+      case AppThemeMode.deepPurple:
+        return 'Deep Purple';
+    }
+  }
+
+  // --- Get Theme Icon Method ---
+  static IconData getThemeIcon(AppThemeMode mode) {
+    switch (mode) {
+      case AppThemeMode.lightBlue:
+        return Icons.water_drop;
+      case AppThemeMode.darkGreen:
+        return Icons.forest;
+      case AppThemeMode.sciFiBlue:
+        return Icons.rocket_launch;
+      case AppThemeMode.warmOrange:
+        return Icons.local_fire_department;
+      case AppThemeMode.lightGreen:
+        return Icons.grass;
+      case AppThemeMode.modernGrey:
+        return Icons.layers;
+      case AppThemeMode.deepPurple:
+        return Icons.star_border;
+    }
+  }
 }
