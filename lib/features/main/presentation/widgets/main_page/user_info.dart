@@ -39,15 +39,6 @@ class InfoText extends StatelessWidget {
                     ),
               ),
               const Spacer(),
-              // Login Button added here
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () =>
-                      context.push('/login'), // Navigation using named route
-                  child: const Text('Login'),
-                ),
-              ),
             ],
           ),
         ),
