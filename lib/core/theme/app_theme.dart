@@ -3,13 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 enum AppThemeMode {
-  lightBlue,
-  darkGreen,
+  light,
   sciFiBlue,
-  warmOrange, // Now a dark/neutral warm theme, more distinctly orange
-  lightGreen,
-  modernGrey, // Now a dark theme
-  deepPurple, // New dark theme
+  warmOrange,
+  modernGrey,
 }
 
 class AppTheme {
@@ -133,40 +130,24 @@ class AppTheme {
   // --- Theme Definitions (Only ColorScheme and Font) ---
 
   static const Map<AppThemeMode, Map<String, dynamic>> _themeData = {
-    AppThemeMode.lightBlue: {
+    AppThemeMode.light: {
       'colorScheme': ColorScheme.light(
-        primary: Color(0xFF64B5F6), // Sky blue
+        primary: Color(0xFF1565C0), // Deeper, more saturated blue
         onPrimary: Colors.white,
-        secondary: Color(0xFFBBDEFB), // Lighter blue
-        onSecondary: Colors.black,
-        surface: Color(0xFFE3F2FD), // Very light blue surface
-        onSurface: Color(0xFF2196F3), // Darker blue text
-        error: Color(0xFFEF5350), // Standard red error
+        secondary: Color(0xFF42A5F5), // Medium blue for secondary
+        onSecondary: Colors.white,
+        surface: Color(0xFFF8F9FA), // Clean white with slight grey tint
+        onSurface: Color(0xFF212121), // Near-black for high contrast text
+        error: Color(0xFFD32F2F), // Deeper red for better contrast
         onError: Colors.white,
-        outline: Color(0xFFA7D9F8),
-        outlineVariant: Color(0xFFC7EBFD),
-        shadow: Color(0xFF64B5F6),
-        surfaceContainerHigh: Color(0xFFCFE8FC), // Added for fill color
-      ),
-      'fontName': 'Roboto', // A clean, widely used font
-    },
-    AppThemeMode.darkGreen: {
-      'colorScheme': ColorScheme.dark(
-        primary: Color(0xFF66BB6A), // Medium Green
-        onPrimary: Colors.black,
-        secondary: Color(0xFF81C784), // Lighter Green
-        onSecondary: Colors.black,
-        surface: Color(0xFF2E3D34), // Dark Forest Green
-        onSurface: Color(0xFFE8F5E9), // Lightest Green for text
-        error: Color(0xFFEF5350), // Standard Red
-        onError: Colors.white,
-        outline: Color(0xFF4CAF50), // Green outline
-        outlineVariant: Color(0xFF66BB6A), // Lighter green outline
-        shadow: Color(0xFF66BB6A), // Green shadow
+        outline: Color.fromARGB(255, 115, 115, 115), // Medium grey for borders
+        outlineVariant:
+            Color.fromARGB(255, 162, 162, 162), // Light grey for subtle borders
+        shadow: Color(0xFF000000), // Black for proper shadows
         surfaceContainerHigh:
-            Color(0xFF3C4B42), // Slightly lighter dark green for fill
+            Color(0xFFEEEEEE), // Light grey for elevated surfaces
       ),
-      'fontName': 'Open Sans', // Readable and pleasant
+      'fontName': 'Roboto',
     },
     AppThemeMode.sciFiBlue: {
       'colorScheme': ColorScheme.dark(
@@ -203,23 +184,6 @@ class AppTheme {
       ),
       'fontName': 'Cabin', // Friendly and warm, yet modern
     },
-    AppThemeMode.lightGreen: {
-      'colorScheme': ColorScheme.light(
-        primary: Color(0xFF81C784), // Soft green
-        onPrimary: Colors.black,
-        secondary: Color(0xFFC8E6C9), // Lighter green
-        onSecondary: Colors.black,
-        surface: Color(0xFFE8F5E9), // Very light green surface
-        onSurface: Color(0xFF4CAF50), // Darker green text
-        error: Color(0xFFE57373), // Red error
-        onError: Colors.white,
-        outline: Color(0xFFA5D6A7),
-        outlineVariant: Color(0xFFC8E6C9),
-        shadow: Color(0xFF81C784),
-        surfaceContainerHigh: Color(0xFFD4EDD6), // Added for fill color
-      ),
-      'fontName': 'Nunito', // Soft and rounded, fits light green
-    },
     AppThemeMode.modernGrey: {
       'colorScheme': ColorScheme.dark(
         primary: Color(0xFF90A4AE), // Lighter Blue Grey primary
@@ -236,23 +200,6 @@ class AppTheme {
         surfaceContainerHigh: Color(0xFF37474F), // Medium dark grey for fill
       ),
       'fontName': 'Montserrat', // Modern and clean
-    },
-    AppThemeMode.deepPurple: {
-      'colorScheme': ColorScheme.dark(
-        primary: Color(0xFFAB47BC), // Medium Purple
-        onPrimary: Colors.white,
-        secondary: Color(0xFFCE93D8), // Lighter Purple
-        onSecondary: Colors.black,
-        surface: Color(0xFF210033), // Very Dark Purple
-        onSurface: Color(0xFFF3E5F5), // Lightest Lavender for text
-        error: Color(0xFFEF5350), // Standard Red
-        onError: Colors.white,
-        outline: Color(0xFF7B1FA2), // Darker Purple outline
-        outlineVariant: Color(0xFFA567E1), // Medium Purple outline
-        shadow: Color(0xFFAB47BC), // Purple shadow
-        surfaceContainerHigh: Color(0xFF330055), // Darker purple for fill
-      ),
-      'fontName': 'Lato', // A clean, readable font for this theme
     },
   };
 
@@ -278,40 +225,28 @@ class AppTheme {
   // --- Get Theme Name Method ---
   static String getThemeName(AppThemeMode mode) {
     switch (mode) {
-      case AppThemeMode.lightBlue:
-        return 'Light Blue';
-      case AppThemeMode.darkGreen:
-        return 'Dark Green';
+      case AppThemeMode.light:
+        return 'Light Theme';
       case AppThemeMode.sciFiBlue:
         return 'Sci-Fi Blue';
       case AppThemeMode.warmOrange:
         return 'Warm Orange';
-      case AppThemeMode.lightGreen:
-        return 'Light Green';
       case AppThemeMode.modernGrey:
         return 'Modern Grey';
-      case AppThemeMode.deepPurple:
-        return 'Deep Purple';
     }
   }
 
   // --- Get Theme Icon Method ---
   static IconData getThemeIcon(AppThemeMode mode) {
     switch (mode) {
-      case AppThemeMode.lightBlue:
+      case AppThemeMode.light:
         return Icons.water_drop;
-      case AppThemeMode.darkGreen:
-        return Icons.forest;
       case AppThemeMode.sciFiBlue:
         return Icons.rocket_launch;
       case AppThemeMode.warmOrange:
         return Icons.local_fire_department;
-      case AppThemeMode.lightGreen:
-        return Icons.grass;
       case AppThemeMode.modernGrey:
         return Icons.layers;
-      case AppThemeMode.deepPurple:
-        return Icons.star_border;
     }
   }
 }
