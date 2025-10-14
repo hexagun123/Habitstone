@@ -85,11 +85,9 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
             lastUpdate: now,
             updated: false,
           );
-          print("wtf");
         }
       } else {
         updatedGoal = goal; // dont spam the button please
-        print("wtf!!!");
       }
 
       if (updatedGoal != goal) {

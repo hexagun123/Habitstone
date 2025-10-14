@@ -1,33 +1,31 @@
 // providers/task_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/hive.dart';
 import '../model/task.dart';
 import 'goal.dart';
 import '../data/util.dart';
 import '../provider/hive.dart';
+import '../../main.dart';
 
 final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
   return TaskNotifier(ref.read(hiveRepositoryProvider));
 });
 
 class TaskNotifier extends StateNotifier<List<Task>> {
-  final HiveRepository _repository;
-
-  TaskNotifier(this._repository) : super(_repository.getTasks());
+  TaskNotifier(repository) : super(repository.getTasks());
 
   Future<void> _refresh() async {
-    state = [..._repository.getTasks()];
+    state = [...repository.getTasks()];
   }
 
   Future<void> createTask(Task task) async {
-    await _repository.addTask(task);
+    await repository.addTask(task);
     await _refresh();
   }
 
   Future<void> updateTask(Task task) async {
     final key = task.key;
     if (key != null) {
-      await _repository.updateTask(key, task);
+      await repository.updateTask(key, task);
       await _refresh();
     }
   }
@@ -35,7 +33,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   Future<void> deleteTask(Task task) async {
     final key = task.key;
     if (key != null) {
-      await _repository.deleteTask(key);
+      await repository.deleteTask(key);
       await _refresh();
     }
   }
@@ -57,7 +55,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
 
     // Record daily completion
     final today = DateUtil.now().toString();
-    await _repository.recordTaskCompletion(today);
+    await repository.recordTaskCompletion(today);
     ref.invalidate(tasksCompletedTodayProvider);
     ref.invalidate(weeklyCompletionsProvider);
     await deleteTask(task);
@@ -104,7 +102,6 @@ final longestStreakProvider = Provider<int>((ref) {
 });
 
 final tasksCompletedTodayProvider = Provider<int>((ref) {
-  final repository = ref.read(hiveRepositoryProvider);
   return repository.getTaskCompletionCount(null);
 });
 

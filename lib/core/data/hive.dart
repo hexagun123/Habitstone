@@ -50,16 +50,7 @@ class HiveRepository {
   // to record stats
   // can be on what ever date for later impletmentation of delayed task?
   Future<void> recordTaskCompletion(String date) async {
-    if (_dailyBox == null) return;
-
-    // Get data
-    final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
-    final Map data = dynamicData is Map ? dynamicData : {'count': 0};
-
-    // extract value
-    final count = (data['count'] is int)
-        ? data['count'] as int
-        : int.tryParse(data['count'].toString()) ?? 0;
+    final count = getTaskCompletionCount(date);
 
     // update the new value
     await _dailyBox!.put(date, {'count': count + 1});
@@ -69,13 +60,19 @@ class HiveRepository {
   // basically the same procedure
   int getTaskCompletionCount(String? date) {
     if (_dailyBox == null) return 0;
-    date ??= DateUtil.now.toString();
+
+    date ??= DateUtil.now().toString();
+
+    // Get data
     final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
     final Map data = dynamicData is Map ? dynamicData : {'count': 0};
 
-    return (data['count'] is int)
+    // extract value
+    int count = (data['count'] is int)
         ? data['count'] as int
         : int.tryParse(data['count'].toString()) ?? 0;
+
+    return count;
   }
 
   Future<void> saveThemeMode(AppThemeMode mode) async {
