@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:streak/core/model/reward.dart';
 import 'package:streak/core/provider/goal.dart';
 import 'core/router/app_router.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,6 +22,7 @@ void main() async {
   await Hive.initFlutter(); // init hive
   Hive.registerAdapter(GoalAdapter()); // init hive with goal
   Hive.registerAdapter(TaskAdapter()); // init hive with task
+  Hive.registerAdapter(RewardAdapter());
 
   await repository.init(); // init the repo
   await Firebase.initializeApp(

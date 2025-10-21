@@ -48,6 +48,19 @@ class NavigationMenu extends ConsumerWidget {
                     title: 'My Lists',
                     onTap: () => onNavigate('display'),
                   ),
+                  _buildMenuItem(
+                    context,
+                    icon: Icons.toys,
+                    title: 'New Reward',
+                    onTap: () => onNavigate('new-reward'),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    icon: Icons.numbers,
+                    title: 'Stats',
+                    onTap: () => onNavigate('stats'),
+                  ),
+
                   const SizedBox(height: 16),
                   const Divider(),
                   const SizedBox(height: 16),

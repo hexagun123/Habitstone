@@ -3,6 +3,7 @@
 import 'package:hive/hive.dart';
 import '../model/goal.dart';
 import '../model/task.dart';
+import '../model/reward.dart'; // Import the Reward model
 import 'util.dart';
 import '../theme/app_theme.dart';
 
@@ -13,27 +14,32 @@ class HiveRepository {
   // id to the box
   static const String _goalsBoxName = 'goals_box';
   static const String _tasksBoxName = 'tasks_box';
+  static const String _rewardsBoxName = 'rewards_box'; // New rewards box name
   static const String _dailyBoxName = 'daily_box';
-  static const String _settingsBoxName = 'settings_box'; // New settings box
+  static const String _settingsBoxName = 'settings_box';
 
 // boxes attribute
   Box<Goal>? _goalsBox;
   Box<Task>? _tasksBox;
+  Box<Reward>? _rewardsBox; // New rewards box attribute
   Box<Map>? _dailyBox;
-  Box<Map>? _settingsBox; // New settings box
+  Box<Map>? _settingsBox;
 
   // Initialize all boxes
   Future<void> init() async {
     _goalsBox = await Hive.openBox<Goal>(_goalsBoxName);
     _tasksBox = await Hive.openBox<Task>(_tasksBoxName);
+    _rewardsBox =
+        await Hive.openBox<Reward>(_rewardsBoxName); // Initialize rewards box
     _dailyBox = await Hive.openBox<Map>(_dailyBoxName);
-    _settingsBox =
-        await Hive.openBox<Map>(_settingsBoxName); // Initialize settings box
+    _settingsBox = await Hive.openBox<Map>(_settingsBoxName);
   }
 
   // getters
   List<Goal> getGoals() => _goalsBox?.values.toList() ?? [];
   List<Task> getTasks() => _tasksBox?.values.toList() ?? [];
+  List<Reward> getRewards() =>
+      _rewardsBox?.values.toList() ?? []; // New rewards getter
 
   // crud for goal and task
   Future<void> addGoal(Goal goal) async => await _goalsBox?.add(goal);
@@ -45,6 +51,12 @@ class HiveRepository {
   Future<void> updateTask(int key, Task task) async =>
       await _tasksBox?.put(key, task);
   Future<void> deleteTask(int key) async => await _tasksBox?.delete(key);
+
+  // --- CRUD for Reward ---
+  Future<void> addReward(Reward reward) async => await _rewardsBox?.add(reward);
+  Future<void> updateReward(int key, Reward reward) async =>
+      await _rewardsBox?.put(key, reward);
+  Future<void> deleteReward(int key) async => await _rewardsBox?.delete(key);
 
   // function to call then task is completed
   // to record stats
