@@ -68,18 +68,10 @@ class RewardNotifier extends StateNotifier<List<Reward>> {
       return state.first;
     }
 
-    // Step 1: Find the highest rarity value. This is used as a baseline to
-    // create clean, integer-based weights for each reward. Any rarity value
-    // less than 1 is treated as 1.
-    final maxRarity = state.map((r) => r.rarity > 0 ? r.rarity : 1).reduce(max);
-
-    // Step 2: Calculate the total weight of all possible rewards.
-    // The weight for an individual reward is calculated as 2^(maxRarity - rarity).
-    // This formula creates the desired probability distribution.
     int totalWeight = 0;
     for (final reward in state) {
       final rarity = reward.rarity > 0 ? reward.rarity : 1;
-      totalWeight += (pow(1.35, maxRarity - rarity)).toInt();
+      totalWeight += 11-rarity;
     }
 
     // This is an unlikely edge case (e.g., if all rarities are invalid).
@@ -96,9 +88,8 @@ class RewardNotifier extends StateNotifier<List<Reward>> {
     // cumulative weight over the random number is the chosen one.
     for (final reward in state) {
       final rarity = reward.rarity > 0 ? reward.rarity : 1;
-      final weight = pow(2, maxRarity - rarity).toInt();
 
-      cumulativeWeight += weight;
+      cumulativeWeight += 11-rarity;
 
       if (randomNumber < cumulativeWeight) {
         return reward;

@@ -88,30 +88,6 @@ class _AddRewardFormState extends ConsumerState<RewardForm> {
     }
   }
 
-  void _testRandomReward() {
-    final randomReward = ref.read(rewardProvider.notifier).getRandomReward();
-    if (randomReward != null) {
-      print('--- 🎲 Random Reward Drawn 🎲 ---');
-      print('Title: ${randomReward.title}');
-      print('Rarity: ${randomReward.rarity}');
-      print('Time: ${randomReward.time} mins'); // Updated print
-      print('---------------------------------');
-    } else {
-      print('--- No rewards available to draw from. ---');
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          randomReward != null
-              ? 'Drawn: ${randomReward.title} (Rarity: ${randomReward.rarity})'
-              : 'No rewards available!',
-        ),
-        duration: const Duration(milliseconds: 1500),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -249,18 +225,6 @@ class _AddRewardFormState extends ConsumerState<RewardForm> {
             child: Text(
               'Rewards are items you can earn by completing tasks. Rarity determines how often a reward might be chosen.',
               style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Center(
-            child: ElevatedButton.icon(
-              onPressed: _testRandomReward,
-              icon: const Icon(Icons.science),
-              label: const Text('Test Random Reward Generation'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade700,
-                foregroundColor: Colors.white,
-              ),
             ),
           ),
         ],
