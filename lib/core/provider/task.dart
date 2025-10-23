@@ -38,7 +38,24 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     }
   }
 
-// In markTaskDone method:
+  // Get tasks that are not displayed (for the popup)
+  List<Task> get hiddenTasks {
+    return state.where((task) => !task.display).toList();
+  }
+
+  // Get tasks that are displayed (for the task list)
+  List<Task> get displayedTasks {
+    return state.where((task) => task.display).toList();
+  }
+
+  // Activate a hidden task (set display = true and decrement appearance)
+  Future<void> activateTask(Task task) async {
+    if (task.activate()) {
+      await updateTask(task);
+    }
+  }
+
+  // Updated markTaskDone method to handle deletion when appearanceCount reaches 0
   Future<void> markTaskDone(Task task, WidgetRef ref) async {
     // Update linked goals
     final goalNotifier = ref.read(goalProvider.notifier);
@@ -58,22 +75,21 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     await repository.recordTaskCompletion(today);
     ref.invalidate(tasksCompletedTodayProvider);
     ref.invalidate(weeklyCompletionsProvider);
-    await deleteTask(task);
-  }
 
-  Future<void> addGoalToTask(Task task, int goalId) async {
-    task.addGoal(goalId);
-    await updateTask(task);
-  }
-
-  Future<void> removeGoalFromTask(Task task, int goalId) async {
-    task.removeGoal(goalId);
-    await updateTask(task);
+    // Delete task only if appearanceCount is 0, otherwise just update
+    if (task.shouldBeDeleted) {
+      await deleteTask(task);
+    } else {
+      // If there are still appearances left, keep the task but mark it as not displayed
+      task.display = false;
+      await updateTask(task);
+    }
   }
 }
 
+// Update the provider to only count displayed tasks
 final tasksNotCompletedCountProvider = Provider<int>((ref) {
-  return ref.watch(taskProvider).length;
+  return ref.watch(taskProvider.notifier).displayedTasks.length;
 });
 
 final weeklyCompletionsProvider =

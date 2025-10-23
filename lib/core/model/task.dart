@@ -1,14 +1,6 @@
-// core/model/task.dart
 import 'package:hive/hive.dart';
 
-// auto build
 part 'task.g.dart';
-
-// hive template for task
-// definition of task: something short and easy to complete and tick off
-// eg: go for a run
-// gets ticked off when completed
-// has zero or more goals that it satisfies
 
 @HiveType(typeId: 1)
 class Task extends HiveObject {
@@ -21,22 +13,40 @@ class Task extends HiveObject {
   @HiveField(2)
   List<int> goalIds;
 
+  @HiveField(3)
+  int appearanceCount; // How many times task appears before completion
+
+  @HiveField(4)
+  int importance; // How important this task is (1-10 scale)
+
+  @HiveField(5)
+  bool display; // Whether task is displayed in the task list
+
   // constructor
   Task({
     required this.title,
     required this.description,
     List<int>? goalIds,
+    required this.appearanceCount,
+    required this.importance,
+    required this.display,
   }) : goalIds = goalIds ?? [];
 
   Task copyWith({
     String? title,
     String? description,
     List<int>? goalIds,
+    int? appearanceCount,
+    int? importance,
+    bool? display,
   }) {
     return Task(
       title: title ?? this.title,
       description: description ?? this.description,
       goalIds: goalIds ?? List<int>.from(this.goalIds),
+      appearanceCount: appearanceCount ?? this.appearanceCount,
+      importance: importance ?? this.importance,
+      display: display ?? this.display,
     );
   }
 
@@ -50,5 +60,27 @@ class Task extends HiveObject {
   // removing goals from the list
   void removeGoal(int goalId) {
     goalIds.remove(goalId);
+  }
+
+  // Decrement appearance count
+  bool decrementAppearance() {
+    if (appearanceCount > 0) {
+      appearanceCount--;
+      return true;
+    }
+    return false;
+  }
+
+  // Check if task should be deleted
+  bool get shouldBeDeleted => appearanceCount <= 0;
+
+  // Activate task for display
+  bool activate() {
+    if (appearanceCount > 0 && !display) {
+      display = true;
+      appearanceCount--;
+      return true;
+    }
+    return false;
   }
 }

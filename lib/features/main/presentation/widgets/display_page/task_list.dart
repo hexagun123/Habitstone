@@ -1,17 +1,19 @@
 // lib/features/main/presentation/widgets/task_list.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../../core/provider/task.dart';
 import '../../../../../core/provider/goal.dart';
 import '../../../../../core/model/task.dart';
-import '../general/reward.dart';
 
 class TaskList extends ConsumerWidget {
   const TaskList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the entire task provider to react to changes
     final tasks = ref.watch(taskProvider);
+    final displayedTasks = tasks.where((task) => task.display).toList();
 
     return Card(
       child: Padding(
@@ -28,26 +30,95 @@ class TaskList extends ConsumerWidget {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                Text(
-                  '${tasks.length} tasks',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withAlpha(153),
-                      ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () => _showAddTaskPopup(context, ref),
+                      tooltip: 'Add Task from Pool',
+                    ),
+                    Text(
+                      '${displayedTasks.length} tasks',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(153),
+                          ),
+                    ),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            tasks.isEmpty
+            displayedTasks.isEmpty
                 ? const _EmptyTasksIndicator()
                 : Column(
-                    children:
-                        tasks.map((task) => TaskListItem(task: task)).toList(),
+                    children: displayedTasks
+                        .map((task) => TaskListItem(task: task))
+                        .toList(),
                   ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showAddTaskPopup(BuildContext context, WidgetRef ref) {
+    final tasks = ref.read(taskProvider);
+    final hiddenTasks = tasks.where((task) => !task.display).toList();
+    final taskNotifier = ref.read(taskProvider.notifier);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Task from Pool'),
+        content: hiddenTasks.isEmpty
+            ? const Text('No hidden tasks available')
+            : SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: hiddenTasks.length,
+                  itemBuilder: (context, index) {
+                    final task = hiddenTasks[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: ListTile(
+                        title: Text(task.title),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (task.description.isNotEmpty)
+                              Text(task.description),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${task.appearanceCount} appearances left',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          taskNotifier.activateTask(task);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Added "${task.title}" to tasks'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }
@@ -79,8 +150,11 @@ class TaskListItem extends ConsumerWidget {
                 fontWeight: FontWeight.w500,
               ),
         ),
-        subtitle: task.description.isNotEmpty
-            ? Text(
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (task.description.isNotEmpty)
+              Text(
                 task.description,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -90,8 +164,17 @@ class TaskListItem extends ConsumerWidget {
                           .onSurface
                           .withAlpha(178),
                     ),
-              )
-            : null,
+              ),
+            const SizedBox(height: 4),
+            Text(
+              '${task.appearanceCount} appearances left',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(153),
+                  ),
+            ),
+          ],
+        ),
         children: [
           // Linked goals section
           if (task.goalIds.isNotEmpty)
@@ -147,7 +230,6 @@ class TaskListItem extends ConsumerWidget {
                         backgroundColor: Colors.green,
                       ),
                     ),
-                    showRewardPopup(context),
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -168,7 +250,7 @@ class TaskListItem extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Edit Task'),
-        content: const Text('Task editing functionality would go here'),
+        content: const Text('Task editing'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -206,7 +288,14 @@ class _EmptyTasksIndicator extends StatelessWidget {
                     color:
                         Theme.of(context).colorScheme.onSurface.withAlpha(153),
                   ),
-            )
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () {
+                context.push('new-task');
+              },
+              child: const Text('Create your first task'),
+            ),
           ],
         ),
       ),
