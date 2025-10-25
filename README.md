@@ -9,13 +9,14 @@ Just as a sculptor reveals statues from marble, your habits carve greatness from
 - Create goals, track task, the fundimental of all
 - Burn the streak
 - Be proud of what you've achieved, and show the graphs to others
+- Finished a task? Have a treat for your great work!
+- Would you like to give your life a bit more random and exciting?
 
 ## Current TODO
 - fix some bugs on graphs
 - fix some color palette issues
 - configure android and linux release
 - implement account: username and password
-- generation of random tasks
 - <del>lure some beta testers</del>
 
 ## Future updates
@@ -33,7 +34,7 @@ Just as a sculptor reveals statues from marble, your habits carve greatness from
 4. Start with flutter run (your device) -> eg: flutter run windows
 
 ## Other methods
-See release for read made windows binary: [https://github.com/hexagun123/csia/releases/tag/v0.0.1-beta]
+See release for read made windows binary: [https://github.com/hexagun123/csia/releases/tag/v0.0.2-beta]
 
 link to web version: [https://wcas-39ffa.web.app]
 
