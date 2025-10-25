@@ -207,11 +207,6 @@ class TaskListItem extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _showEditDialog(context, ref, task),
-                  tooltip: 'Edit Task',
-                ),
-                IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () =>
                       ref.read(taskProvider.notifier).deleteTask(task),
@@ -231,7 +226,7 @@ class TaskListItem extends ConsumerWidget {
                         backgroundColor: Colors.green,
                       ),
                     ),
-                    showRewardPopup(context,ref),
+                    showRewardPopup(context, ref),
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -294,7 +289,7 @@ class _EmptyTasksIndicator extends StatelessWidget {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {
-                context.push('new-task');
+                context.push('/new-task');
               },
               child: const Text('Create your first task'),
             ),

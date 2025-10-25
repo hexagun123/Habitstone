@@ -6,6 +6,7 @@ import '../../../features/main/presentation/pages/new_task.dart';
 import '../../../features/main/presentation/pages/display_page.dart';
 import '../../../features/main/presentation/pages/stats.dart';
 import '../../../features/main/presentation/pages/new_reward.dart';
+import '../../../features/main/presentation/pages/setting.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -40,6 +41,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/new-reward',
         name: 'new-reward',
         builder: (context, state) => const RewardPage(),
+      ),
+      GoRoute(
+        path: '/setting',
+        name: 'setting',
+        builder: (context, state) => const SettingPage(),
       ),
     ],
   );

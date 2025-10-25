@@ -5,6 +5,7 @@ import 'package:streak/features/main/presentation/widgets/display_page/summary_s
 import '../widgets/display_page/chart_section.dart';
 import '../widgets/display_page/goal_list.dart';
 import '../widgets/display_page/task_list.dart';
+import '../widgets/display_page/reward_list.dart';
 
 class DisplayPage extends ConsumerWidget {
   const DisplayPage({super.key});
@@ -25,6 +26,8 @@ class DisplayPage extends ConsumerWidget {
               const ChartSection(),
               const SizedBox(height: 24),
               const GoalList(),
+              const SizedBox(height: 24),
+              const RewardList(),
               const SizedBox(height: 24),
               const TaskList(),
             ],

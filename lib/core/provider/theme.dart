@@ -1,24 +1,22 @@
 // theme.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../provider/hive.dart';
-import '../data/hive.dart';
 import '../theme/app_theme.dart';
+import '../provider/setting.dart';
 
 final themeProvider = StateNotifierProvider<ThemeNotifier, AppThemeMode>((ref) {
-  final repository = ref.watch(hiveRepositoryProvider);
-  return ThemeNotifier(repository);
+  return ThemeNotifier(ref.read(settingsProvider.notifier));
 });
 
 class ThemeNotifier extends StateNotifier<AppThemeMode> {
-  final HiveRepository _repository;
+  final SettingsNotifier _settingsNotifier;
 
-  ThemeNotifier(this._repository)
-      : super(_repository.getThemeMode() ?? AppThemeMode.light);
+  ThemeNotifier(this._settingsNotifier) : super(_settingsNotifier.state.themeMode);
+
   Future<void> setTheme(AppThemeMode mode) async {
     if (state != mode) {
       state = mode;
-      await _repository.saveThemeMode(mode);
+      await _settingsNotifier.updateThemeMode(mode);
     }
   }
 }

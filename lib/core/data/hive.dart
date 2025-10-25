@@ -6,6 +6,7 @@ import '../model/task.dart';
 import '../model/reward.dart'; // Import the Reward model
 import 'util.dart';
 import '../theme/app_theme.dart';
+import '../model/settings.dart';
 
 // the repo class
 class HiveRepository {
@@ -23,16 +24,59 @@ class HiveRepository {
   Box<Task>? _tasksBox;
   Box<Reward>? _rewardsBox; // New rewards box attribute
   Box<Map>? _dailyBox;
-  Box<Map>? _settingsBox;
+  Box<Settings>? _settingsBox;
 
-  // Initialize all boxes
+  // Update init method
   Future<void> init() async {
     _goalsBox = await Hive.openBox<Goal>(_goalsBoxName);
     _tasksBox = await Hive.openBox<Task>(_tasksBoxName);
-    _rewardsBox =
-        await Hive.openBox<Reward>(_rewardsBoxName); // Initialize rewards box
+    _rewardsBox = await Hive.openBox<Reward>(_rewardsBoxName);
     _dailyBox = await Hive.openBox<Map>(_dailyBoxName);
-    _settingsBox = await Hive.openBox<Map>(_settingsBoxName);
+    _settingsBox = await Hive.openBox<Settings>(_settingsBoxName);
+
+    // Initialize default setting if none exist
+  }
+
+  Settings getSettings() {
+    try {
+      if (_settingsBox == null || _settingsBox!.isEmpty) {
+        return Settings.create();
+      }
+
+      final dynamic data = _settingsBox!.values.first;
+
+      // Double-check it's actually a Settings object
+      if (data is Settings) {
+        return data;
+      } else {
+        print('Warning: Expected Settings but got ${data.runtimeType}');
+        return Settings.create();
+      }
+    } catch (e) {
+      print('Error in getSettings: $e');
+      return Settings.create();
+    }
+  }
+
+  Future<void> updateSettings(Settings settings) async {
+    if (_settingsBox!.isNotEmpty) {
+      final key = _settingsBox!.keys.first;
+      await _settingsBox!.put(key, settings);
+    } else {
+      await _settingsBox!.add(settings);
+    }
+  }
+
+  Future<void> updateThemeMode(AppThemeMode themeMode) async {
+    final currentSettings = getSettings();
+    final updatedSettings = currentSettings.copyWith(themeMode: themeMode);
+    await updateSettings(updatedSettings);
+  }
+
+  Future<void> updateWeight(int weight) async {
+    final currentSettings = getSettings();
+    final updatedSettings = currentSettings.copyWith(weight: weight);
+    await updateSettings(updatedSettings);
   }
 
   // getters
@@ -87,19 +131,19 @@ class HiveRepository {
     return count;
   }
 
-  Future<void> saveThemeMode(AppThemeMode mode) async {
-    await _settingsBox?.put('theme', {'mode': mode.index});
-  }
+  // In HiveRepository class
+  Future<void> clearCorruptedSettings() async {
+    try {
+      await _settingsBox?.close();
+      await Hive.deleteBoxFromDisk(_settingsBoxName);
+      _settingsBox = await Hive.openBox<Settings>(_settingsBoxName);
 
-  AppThemeMode? getThemeMode() {
-    final data = _settingsBox?.get('theme');
-    if (data != null && data['mode'] is int) {
-      final index = data['mode'] as int;
-      if (index < AppThemeMode.values.length) {
-        final mode = AppThemeMode.values[index];
-        return mode;
+      // Initialize with default settings
+      if (_settingsBox!.isEmpty) {
+        await _settingsBox!.add(Settings.create());
       }
+    } catch (e) {
+      print('Error clearing settings: $e');
     }
-    return null;
   }
 }

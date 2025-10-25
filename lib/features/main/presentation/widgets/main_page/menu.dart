@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/provider/theme.dart';
-import '../../../../../core/theme/app_theme.dart';
 
 class NavigationMenu extends ConsumerWidget {
   final Function(String) onNavigate;
@@ -13,7 +12,6 @@ class NavigationMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentTheme = ref.watch(themeProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -65,20 +63,12 @@ class NavigationMenu extends ConsumerWidget {
                   const Divider(),
                   const SizedBox(height: 16),
                   //temp
-                  _buildMenuItem(
-                    context,
-                    icon: getThemeIcon(currentTheme),
-                    title: 'Theme: ${AppTheme.getThemeName(currentTheme)}',
-                    onTap: () {
-                      final nextTheme = getNextTheme(currentTheme);
-                      ref.read(themeProvider.notifier).setTheme(nextTheme);
-                    },
-                  ),
+
                   _buildMenuItem(
                     context,
                     icon: Icons.settings_outlined,
                     title: 'Settings',
-                    onTap: () {},
+                    onTap: () => onNavigate('setting'),
                   ),
                 ],
               ),
