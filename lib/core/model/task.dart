@@ -14,13 +14,13 @@ class Task extends HiveObject {
   List<int> goalIds;
 
   @HiveField(3)
-  int appearanceCount; // How many times task appears before completion
+  late int appearanceCount; // How many times task appears before completion
 
   @HiveField(4)
-  int importance; // How important this task is (1-10 scale)
+  late int importance; // How important this task is (1-10 scale)
 
   @HiveField(5)
-  bool display; // Whether task is displayed in the task list
+  late bool display; // Whether task is displayed in the task list
 
   // constructor
   Task({

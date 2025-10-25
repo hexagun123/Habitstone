@@ -83,7 +83,11 @@ class _RewardPopupState extends ConsumerState<RewardPopup> {
   }
 }
 
-void showRewardPopup(BuildContext context) {
+void showRewardPopup(BuildContext context, WidgetRef ref) {
+  final reward = ref.watch(rewardProvider);
+  if (reward.isEmpty) {
+    return; // No rewards to show
+  }
   showDialog(
     context: context,
     barrierDismissible: false, // User must tap button to close

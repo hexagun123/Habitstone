@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/provider/task.dart';
 import '../../../../../core/provider/goal.dart';
 import '../../../../../core/model/task.dart';
+import '../general/reward.dart';
 
 class TaskList extends ConsumerWidget {
   const TaskList({super.key});
@@ -230,6 +231,7 @@ class TaskListItem extends ConsumerWidget {
                         backgroundColor: Colors.green,
                       ),
                     ),
+                    showRewardPopup(context,ref),
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
