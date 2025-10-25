@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:streak/features/main/presentation/widgets/display_page/summary_section.dart';
 import '../widgets/display_page/chart_section.dart';
 import '../widgets/display_page/goal_list.dart';
-import '../widgets/display_page/task_list.dart';
+import '../widgets/display_page/task_list/task_list.dart';
 import '../widgets/display_page/reward_list.dart';
 
 class DisplayPage extends ConsumerWidget {

@@ -1,9 +1,11 @@
 // providers/task_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math'; // Add this import
 import '../model/task.dart';
 import 'goal.dart';
 import '../data/util.dart';
 import '../provider/hive.dart';
+import '../provider/setting.dart'; // Add this import
 import '../../main.dart';
 
 final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
@@ -38,26 +40,21 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     }
   }
 
-  // Get tasks that are not displayed (for the popup)
   List<Task> get hiddenTasks {
     return state.where((task) => !task.display).toList();
   }
 
-  // Get tasks that are displayed (for the task list)
   List<Task> get displayedTasks {
     return state.where((task) => task.display).toList();
   }
 
-  // Activate a hidden task (set display = true and decrement appearance)
   Future<void> activateTask(Task task) async {
     if (task.activate()) {
       await updateTask(task);
     }
   }
 
-  // Updated markTaskDone method to handle deletion when appearanceCount reaches 0
   Future<void> markTaskDone(Task task, WidgetRef ref) async {
-    // Update linked goals
     final goalNotifier = ref.read(goalProvider.notifier);
     final goals = ref.read(goalProvider);
 
@@ -70,24 +67,76 @@ class TaskNotifier extends StateNotifier<List<Task>> {
       }
     }
 
-    // Record daily completion
     final today = DateUtil.now().toString();
     await repository.recordTaskCompletion(today);
     ref.invalidate(tasksCompletedTodayProvider);
     ref.invalidate(weeklyCompletionsProvider);
 
-    // Delete task only if appearanceCount is 0, otherwise just update
     if (task.shouldBeDeleted) {
       await deleteTask(task);
     } else {
-      // If there are still appearances left, keep the task but mark it as not displayed
       task.display = false;
       await updateTask(task);
     }
   }
+
+  Task? getWeightedTask(WidgetRef ref) {
+    final activeTasks = hiddenTasks;
+
+    if (activeTasks.isEmpty) return null;
+    if (activeTasks.length == 1) return activeTasks.first;
+
+    final currentWeight = ref.read(settingsProvider).weight;
+    int totalWeight = 0;
+    final List<int> weights = [];
+
+    for (final task in activeTasks) {
+      final weightValue = _calculateTaskWeight(task, currentWeight);
+      weights.add(weightValue);
+      totalWeight += weightValue;
+    }
+
+    if (totalWeight == 0) {
+      return activeTasks[Random().nextInt(activeTasks.length)];
+    }
+
+    final randomNumber = Random().nextInt(totalWeight);
+    int cumulativeWeight = 0;
+
+    for (int i = 0; i < activeTasks.length; i++) {
+      cumulativeWeight += weights[i];
+      if (randomNumber < cumulativeWeight) {
+        return activeTasks[i];
+      }
+    }
+
+    return activeTasks.last;
+  }
+
+  int _calculateTaskWeight(Task task, int settingWeight) {
+    final appearance = task.appearanceCount;
+    final importance = task.importance;
+
+    final exponent = (5 - settingWeight).toDouble();
+    final appearanceComponent = pow(appearance, exponent) * 8;
+    final importanceComponent = importance * 12;
+
+    final totalWeight = (appearanceComponent + importanceComponent).toInt();
+
+    return totalWeight.clamp(1, 1000);
+  }
+
+  /// Activates a random weighted task for display
+  Future<bool> activateWeightedTask(WidgetRef ref) async {
+    final task = getWeightedTask(ref);
+    if (task != null) {
+      await activateTask(task);
+      return true;
+    }
+    return false;
+  }
 }
 
-// Update the provider to only count displayed tasks
 final tasksNotCompletedCountProvider = Provider<int>((ref) {
   return ref.watch(taskProvider.notifier).displayedTasks.length;
 });
