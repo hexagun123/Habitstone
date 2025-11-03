@@ -1,23 +1,24 @@
-// lib/core/model/settings.dart
+// core/model/settings.dart
 import 'package:hive/hive.dart';
 import '../theme/app_theme.dart';
 
 part 'settings.g.dart';
 
 @HiveType(typeId: 3)
-class Settings extends HiveObject {
+// --- THE FIX: REMOVE "extends HiveObject" ---
+class Settings { 
   @HiveField(0)
-  late int themeModeIndex;
+  int themeModeIndex; // Removed 'late'
 
   @HiveField(1)
-  late int weight;
+  int weight; // Removed 'late'
 
   Settings({
     required this.themeModeIndex,
     required this.weight,
   });
 
-  // Getter to convert index to AppThemeMode
+  // This part is unchanged
   AppThemeMode get themeMode {
     if (themeModeIndex >= 0 && themeModeIndex < AppThemeMode.values.length) {
       return AppThemeMode.values[themeModeIndex];
@@ -25,15 +26,17 @@ class Settings extends HiveObject {
     return AppThemeMode.light;
   }
 
-  // Setter to convert AppThemeMode to index
   set themeMode(AppThemeMode mode) {
     themeModeIndex = mode.index;
   }
 
-  // Default constructor
-  Settings.create()
-      : themeModeIndex = AppThemeMode.light.index,
-        weight = 5;
+  // Factory constructor for defaults
+  factory Settings.create() {
+    return Settings(
+      themeModeIndex: AppThemeMode.light.index,
+      weight: 5,
+    );
+  }
 
   Settings copyWith({
     AppThemeMode? themeMode,

@@ -91,7 +91,7 @@ class TaskList extends ConsumerWidget {
                     return NewTaskPopUp(
                       task: task,
                       onActivate: () => taskNotifier.activateTask(task),
-                      onRandomize: () => taskNotifier.activateWeightedTask(ref),
+                      onRandomize: () => taskNotifier.activateWeightedTask(),
                     );
                   },
                 ),

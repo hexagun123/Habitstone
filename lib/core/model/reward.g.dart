@@ -21,13 +21,14 @@ class RewardAdapter extends TypeAdapter<Reward> {
       description: fields[1] as String,
       time: fields[2] as int,
       rarity: fields[3] as int,
+      id: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Reward obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class RewardAdapter extends TypeAdapter<Reward> {
       ..writeByte(2)
       ..write(obj.time)
       ..writeByte(3)
-      ..write(obj.rarity);
+      ..write(obj.rarity)
+      ..writeByte(4)
+      ..write(obj.id);
   }
 
   @override

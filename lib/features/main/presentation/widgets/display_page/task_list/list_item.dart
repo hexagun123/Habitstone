@@ -98,7 +98,7 @@ class TaskListItem extends ConsumerWidget {
                   icon: const Icon(Icons.check),
                   label: const Text('Mark Done'),
                   onPressed: () => {
-                    ref.read(taskProvider.notifier).markTaskDone(task, ref),
+                    ref.read(taskProvider.notifier).markTaskDone(task),
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Task Done!'),

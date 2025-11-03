@@ -2,13 +2,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/settings.dart';
 import '../data/hive.dart';
-import '../../main.dart';
+import 'hive.dart'; 
 import '../theme/app_theme.dart';
 
+// 3. This is the only part that changes
 final settingsProvider = StateNotifierProvider<SettingsNotifier, Settings>((ref) {
-  return SettingsNotifier(repository);
+  // Instead of using the global 'repository'...
+  // ...we now watch the provider to get the HiveRepository instance.
+  final hiveRepository = ref.watch(hiveRepositoryProvider);
+  
+  // Then, we pass that instance to our notifier.
+  return SettingsNotifier(hiveRepository);
 });
 
+// The SettingsNotifier class is already correct and needs NO changes.
 class SettingsNotifier extends StateNotifier<Settings> {
   final HiveRepository _repository;
 

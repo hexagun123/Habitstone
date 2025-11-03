@@ -95,7 +95,7 @@ class GoalList extends ConsumerWidget {
                 title: titleController.text,
                 description: descriptionController.text,
               );
-              ref.read(goalProvider.notifier).updateGoal(goal, updatedGoal);
+              ref.read(goalProvider.notifier).updateGoal(updatedGoal);
               Navigator.pop(context);
             },
             child: const Text('Save'),

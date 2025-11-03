@@ -19,17 +19,18 @@ class TaskAdapter extends TypeAdapter<Task> {
     return Task(
       title: fields[0] as String,
       description: fields[1] as String,
-      goalIds: (fields[2] as List?)?.cast<int>(),
+      goalIds: (fields[2] as List?)?.cast<String>(),
       appearanceCount: fields[3] as int,
       importance: fields[4] as int,
       display: fields[5] as bool,
+      id: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(4)
       ..write(obj.importance)
       ..writeByte(5)
-      ..write(obj.display);
+      ..write(obj.display)
+      ..writeByte(6)
+      ..write(obj.id);
   }
 
   @override

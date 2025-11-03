@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 part 'task.g.dart';
 
@@ -11,58 +12,110 @@ class Task extends HiveObject {
   String description;
 
   @HiveField(2)
-  List<int> goalIds;
+  List<String> goalIds; // Changed to List<String>
 
   @HiveField(3)
-  late int appearanceCount; // How many times task appears before completion
+  late int appearanceCount;
 
   @HiveField(4)
-  late int importance; // How important this task is (1-10 scale)
+  late int importance;
 
   @HiveField(5)
-  late bool display; // Whether task is displayed in the task list
+  late bool display;
 
-  // constructor
-  Task({
+  @HiveField(6) // New field
+  late String id;
+
+  // Private constructor
+  Task._({
     required this.title,
     required this.description,
-    List<int>? goalIds,
+    required this.goalIds,
     required this.appearanceCount,
     required this.importance,
     required this.display,
-  }) : goalIds = goalIds ?? [];
+    required this.id,
+  });
 
-  Task copyWith({
-    String? title,
-    String? description,
-    List<int>? goalIds,
-    int? appearanceCount,
-    int? importance,
-    bool? display,
+  // Public factory constructor
+  factory Task({
+    required String title,
+    required String description,
+    List<String>? goalIds,
+    required int appearanceCount,
+    required int importance,
+    required bool display,
+    String? id,
   }) {
-    return Task(
-      title: title ?? this.title,
-      description: description ?? this.description,
-      goalIds: goalIds ?? List<int>.from(this.goalIds),
-      appearanceCount: appearanceCount ?? this.appearanceCount,
-      importance: importance ?? this.importance,
-      display: display ?? this.display,
+    final newId = id ?? const Uuid().v4();
+    final newGoalIds = goalIds ?? [];
+
+    return Task._(
+      title: title,
+      description: description,
+      goalIds: newGoalIds,
+      appearanceCount: appearanceCount,
+      importance: importance,
+      display: display,
+      id: newId,
     );
   }
 
-  // adding goals to the list
-  void addGoal(int goalId) {
+  // --- Methods for Firebase ---
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task._(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      goalIds: List<String>.from(json['goalIds']),
+      appearanceCount: json['appearanceCount'],
+      importance: json['importance'],
+      display: json['display'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'goalIds': goalIds,
+      'appearanceCount': appearanceCount,
+      'importance': importance,
+      'display': display,
+    };
+  }
+
+  void addGoal(String goalId) {
     if (!goalIds.contains(goalId)) {
       goalIds.add(goalId);
     }
   }
 
-  // removing goals from the list
-  void removeGoal(int goalId) {
+  void removeGoal(String goalId) {
     goalIds.remove(goalId);
   }
 
-  // Decrement appearance count
+  Task copyWith({
+    String? title,
+    String? description,
+    List<String>? goalIds,
+    int? appearanceCount,
+    int? importance,
+    bool? display,
+    String? id,
+  }) {
+    return Task._(
+      title: title ?? this.title,
+      description: description ?? this.description,
+      goalIds: goalIds ?? List<String>.from(this.goalIds),
+      appearanceCount: appearanceCount ?? this.appearanceCount,
+      importance: importance ?? this.importance,
+      display: display ?? this.display,
+      id: id ?? this.id,
+    );
+  }
+
   bool decrementAppearance() {
     if (appearanceCount > 0) {
       appearanceCount--;
@@ -71,10 +124,8 @@ class Task extends HiveObject {
     return false;
   }
 
-  // Check if task should be deleted
   bool get shouldBeDeleted => appearanceCount <= 0;
 
-  // Activate task for display
   bool activate() {
     if (appearanceCount > 0 && !display) {
       display = true;

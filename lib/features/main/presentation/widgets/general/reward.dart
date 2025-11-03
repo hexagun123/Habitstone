@@ -14,6 +14,8 @@ class RewardPopup extends ConsumerStatefulWidget {
 class _RewardPopupState extends ConsumerState<RewardPopup> {
   Reward? _currentReward;
   int _remainingTime = 0;
+  int _remainingMinutes = 0;
+  int _remainingSeconds = 0;
   Timer? _timer;
 
   @override
@@ -27,7 +29,9 @@ class _RewardPopupState extends ConsumerState<RewardPopup> {
     if (reward != null) {
       setState(() {
         _currentReward = reward;
-        _remainingTime = reward.time;
+        _remainingTime = reward.time * 60;
+        _remainingMinutes = _remainingTime ~/ 60;
+        _remainingSeconds = _remainingTime % 60;
       });
       _startTimer();
     }
@@ -38,6 +42,8 @@ class _RewardPopupState extends ConsumerState<RewardPopup> {
       setState(() {
         if (_remainingTime > 0) {
           _remainingTime--;
+          _remainingMinutes = _remainingTime ~/ 60;
+          _remainingSeconds = _remainingTime % 60;
         } else {
           _closePopup();
         }
@@ -70,7 +76,7 @@ class _RewardPopupState extends ConsumerState<RewardPopup> {
         children: [
           Text(_currentReward!.description),
           const SizedBox(height: 16),
-          Text('Time remaining: $_remainingTime seconds'),
+          Text('Time remaining: $_remainingMinutes:$_remainingSeconds'),
         ],
       ),
       actions: [

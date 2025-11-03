@@ -20,7 +20,7 @@ class TaskPopup extends ConsumerWidget {
         ),
         ElevatedButton(
           onPressed: () async {
-            final success = await taskNotifier.activateWeightedTask(ref);
+            final success = await taskNotifier.activateWeightedTask();
             if (success) {
               Navigator.pop(context);
             } else {

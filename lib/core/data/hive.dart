@@ -1,149 +1,140 @@
-// core/data/hive.dart
-// the hive repository for local data storage
 import 'package:hive/hive.dart';
 import '../model/goal.dart';
 import '../model/task.dart';
-import '../model/reward.dart'; // Import the Reward model
+import '../model/reward.dart';
 import 'util.dart';
 import '../theme/app_theme.dart';
 import '../model/settings.dart';
 
-// the repo class
 class HiveRepository {
-  // three boxes to be opened
-  // goal task and daily - daily checks for statistics of daily completion
-  // id to the box
+  // --- Unchanged Section ---
   static const String _goalsBoxName = 'goals_box';
   static const String _tasksBoxName = 'tasks_box';
-  static const String _rewardsBoxName = 'rewards_box'; // New rewards box name
+  static const String _rewardsBoxName = 'rewards_box';
   static const String _dailyBoxName = 'daily_box';
   static const String _settingsBoxName = 'settings_box';
 
-// boxes attribute
+  // --- NEW: A constant key for our settings object ---
+  static const String _settingsKey = 'current_settings';
+
   Box<Goal>? _goalsBox;
   Box<Task>? _tasksBox;
-  Box<Reward>? _rewardsBox; // New rewards box attribute
+  Box<Reward>? _rewardsBox;
   Box<Map>? _dailyBox;
   Box<Settings>? _settingsBox;
 
-  // Update init method
   Future<void> init() async {
     _goalsBox = await Hive.openBox<Goal>(_goalsBoxName);
     _tasksBox = await Hive.openBox<Task>(_tasksBoxName);
     _rewardsBox = await Hive.openBox<Reward>(_rewardsBoxName);
     _dailyBox = await Hive.openBox<Map>(_dailyBoxName);
+    // The settings box now stores a plain Settings object, not a HiveObject
     _settingsBox = await Hive.openBox<Settings>(_settingsBoxName);
-
-    // Initialize default setting if none exist
   }
 
+  // --- REWRITTEN SETTINGS LOGIC ---
+
+  /// Saves the provided settings object to the box with a fixed key.
+  Future<void> _saveSettings(Settings settings) async {
+    await _settingsBox?.put(_settingsKey, settings);
+  }
+
+  /// Gets the settings object. If it doesn't exist, it creates, saves, and returns it.
   Settings getSettings() {
-    try {
-      if (_settingsBox == null || _settingsBox!.isEmpty) {
-        return Settings.create();
-      }
-
-      final dynamic data = _settingsBox!.values.first;
-
-      // Double-check it's actually a Settings object
-      if (data is Settings) {
-        return data;
-      } else {
-        print('Warning: Expected Settings but got ${data.runtimeType}');
-        return Settings.create();
-      }
-    } catch (e) {
-      print('Error in getSettings: $e');
-      return Settings.create();
+    // Try to get the settings object using our constant key.
+    final settings = _settingsBox?.get(_settingsKey);
+    if (settings == null) {
+      print("No settings found, creating defaults.");
+      final defaultSettings = Settings.create();
+      // Save the new default settings for next time.
+      _saveSettings(defaultSettings);
+      return defaultSettings;
     }
+    return settings;
   }
 
-  Future<void> updateSettings(Settings settings) async {
-    if (_settingsBox!.isNotEmpty) {
-      final key = _settingsBox!.keys.first;
-      await _settingsBox!.put(key, settings);
-    } else {
-      await _settingsBox!.add(settings);
-    }
-  }
-
+  /// Updates the theme using the "get-copy-save" pattern.
   Future<void> updateThemeMode(AppThemeMode themeMode) async {
     final currentSettings = getSettings();
+    // Create a new, updated copy.
     final updatedSettings = currentSettings.copyWith(themeMode: themeMode);
-    await updateSettings(updatedSettings);
+    // Save the new copy, overwriting the old one.
+    await _saveSettings(updatedSettings);
   }
 
+  /// Updates the weight using the "get-copy-save" pattern.
   Future<void> updateWeight(int weight) async {
     final currentSettings = getSettings();
     final updatedSettings = currentSettings.copyWith(weight: weight);
-    await updateSettings(updatedSettings);
+    await _saveSettings(updatedSettings);
   }
 
-  // getters
+  // --- The rest of the file is correct and unchanged ---
   List<Goal> getGoals() => _goalsBox?.values.toList() ?? [];
   List<Task> getTasks() => _tasksBox?.values.toList() ?? [];
-  List<Reward> getRewards() =>
-      _rewardsBox?.values.toList() ?? []; // New rewards getter
+  List<Reward> getRewards() => _rewardsBox?.values.toList() ?? [];
 
-  // crud for goal and task
-  Future<void> addGoal(Goal goal) async => await _goalsBox?.add(goal);
-  Future<void> updateGoal(int key, Goal goal) async =>
-      await _goalsBox?.put(key, goal);
-  Future<void> deleteGoal(int key) async => await _goalsBox?.delete(key);
+  Future<void> addGoal(Goal goal) async => await _goalsBox?.put(goal.id, goal);
+  Future<void> updateGoal(String id, Goal goal) async =>
+      await _goalsBox?.put(id, goal);
+  Future<void> deleteGoal(String id) async => await _goalsBox?.delete(id);
 
-  Future<void> addTask(Task task) async => await _tasksBox?.add(task);
-  Future<void> updateTask(int key, Task task) async =>
-      await _tasksBox?.put(key, task);
-  Future<void> deleteTask(int key) async => await _tasksBox?.delete(key);
+  Future<void> addTask(Task task) async => await _tasksBox?.put(task.id, task);
+  Future<void> updateTask(String id, Task task) async =>
+      await _tasksBox?.put(id, task);
+  Future<void> deleteTask(String id) async => await _tasksBox?.delete(id);
 
-  // --- CRUD for Reward ---
-  Future<void> addReward(Reward reward) async => await _rewardsBox?.add(reward);
-  Future<void> updateReward(int key, Reward reward) async =>
-      await _rewardsBox?.put(key, reward);
-  Future<void> deleteReward(int key) async => await _rewardsBox?.delete(key);
+  Future<void> addReward(Reward reward) async =>
+      await _rewardsBox?.put(reward.id, reward);
+  Future<void> updateReward(String id, Reward reward) async =>
+      await _rewardsBox?.put(id, reward);
+  Future<void> deleteReward(String id) async => await _rewardsBox?.delete(id);
+  Box<Goal>? get goalsBox => _goalsBox;
+  Box<Task>? get tasksBox => _tasksBox;
+  Box<Reward>? get rewardsBox => _rewardsBox;
 
-  // function to call then task is completed
-  // to record stats
-  // can be on what ever date for later impletmentation of delayed task?
+  // --- STATS METHODS ---
   Future<void> recordTaskCompletion(String date) async {
     final count = getTaskCompletionCount(date);
-
-    // update the new value
     await _dailyBox!.put(date, {'count': count + 1});
   }
 
-  // function to get the statistics
-  // basically the same procedure
   int getTaskCompletionCount(String? date) {
     if (_dailyBox == null) return 0;
-
     date ??= DateUtil.now().toString();
-
-    // Get data
     final dynamicData = _dailyBox!.get(date, defaultValue: {'count': 0});
     final Map data = dynamicData is Map ? dynamicData : {'count': 0};
-
-    // extract value
     int count = (data['count'] is int)
         ? data['count'] as int
         : int.tryParse(data['count'].toString()) ?? 0;
-
     return count;
   }
 
-  // In HiveRepository class
+  // --- SYNC & UTILITY METHODS ---
   Future<void> clearCorruptedSettings() async {
     try {
       await _settingsBox?.close();
       await Hive.deleteBoxFromDisk(_settingsBoxName);
       _settingsBox = await Hive.openBox<Settings>(_settingsBoxName);
-
-      // Initialize with default settings
       if (_settingsBox!.isEmpty) {
         await _settingsBox!.add(Settings.create());
       }
     } catch (e) {
       print('Error clearing settings: $e');
     }
+  }
+
+  Future<void> cacheAllData({
+    required List<Goal> goals,
+    required List<Task> tasks,
+    required List<Reward> rewards,
+  }) async {
+    await _goalsBox?.clear();
+    await _tasksBox?.clear();
+    await _rewardsBox?.clear();
+
+    await _goalsBox?.putAll({for (var g in goals) g.id: g});
+    await _tasksBox?.putAll({for (var t in tasks) t.id: t});
+    await _rewardsBox?.putAll({for (var r in rewards) r.id: r});
   }
 }

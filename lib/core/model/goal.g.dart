@@ -22,13 +22,14 @@ class GoalAdapter extends TypeAdapter<Goal> {
       streak: fields[2] as int,
       lastUpdate: fields[3] as DateTime?,
       updated: fields[4] as bool,
+      id: fields[5] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Goal obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class GoalAdapter extends TypeAdapter<Goal> {
       ..writeByte(3)
       ..write(obj.lastUpdate)
       ..writeByte(4)
-      ..write(obj.updated);
+      ..write(obj.updated)
+      ..writeByte(5)
+      ..write(obj.id);
   }
 
   @override

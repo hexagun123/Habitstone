@@ -1,18 +1,12 @@
-// core/model/goal.dart
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../data/util.dart';
 
-// prompt auto generation
 part 'goal.g.dart';
-
-// hive object of goal
-// definition of a goal: something long term that one might want to work on
-// eg: physical health
-// that one is willing to give consistent effort creating tasks to work on
 
 @HiveType(typeId: 0)
 class Goal extends HiveObject {
-  // fields
   @HiveField(0)
   String title;
 
@@ -28,38 +22,86 @@ class Goal extends HiveObject {
   @HiveField(4)
   bool updated;
 
-  // constructor
-  Goal({
-    // attributes
+  @HiveField(5) // New field
+  late String id;
+
+  // Private constructor for internal use by the factory.
+  Goal._({
     required this.title,
     required this.description,
-    this.streak = 0, // streak is automaticlly set to zero
-    DateTime? lastUpdate,
-    this.updated = false,
-  }) : lastUpdate = lastUpdate ??
-            DateUtil.now() // straight into utc
-                .subtract(const Duration(days: 10));
+    required this.streak,
+    required this.lastUpdate,
+    required this.updated,
+    required this.id,
+  });
 
-  // copywith
+  // Public factory constructor for creating instances.
+  factory Goal({
+    required String title,
+    required String description,
+    int streak = 0,
+    DateTime? lastUpdate,
+    bool updated = false,
+    String? id,
+  }) {
+    // Handle default values and ID generation here.
+    final newId = id ?? const Uuid().v4();
+    final newLastUpdate = lastUpdate ?? DateUtil.now().subtract(const Duration(days: 10));
+
+    // Call the private constructor to create the instance.
+    return Goal._(
+      title: title,
+      description: description,
+      streak: streak,
+      lastUpdate: newLastUpdate,
+      updated: updated,
+      id: newId,
+    );
+  }
+  
+  // --- Methods for Firebase ---
+  factory Goal.fromJson(Map<String, dynamic> json) {
+    return Goal._(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      streak: json['streak'],
+      lastUpdate: (json['lastUpdate'] as Timestamp).toDate(),
+      updated: json['updated'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'streak': streak,
+      'lastUpdate': lastUpdate,
+      'updated': updated,
+    };
+  }
+  
   Goal copyWith({
     String? title,
     String? description,
     int? streak,
     DateTime? lastUpdate,
     bool? updated,
+    String? id,
   }) {
-    return Goal(
+    return Goal._(
       title: title ?? this.title,
       description: description ?? this.description,
       streak: streak ?? this.streak,
       lastUpdate: lastUpdate ?? this.lastUpdate,
       updated: updated ?? this.updated,
+      id: id ?? this.id,
     );
   }
 
-  // to string for easy debug
   @override
   String toString() {
-    return 'Goal{title: $title, streak: $streak, lastUpdate: $lastUpdate, updated: $updated}';
+    return 'Goal{id: $id, title: $title, streak: $streak}';
   }
 }

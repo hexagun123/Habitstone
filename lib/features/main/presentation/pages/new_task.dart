@@ -35,7 +35,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   final _descriptionController = TextEditingController();
   final _appearanceController = TextEditingController(text: '1');
   bool _isSubmitting = false;
-  List<int> _selectedGoalIds = [];
+  List<String> _selectedGoalIds = [];
 
   int _appearanceCount = 1;
   int _importance = 5;
@@ -136,7 +136,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     }
   }
 
-  void _toggleGoalSelection(int goalId) {
+  void _toggleGoalSelection(String goalId) {
     setState(() {
       if (_selectedGoalIds.contains(goalId)) {
         _selectedGoalIds.remove(goalId);
