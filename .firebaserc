@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "wcas-39ffa"
-  }
+    "default": "wcas-39ffa",
+    "production": "habitstone-de992"
+  },
+  "targets": {},
+  "etags": {}
 }

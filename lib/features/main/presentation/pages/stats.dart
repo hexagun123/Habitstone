@@ -159,24 +159,39 @@ class _StatRowPlaceholder extends StatelessWidget {
               color: iconColor ?? colorScheme.onSurfaceVariant, size: 20),
           const SizedBox(width: 12),
         ],
-        Text(
-          label,
-          style: textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
+
+        // --- THE FIX IS HERE ---
+        // 1. Wrap the flexible parts of the Row in an Expanded widget.
+        // This tells the Row to give all remaining space to this group.
         Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              '.' * 50,
-              maxLines: 1,
-              overflow: TextOverflow.clip,
-              // 102 is ~40% opaque
-              style: TextStyle(color: colorScheme.outline.withAlpha(102)),
-            ),
+          child: Row(
+            children: [
+              // 2. The Text now has a defined parent, so it's not expanding infinitely.
+              Text(
+                label,
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+
+              // 3. This Expanded now works correctly. It asks its parent Row:
+              // "How much space is left?" and fills it. This is a finite amount.
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    '.' * 50,
+                    maxLines: 1,
+                    overflow: TextOverflow.clip,
+                    style: TextStyle(color: colorScheme.outline.withAlpha(102)),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
+
+        // 4. The value placeholder is outside the Expanded, so it retains its fixed width.
         Container(
           height: 20.0,
           width: valueWidth,

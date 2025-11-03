@@ -6,7 +6,7 @@ import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
 import '../auth/auth_service.dart';
 import '../data/sync.dart';
 import 'app.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../model/environment.dart';
 
 final firebaseSyncProvider = Provider<FirebaseSync>((ref) {
   // The sync service needs the Hive repository to do its job
@@ -14,28 +14,25 @@ final firebaseSyncProvider = Provider<FirebaseSync>((ref) {
   return FirebaseSync(hiveRepo);
 });
 
-
-
 // Provider that creates the correctly configured GoogleSignIn instance
 final googleSignInProvider = Provider<GoogleSignIn>((ref) {
-  final String webClientId = dotenv.env['WEB_CLIENT_ID']!;
-  final String desktopClientId = dotenv.env['DESKTOP_CLIENT_ID']!;
-  final String desktopClientSecret = dotenv.env['DESKTOP_CLIENT_SECRET']!;
-
   GoogleSignInParams params;
-
   if (kIsWeb) {
-    params =
-        GoogleSignInParams(clientId: webClientId, scopes: ['email', 'profile']);
+    params = GoogleSignInParams(
+      clientId: Environment.webClientId,
+      scopes: ['email', 'profile'],
+    );
   } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     params = GoogleSignInParams(
-      clientId: desktopClientId,
-      clientSecret: desktopClientSecret,
+      clientId: Environment.desktopClientId,
+      clientSecret: Environment.desktopClientSecret,
       scopes: ['email', 'profile'],
       redirectPort: 3000,
     );
   } else {
-    params = const GoogleSignInParams(scopes: ['email', 'profile']);
+    params = const GoogleSignInParams(
+      scopes: ['email', 'profile'],
+    );
   }
 
   return GoogleSignIn(params: params);
