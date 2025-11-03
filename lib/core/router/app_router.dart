@@ -1,9 +1,3 @@
-// core/router/app_router.dart
-
-import 'dart:async';
-import 'package:flutter/material.dart';
-// core/router/app_router.dart
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,24 +12,19 @@ import '../../../features/main/presentation/pages/stats.dart';
 import '../../../features/main/presentation/pages/new_reward.dart';
 import '../../../features/main/presentation/pages/setting.dart';
 import '../../../features/main/presentation/pages/sign_in.dart';
-import '../../../features/main/presentation/pages/sign_in.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
+  final authStream = ref.watch(authStateProvider.stream);
 
   return GoRouter(
     initialLocation: '/',
 
-    // This is still needed so the app can navigate automatically AFTER a successful sign-in.
-    refreshListenable:
-        GoRouterRefreshStream(ref.watch(authStateProvider.stream)),
+    // Listens to auth state changes (e.g., user signs in/out)
+    refreshListenable: GoRouterRefreshStream(authStream),
 
     routes: [
-      // Your routes are unchanged.
       GoRoute(
-          path: '/',
-          name: 'main',
-          builder: (context, state) => const MainPage()),
           path: '/',
           name: 'main',
           builder: (context, state) => const MainPage()),
@@ -43,13 +32,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/new-goal',
           name: 'new-goal',
           builder: (context, state) => const NewGoalPage()),
-          path: '/new-goal',
-          name: 'new-goal',
-          builder: (context, state) => const NewGoalPage()),
       GoRoute(
-          path: '/new-task',
-          name: 'new-task',
-          builder: (context, state) => const NewTaskPage()),
           path: '/new-task',
           name: 'new-task',
           builder: (context, state) => const NewTaskPage()),
@@ -57,13 +40,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/display',
           name: 'display',
           builder: (context, state) => const DisplayPage()),
-          path: '/display',
-          name: 'display',
-          builder: (context, state) => const DisplayPage()),
       GoRoute(
-          path: '/stats',
-          name: 'stats',
-          builder: (context, state) => const StatsPage()),
           path: '/stats',
           name: 'stats',
           builder: (context, state) => const StatsPage()),
@@ -71,17 +48,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/new-reward',
           name: 'new-reward',
           builder: (context, state) => const RewardPage()),
-          path: '/new-reward',
-          name: 'new-reward',
-          builder: (context, state) => const RewardPage()),
       GoRoute(
-          path: '/setting',
-          name: 'setting',
-          builder: (context, state) => const SettingPage()),
-      GoRoute(
-          path: '/sign-in',
-          name: 'sign-in',
-          builder: (context, state) => const SignInScreen()),
           path: '/setting',
           name: 'setting',
           builder: (context, state) => const SettingPage()),
@@ -91,32 +58,37 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => const SignInScreen()),
     ],
 
-    // --- THE NEW, SIMPLE REDIRECT LOGIC ---
+    // Global redirect logic based on authentication status
     redirect: (BuildContext context, GoRouterState state) {
-      // While checking auth state, don't do anything.
       if (authState.isLoading || authState.hasError) {
-        return null;
+        return null; // Wait for state resolution
       }
 
       final isLoggedIn = authState.valueOrNull != null;
       final isGoingToSignIn = state.matchedLocation == '/sign-in';
 
-      // This is now the ONLY rule.
-      // If a logged-in user tries to go to the sign-in page, send them home.
+      // Rule 1: Prevent signed-in users from seeing the sign-in page.
       if (isLoggedIn && isGoingToSignIn) {
-        return '/';
+        return '/'; // Send home
       }
 
-      // For every other case, do nothing. Let the user go where they want.
+      // Rule 2: Ensure signed-out users must go to the sign-in page.
+      // (Assuming all other pages require auth)
+      if (!isLoggedIn && !isGoingToSignIn) {
+        return '/sign-in';
+      }
+
+      // Allow navigation
       return null;
     },
   );
 });
 
-// This helper class is still necessary for the refreshListenable to work.
+/// Rfrsh strm helper for GoRtr, translates Stream updates to ChangeNtfy calls.
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
+    // Listen to the stream and notify GoRouter whenever an event occurs
     stream.asBroadcastStream().listen((_) => notifyListeners());
   }
 }
