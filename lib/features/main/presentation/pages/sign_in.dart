@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
 import '../../../../core/provider/auth.dart';
 
@@ -8,11 +9,25 @@ class SignInScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Get the GoogleSignIn instance from its provider
     final googleSignIn = ref.watch(googleSignInProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Sign In")),
+      appBar: AppBar(
+        title: const Text("Sign In"),
+        // Add a standard back button that works with GoRouter
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // This will navigate to the previous screen in the stack
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              // If there's no screen to pop to, go to the main page
+              context.goNamed('main');
+            }
+          },
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -22,11 +37,6 @@ class SignInScreen extends ConsumerWidget {
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 24),
-
-            // --- THE SIMPLIFIED BUTTON ---
-            // We removed the onSignIn callback. This button's only purpose
-            // is to trigger the sign-in flow. The result will be caught
-            // by our new `authStateControllerProvider`.
             SizedBox(
               height: 50,
               child: googleSignIn.signInButton(

@@ -8,7 +8,6 @@ import '../../../features/main/presentation/pages/new_goal.dart';
 import '../../../features/main/presentation/pages/main_page.dart';
 import '../../../features/main/presentation/pages/new_task.dart';
 import '../../../features/main/presentation/pages/display_page.dart';
-import '../../../features/main/presentation/pages/stats.dart';
 import '../../../features/main/presentation/pages/new_reward.dart';
 import '../../../features/main/presentation/pages/setting.dart';
 import '../../../features/main/presentation/pages/sign_in.dart';
@@ -19,10 +18,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: '/',
-
-    // Listens to auth state changes (e.g., user signs in/out)
     refreshListenable: GoRouterRefreshStream(authStream),
-
     routes: [
       GoRoute(
           path: '/',
@@ -41,10 +37,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           name: 'display',
           builder: (context, state) => const DisplayPage()),
       GoRoute(
-          path: '/stats',
-          name: 'stats',
-          builder: (context, state) => const StatsPage()),
-      GoRoute(
           path: '/new-reward',
           name: 'new-reward',
           builder: (context, state) => const RewardPage()),
@@ -58,7 +50,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => const SignInScreen()),
     ],
 
-    // Global redirect logic based on authentication status
+    // --- UPDATED REDIRECT LOGIC ---
+    // This no longer forces the user to the sign-in page.
     redirect: (BuildContext context, GoRouterState state) {
       if (authState.isLoading || authState.hasError) {
         return null; // Wait for state resolution
@@ -67,18 +60,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = authState.valueOrNull != null;
       final isGoingToSignIn = state.matchedLocation == '/sign-in';
 
-      // Rule 1: Prevent signed-in users from seeing the sign-in page.
+      // Rule: If a user who IS logged in tries to visit the sign-in
+      // page, redirect them to the main page.
       if (isLoggedIn && isGoingToSignIn) {
-        return '/'; // Send home
+        return '/';
       }
 
-      // Rule 2: Ensure signed-out users must go to the sign-in page.
-      // (Assuming all other pages require auth)
-      if (!isLoggedIn && !isGoingToSignIn) {
-        return '/sign-in';
-      }
-
-      // Allow navigation
+      // No other rules are needed. Return null to allow navigation
+      // for all other cases, including unauthenticated users.
       return null;
     },
   );
