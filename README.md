@@ -30,15 +30,17 @@ Just as a sculptor reveals statues from marble, your habits carve greatness from
 
 - Feed the stone to spiderwebs
 
-## Getting Started by Cloning
+## Recommanded installations
+
+See release for read made windows binary: [https://github.com/hexagun123/Habitstone/releases/tag/v0.0.3-beta]
+
+link to web version: [https://habitstone-de992.web.app/]
+
+## Or clone it yourself... however this is only local, you'll have to set up a server yourself
 
 1. Clone this repository using git - git clone https://github.com/hexagun123/csia/
 2. Install the flutter sdk
 3. Run flutter pub get
 4. Start with flutter run (your device) -> eg: flutter run windows
 
-## Other methods
 
-See release for read made windows binary: [https://github.com/hexagun123/Habitstone/releases/tag/v0.0.3-beta]
-
-link to web version: [https://habitstone-de992.web.app/]
