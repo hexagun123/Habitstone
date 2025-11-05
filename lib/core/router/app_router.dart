@@ -8,7 +8,6 @@ import '../../../features/main/presentation/pages/new_goal.dart';
 import '../../../features/main/presentation/pages/main_page.dart';
 import '../../../features/main/presentation/pages/new_task.dart';
 import '../../../features/main/presentation/pages/display_page.dart';
-import '../../../features/main/presentation/pages/stats.dart';
 import '../../../features/main/presentation/pages/new_reward.dart';
 import '../../../features/main/presentation/pages/setting.dart';
 import '../../../features/main/presentation/pages/sign_in.dart';
@@ -40,10 +39,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/display',
           name: 'display',
           builder: (context, state) => const DisplayPage()),
-      GoRoute(
-          path: '/stats',
-          name: 'stats',
-          builder: (context, state) => const StatsPage()),
       GoRoute(
           path: '/new-reward',
           name: 'new-reward',
