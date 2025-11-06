@@ -1,33 +1,24 @@
-// core/router/app_router.dart
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Import your auth providers and all your page files
-import '../provider/auth.dart'; // Ensure this path is correct
+import '../provider/auth.dart';
 import '../../../features/main/presentation/pages/new_goal.dart';
 import '../../../features/main/presentation/pages/main_page.dart';
 import '../../../features/main/presentation/pages/new_task.dart';
 import '../../../features/main/presentation/pages/display_page.dart';
-import '../../../features/main/presentation/pages/stats.dart';
 import '../../../features/main/presentation/pages/new_reward.dart';
 import '../../../features/main/presentation/pages/setting.dart';
 import '../../../features/main/presentation/pages/sign_in.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
-  // We still watch the state to use it in the redirect logic
   final authState = ref.watch(authStateProvider);
+  final authStream = ref.watch(authStateProvider.stream);
 
   return GoRouter(
     initialLocation: '/',
-
-    // --- THE FIX IS HERE ---
-    // To get the actual stream, we access the provider's .stream property
-    refreshListenable:
-        GoRouterRefreshStream(ref.watch(authStateProvider.stream)),
-
+    refreshListenable: GoRouterRefreshStream(authStream),
     routes: [
       GoRoute(
           path: '/',
@@ -46,10 +37,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           name: 'display',
           builder: (context, state) => const DisplayPage()),
       GoRoute(
-          path: '/stats',
-          name: 'stats',
-          builder: (context, state) => const StatsPage()),
-      GoRoute(
           path: '/new-reward',
           name: 'new-reward',
           builder: (context, state) => const RewardPage()),
@@ -63,32 +50,34 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => const SignInScreen()),
     ],
 
+    // --- UPDATED REDIRECT LOGIC ---
+    // This no longer forces the user to the sign-in page.
     redirect: (BuildContext context, GoRouterState state) {
       if (authState.isLoading || authState.hasError) {
-        return null;
+        return null; // Wait for state resolution
       }
 
       final isLoggedIn = authState.valueOrNull != null;
       final isGoingToSignIn = state.matchedLocation == '/sign-in';
 
+      // Rule: If a user who IS logged in tries to visit the sign-in
+      // page, redirect them to the main page.
       if (isLoggedIn && isGoingToSignIn) {
         return '/';
       }
 
-      final isPublicPage = state.matchedLocation == '/' || isGoingToSignIn;
-      if (!isLoggedIn && !isPublicPage) {
-        return '/sign-in';
-      }
-
+      // No other rules are needed. Return null to allow navigation
+      // for all other cases, including unauthenticated users.
       return null;
     },
   );
 });
 
-// This helper class is correct and needs no changes.
+/// Rfrsh strm helper for GoRtr, translates Stream updates to ChangeNtfy calls.
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
+    // Listen to the stream and notify GoRouter whenever an event occurs
     stream.asBroadcastStream().listen((_) => notifyListeners());
   }
 }

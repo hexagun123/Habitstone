@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'core/model/goal.dart';
 import 'core/model/task.dart';
 import 'core/model/reward.dart';
@@ -13,33 +14,42 @@ import 'firebase_options.dart';
 import 'core/provider/sync.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/provider/auth.dart';
 
 void main() async {
-  // Only the most essential, non-Riverpod initializations remain here
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env");
-
   if (!kIsWeb) {
-    // For any platform that is NOT web (mobile, desktop)
-    // we get a safe directory and initialize Hive there.
+    // Get a safe directory and initialize Hive there.
+    // Get a safe directory and initialize Hive there.
     final appDocumentDir = await getApplicationDocumentsDirectory();
     Hive.init(appDocumentDir.path);
+
+    print("==========================================================");
+    print("COMPILER RECEIVED WEB_CLIENT_ID: '$webClientId'");
+    print("==========================================================");
   }
 
+  // 2. Firebase Initialization
+  // 2. Firebase Initialization
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // 3. Hive Initialization (must run even for web)
+  // 3. Hive Initialization (must run even for web)
   await Hive.initFlutter();
+
+  // 4. Register Adapters
+
+  // 4. Register Adapters
   Hive.registerAdapter(GoalAdapter());
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(RewardAdapter());
   Hive.registerAdapter(SettingsAdapter());
 
-  // GoogleSignIn is now initialized inside its provider, not here
-
+  // 5. Start the Application
+  // 5. Start the Application
   runApp(const ProviderScope(
     child: MyApp(),
   ));
@@ -50,12 +60,19 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watching the sync controller to ensure it starts listening to auth/data changes early
+    // Watching the sync controller to ensure it starts listening to auth/data changes early
     ref.watch(syncControllerProvider);
 
+    // Watch the application initialization future (loading Hive data, etc.)
+    // Watch the application initialization future (loading Hive data, etc.)
     final appInit = ref.watch(appInitializerProvider);
+
     final router = ref.watch(routerProvider);
     final theme = ref.watch(currentThemeProvider);
 
+    // Handle loading, data, and error states based on app initialization
+    // Handle loading, data, and error states based on app initialization
     return appInit.when(
       data: (_) => MaterialApp.router(
         title: 'Habitstone',

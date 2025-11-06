@@ -1,1 +1,51 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"wcas-39ffa","appId":"1:478463837582:android:bdee1b0c547605080dd0df","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"wcas-39ffa","configurations":{"web":"1:478463837582:web:4f8c98d741c7b95a0dd0df","windows":"1:478463837582:web:530d4820688da0940dd0df"}}}}},"hosting":{"public":"build/web","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "wcas-39ffa",
+          "appId": "1:478463837582:android:bdee1b0c547605080dd0df",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "habitstone-de992",
+          "configurations": {
+            "web": "1:326422199821:web:e6ac21a540bf4a6b141f44",
+            "windows": "1:326422199821:web:7e07a53769bf6b15141f44"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin-allow-popups"
+          },
+          {
+            "key": "Cross-Origin-Embedder-Policy",
+            "value": "require-corp"
+          }
+        ]
+      }
+    ]
+  }
+}

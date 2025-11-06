@@ -1,5 +1,11 @@
+// lib/core/data/sync.dart
+
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../provider/app.dart';
+import '../provider/auth.dart';
 import '../model/goal.dart';
 import '../model/task.dart';
 import '../model/reward.dart';
@@ -10,35 +16,29 @@ class FirebaseSync {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final HiveRepository _hiveRepo;
 
+  // This is the correctly named flag.
+  bool isSyncingFromServer = false;
+
+  final List<StreamSubscription> _subscriptions = [];
+
   FirebaseSync(this._hiveRepo);
 
   User? get _user => _auth.currentUser;
 
-  // Helper to get a user-specific collection reference
   CollectionReference<Map<String, dynamic>> _collection(String name) {
-    if (_user == null)
-      throw Exception("User is not logged in for sync operation.");
+    if (_user == null) throw Exception("User not logged in.");
     return _db.collection('users').doc(_user!.uid).collection(name);
   }
 
-  /// PULL: Fetches all data from Firestore and overwrites the local Hive database.
-  /// This is typically called right after a user logs in.
   Future<void> pullAllData() async {
-    if (_user == null) {
-      print("Sync Service: Cannot pull data, no user logged in.");
-      return;
-    }
-    print("Sync Service: Starting data pull from Firebase...");
+    if (_user == null) return;
+    isSyncingFromServer = true;
     try {
-      // Fetch all collections in parallel for better performance
-      final goalsFuture = _collection('goals').get();
-      final tasksFuture = _collection('tasks').get();
-      final rewardsFuture = _collection('rewards').get();
-
-      final results =
-          await Future.wait([goalsFuture, tasksFuture, rewardsFuture]);
-
-      // Deserialize Firestore documents into our Dart models
+      final results = await Future.wait([
+        _collection('goals').get(),
+        _collection('tasks').get(),
+        _collection('rewards').get()
+      ]);
       final goals = (results[0] as QuerySnapshot)
           .docs
           .map((d) => Goal.fromJson(d.data() as Map<String, dynamic>))
@@ -51,101 +51,95 @@ class FirebaseSync {
           .docs
           .map((d) => Reward.fromJson(d.data() as Map<String, dynamic>))
           .toList();
-
-      // Use the new caching methods in HiveRepository to store the fresh data
       await _hiveRepo.cacheAllData(
           goals: goals, tasks: tasks, rewards: rewards);
-
-      print(
-          "Sync Service: Data pull successful. Hive is now in sync with Firebase.");
-    } catch (e) {
-      print("Sync Service: 🛑 Firebase data pull failed: $e");
-      // Don't throw an error, just log it. The app can continue in offline mode.
+    } finally {
+      isSyncingFromServer = false;
     }
   }
 
-  /// Pushes a single Goal document to Firestore.
-  Future<void> syncGoal(Goal goal) async {
+  void startRealtimeListeners() {
     if (_user == null) return;
-    try {
-      await _collection('goals').doc(goal.id).set(goal.toJson());
-    } catch (e) {
-      print("Failed to sync goal ${goal.id}: $e");
-    }
+    stopRealtimeListeners();
+    _listenToCollection<Goal>(
+        'goals', Goal.fromJson, _hiveRepo.addGoal, _hiveRepo.deleteGoal);
+    _listenToCollection<Task>(
+        'tasks', Task.fromJson, _hiveRepo.addTask, _hiveRepo.deleteTask);
+    _listenToCollection<Reward>('rewards', Reward.fromJson, _hiveRepo.addReward,
+        _hiveRepo.deleteReward);
   }
 
-  /// Pushes a single Task document to Firestore.
-  Future<void> syncTask(Task task) async {
-    if (_user == null) return;
-    try {
-      await _collection('tasks').doc(task.id).set(task.toJson());
-    } catch (e) {
-      print("Failed to sync task ${task.id}: $e");
-    }
-  }
-
-  /// Pushes a single Reward document to Firestore.
-  Future<void> syncReward(Reward reward) async {
-    if (_user == null) return;
-    try {
-      await _collection('rewards').doc(reward.id).set(reward.toJson());
-    } catch (e) {
-      print("Failed to sync reward ${reward.id}: $e");
-    }
-  }
-
-  /// Deletes a document from a specified collection in Firestore.
-  Future<void> deleteDocument(String id, String collectionName) async {
-    if (_user == null) return;
-    try {
-      await _collection(collectionName).doc(id).delete();
-    } catch (e) {
-      print("Failed to delete document $id from $collectionName: $e");
-    }
-  }
-
-  /// PUSH: Takes all local data from Hive and overwrites Firestore.
-  /// This can be called periodically or before logging out.
-  Future<void> pushAllData() async {
-    if (_user == null) {
-      print("Sync Service: Cannot push data, no user logged in.");
-      return;
-    }
-    print("Sync Service: Starting data push to Firebase...");
-    try {
-      // Use a WriteBatch for an efficient, atomic "all-or-nothing" write.
-      final batch = _db.batch();
-
-      // Get all local data from Hive
-      final goals = _hiveRepo.getGoals();
-      final tasks = _hiveRepo.getTasks();
-      final rewards = _hiveRepo.getRewards();
-
-      // Stage the writes for goals
-      for (final goal in goals) {
-        final docRef = _collection('goals').doc(goal.id);
-        batch.set(docRef, goal.toJson());
+  void _listenToCollection<T>(
+    String colName,
+    T Function(Map<String, dynamic>) fromJson,
+    Future<void> Function(T) cacheItem,
+    Future<void> Function(String) deleteItem,
+  ) {
+    final sub = _collection(colName).snapshots().listen((snapshot) async {
+      isSyncingFromServer = true;
+      try {
+        for (final change in snapshot.docChanges) {
+          final data = change.doc.data();
+          if (data == null) continue;
+          switch (change.type) {
+            case DocumentChangeType.added:
+            case DocumentChangeType.modified:
+              await cacheItem(fromJson(data));
+              break;
+            case DocumentChangeType.removed:
+              await deleteItem(change.doc.id);
+              break;
+          }
+        }
+      } finally {
+        isSyncingFromServer = false;
       }
-
-      // Stage the writes for tasks
-      for (final task in tasks) {
-        final docRef = _collection('tasks').doc(task.id);
-        batch.set(docRef, task.toJson());
-      }
-
-      // Stage the writes for rewards
-      for (final reward in rewards) {
-        final docRef = _collection('rewards').doc(reward.id);
-        batch.set(docRef, reward.toJson());
-      }
-
-      // Commit all writes to Firebase in a single operation
-      await batch.commit();
-
-      print(
-          "Sync Service: Data push successful. Firebase is now in sync with Hive.");
-    } catch (e) {
-      print("Sync Service: 🛑 Firebase data push failed: $e");
-    }
+    });
+    _subscriptions.add(sub);
   }
+
+  void stopRealtimeListeners() {
+    for (final sub in _subscriptions) {
+      sub.cancel();
+    }
+    _subscriptions.clear();
+  }
+
+  Future<void> syncGoal(Goal g) async =>
+      await _collection('goals').doc(g.id).set(g.toJson());
+  Future<void> syncTask(Task t) async =>
+      await _collection('tasks').doc(t.id).set(t.toJson());
+  Future<void> syncReward(Reward r) async =>
+      await _collection('rewards').doc(r.id).set(r.toJson());
+  Future<void> deleteDocument(String id, String col) async =>
+      await _collection(col).doc(id).delete();
 }
+
+/// The provider that sets up the local listeners.
+final syncControllerProvider = Provider.autoDispose<void>((ref) {
+  final hiveRepo = ref.watch(hiveRepositoryProvider);
+  final syncService = ref.watch(firebaseSyncProvider);
+  if (ref.watch(authStateProvider).value == null) return;
+
+  hiveRepo.goalsBox?.watch().listen((event) {
+    // MODIFIED: Checking the correct flag name.
+    if (syncService.isSyncingFromServer) return;
+    event.deleted
+        ? syncService.deleteDocument(event.key, 'goals')
+        : syncService.syncGoal(event.value);
+  });
+  hiveRepo.tasksBox?.watch().listen((event) {
+    // MODIFIED: Checking the correct flag name.
+    if (syncService.isSyncingFromServer) return;
+    event.deleted
+        ? syncService.deleteDocument(event.key, 'tasks')
+        : syncService.syncTask(event.value);
+  });
+  hiveRepo.rewardsBox?.watch().listen((event) {
+    // MODIFIED: Checking the correct flag name.
+    if (syncService.isSyncingFromServer) return;
+    event.deleted
+        ? syncService.deleteDocument(event.key, 'rewards')
+        : syncService.syncReward(event.value);
+  });
+});

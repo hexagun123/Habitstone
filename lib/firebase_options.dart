@@ -41,13 +41,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCvmY4ZiOHh1pQVMaeW65osvM71iYdw0TM',
-    appId: '1:478463837582:web:4f8c98d741c7b95a0dd0df',
-    messagingSenderId: '478463837582',
-    projectId: 'wcas-39ffa',
-    authDomain: 'wcas-39ffa.firebaseapp.com',
-    storageBucket: 'wcas-39ffa.firebasestorage.app',
-    measurementId: 'G-KFQ3WPJ2WR',
+    apiKey: 'AIzaSyDdRB6t2lSvlkqiWmac5VQCZV7uUi4W6hU',
+    appId: '1:326422199821:web:e6ac21a540bf4a6b141f44',
+    messagingSenderId: '326422199821',
+    projectId: 'habitstone-de992',
+    authDomain: 'habitstone-de992.firebaseapp.com',
+    storageBucket: 'habitstone-de992.firebasestorage.app',
+    measurementId: 'G-R9VRY0LGJ1',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -79,13 +79,13 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCvmY4ZiOHh1pQVMaeW65osvM71iYdw0TM',
-    appId: '1:478463837582:web:530d4820688da0940dd0df',
-    messagingSenderId: '478463837582',
-    projectId: 'wcas-39ffa',
-    authDomain: 'wcas-39ffa.firebaseapp.com',
-    storageBucket: 'wcas-39ffa.firebasestorage.app',
-    measurementId: 'G-55S1E2SZBR',
+    apiKey: 'AIzaSyDdRB6t2lSvlkqiWmac5VQCZV7uUi4W6hU',
+    appId: '1:326422199821:web:7e07a53769bf6b15141f44',
+    messagingSenderId: '326422199821',
+    projectId: 'habitstone-de992',
+    authDomain: 'habitstone-de992.firebaseapp.com',
+    storageBucket: 'habitstone-de992.firebasestorage.app',
+    measurementId: 'G-BSG0DRQLT7',
   );
 
 }

@@ -1,13 +1,13 @@
-// core/data/sync.dart
+// core/provider/sync.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'app.dart'; // For hiveRepositoryProvider
-import 'auth.dart'; // For firebaseSyncServiceProvider
+import '../provider/app.dart'; // Assumed path for hiveRepositoryProvider
+import '../provider/auth.dart'; // Assumed path for auth providers
 
 /// This provider's only job is to initialize the Hive listeners.
 /// It doesn't return a value, but its creation triggers the setup.
-final syncControllerProvider = Provider<void>((ref) {
+final syncControllerProvider = Provider.autoDispose<void>((ref) {
   // Get the dependencies
   final hiveRepo = ref.watch(hiveRepositoryProvider);
   final syncService = ref.watch(firebaseSyncProvider);
@@ -23,18 +23,22 @@ final syncControllerProvider = Provider<void>((ref) {
 
   // --- GOAL LISTENER ---
   hiveRepo.goalsBox?.watch().listen((BoxEvent event) {
+    // MODIFIED: Checking the correct flag name to prevent the sync loop.
+    if (syncService.isSyncingFromServer) return;
+
     print("SyncController: Detected change in goalsBox!");
     if (event.deleted) {
-      // If an item was deleted
       syncService.deleteDocument(event.key, 'goals');
     } else {
-      // If an item was added or updated
       syncService.syncGoal(event.value);
     }
   });
 
   // --- TASK LISTENER ---
   hiveRepo.tasksBox?.watch().listen((BoxEvent event) {
+    // MODIFIED: Checking the correct flag name to prevent the sync loop.
+    if (syncService.isSyncingFromServer) return;
+
     print("SyncController: Detected change in tasksBox!");
     if (event.deleted) {
       syncService.deleteDocument(event.key, 'tasks');
@@ -45,6 +49,9 @@ final syncControllerProvider = Provider<void>((ref) {
 
   // --- REWARD LISTENER ---
   hiveRepo.rewardsBox?.watch().listen((BoxEvent event) {
+    // MODIFIED: Checking the correct flag name to prevent the sync loop.
+    if (syncService.isSyncingFromServer) return;
+
     print("SyncController: Detected change in rewardsBox!");
     if (event.deleted) {
       syncService.deleteDocument(event.key, 'rewards');
