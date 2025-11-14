@@ -6,6 +6,7 @@ import 'list_item.dart';
 import 'empty.dart';
 import 'popup.dart';
 import '../../general/randomizer.dart';
+import '../../../../../../core/data/quote.dart';
 
 class TaskList extends ConsumerWidget {
   const TaskList({super.key});
@@ -76,33 +77,44 @@ class TaskList extends ConsumerWidget {
     final taskNotifier = ref.read(taskProvider.notifier);
 
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Task from Pool'),
-        content: hiddenTasks.isEmpty
-            ? const Text('No hidden tasks available')
-            : SizedBox(
-                width: double.maxFinite,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: hiddenTasks.length,
-                  itemBuilder: (context, index) {
-                    final task = hiddenTasks[index];
-                    return NewTaskPopUp(
-                      task: task,
-                      onActivate: () => taskNotifier.activateTask(task),
-                      onRandomize: () => taskNotifier.activateWeightedTask(),
-                    );
-                  },
-                ),
+        context: context,
+        builder: (context) {
+          Widget dialogContent;
+
+          if (hiddenTasks.isEmpty) {
+            dialogContent = const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(
+                child: Text('No hidden tasks available'),
               ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
+            );
+          } else {
+            dialogContent = SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                itemCount: hiddenTasks.length,
+                itemBuilder: (context, index) {
+                  final task = hiddenTasks[index];
+                  return NewTaskPopUp(
+                    task: task,
+                    onActivate: () => taskNotifier.activateTask(task),
+                    onRandomize: () => taskNotifier.activateWeightedTask(),
+                  );
+                },
+              ),
+            );
+          }
+
+          return AlertDialog(
+            title: const Text('Add Task from Pool'),
+            content: dialogContent,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        });
   }
 }

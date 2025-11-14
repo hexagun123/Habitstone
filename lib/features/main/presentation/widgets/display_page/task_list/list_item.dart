@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:streak/core/data/quote.dart';
 import '../../../../../../core/provider/task.dart';
 import '../../../../../../core/provider/goal.dart';
 import '../../../../../../core/model/task.dart';
@@ -24,7 +25,8 @@ class TaskListItem extends ConsumerWidget {
         ),
       ),
       child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16.0),
+        tilePadding:
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         title: Text(
           task.title,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(

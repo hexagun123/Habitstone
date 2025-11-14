@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/model/reward.dart';
 import '../../../../../core/provider/reward.dart';
-import 'dart:async';
+import '../../../../../core/data/quote.dart';
 
 class RewardPopup extends ConsumerStatefulWidget {
   const RewardPopup({super.key});
@@ -13,47 +14,47 @@ class RewardPopup extends ConsumerStatefulWidget {
 
 class _RewardPopupState extends ConsumerState<RewardPopup> {
   Reward? _currentReward;
-  int _remainingTime = 0;
-  int _remainingMinutes = 0;
-  int _remainingSeconds = 0;
+  int _remainingTimeInSeconds = 0;
   Timer? _timer;
+  String? _quote; // State variable to hold the quote
 
   @override
   void initState() {
     super.initState();
-    _showRandomReward();
-  }
-
-  void _showRandomReward() {
+    // Fetch the reward and the quote ONCE when the state is initialized.
     final reward = ref.read(rewardProvider.notifier).getRandomReward();
-    if (reward != null) {
-      setState(() {
-        _currentReward = reward;
-        _remainingTime = reward.time * 60;
-        _remainingMinutes = _remainingTime ~/ 60;
-        _remainingSeconds = _remainingTime % 60;
-      });
-      _startTimer();
-    }
+    _quote = ref.read(quoteProvider.notifier).getRandomQuote();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (reward != null) {
+        setState(() {
+          _currentReward = reward;
+          _remainingTimeInSeconds = reward.time * 60;
+        });
+        _startTimer();
+      } else {
+        Navigator.of(context).pop();
+      }
+    });
   }
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_remainingTime > 0) {
-          _remainingTime--;
-          _remainingMinutes = _remainingTime ~/ 60;
-          _remainingSeconds = _remainingTime % 60;
-        } else {
-          _closePopup();
-        }
-      });
+      if (_remainingTimeInSeconds > 0) {
+        setState(() {
+          _remainingTimeInSeconds--;
+        });
+      } else {
+        _closePopup();
+      }
     });
   }
 
   void _closePopup() {
     _timer?.cancel();
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -65,8 +66,20 @@ class _RewardPopupState extends ConsumerState<RewardPopup> {
   @override
   Widget build(BuildContext context) {
     if (_currentReward == null) {
-      return const SizedBox.shrink();
+      return const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text("Claiming your reward..."),
+          ],
+        ),
+      );
     }
+
+    final remainingMinutes = _remainingTimeInSeconds ~/ 60;
+    final remainingSeconds = _remainingTimeInSeconds % 60;
 
     return AlertDialog(
       title: Text(_currentReward!.title),
@@ -75,8 +88,24 @@ class _RewardPopupState extends ConsumerState<RewardPopup> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(_currentReward!.description),
-          const SizedBox(height: 16),
-          Text('Time remaining: $_remainingMinutes:$_remainingSeconds'),
+
+          // Display the quote if it exists
+          if (_quote != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              '"$_quote"',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ],
+
+          const SizedBox(height: 24),
+          Center(
+            child: Text(
+              'Time remaining: $remainingMinutes:${remainingSeconds.toString().padLeft(2, '0')}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
         ],
       ),
       actions: [
@@ -90,13 +119,14 @@ class _RewardPopupState extends ConsumerState<RewardPopup> {
 }
 
 void showRewardPopup(BuildContext context, WidgetRef ref) {
-  final reward = ref.watch(rewardProvider);
-  if (reward.isEmpty) {
-    return; // No rewards to show
+  final rewards = ref.read(rewardProvider);
+  if (rewards.isEmpty) {
+    return;
   }
+
   showDialog(
     context: context,
-    barrierDismissible: false, // User must tap button to close
+    barrierDismissible: false,
     builder: (context) => const RewardPopup(),
   );
 }

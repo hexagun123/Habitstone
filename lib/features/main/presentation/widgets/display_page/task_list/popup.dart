@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/model/task.dart';
+import '../../../../../../core/data/quote.dart';
 
-
-class NewTaskPopUp extends StatelessWidget {
+class NewTaskPopUp extends ConsumerWidget {
   final Task task;
   final VoidCallback onActivate;
   final VoidCallback onRandomize;
@@ -15,9 +16,8 @@ class NewTaskPopUp extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
         children: [
           ListTile(

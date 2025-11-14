@@ -49,11 +49,8 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     final goals = _ref.read(goalProvider);
 
     for (String goalId in task.goalIds) {
-      // <<< 2. THE FIX IS HERE
-      // Use firstWhereOrNull, which is designed to safely return null.
       final goal = goals.firstWhereOrNull((g) => g.id == goalId);
 
-      // Now the rest of the code works perfectly, because 'goal' is a nullable Goal?
       if (goal != null && !goal.updated) {
         await goalNotifier.addStreak(goal);
       }
