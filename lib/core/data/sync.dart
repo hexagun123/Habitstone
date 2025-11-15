@@ -3,21 +3,23 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../provider/app.dart';
-import '../provider/auth.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart'; // REMOVE THIS IF NOT USED BY FirebaseSync CLASS ITSELF
+// import '../provider/app.dart'; // REMOVE THIS IF NOT USED BY FirebaseSync CLASS ITSELF
+// import '../provider/auth.dart'; // REMOVE THIS IF NOT USED BY FirebaseSync CLASS ITSELF
 import '../model/goal.dart';
 import '../model/task.dart';
 import '../model/reward.dart';
 import 'hive.dart';
+
+// You will likely have a provider that provides this FirebaseSync instance,
+// e.g., final firebaseSyncProvider = Provider((ref) => FirebaseSync(ref.watch(hiveRepositoryProvider)));
 
 class FirebaseSync {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final HiveRepository _hiveRepo;
 
-  // This is the correctly named flag.
-  bool isSyncingFromServer = false;
+  bool _isPerformingServerOperation = false; // Renamed for clarity on purpose
 
   final List<StreamSubscription> _subscriptions = [];
 
@@ -32,7 +34,7 @@ class FirebaseSync {
 
   Future<void> pullAllData() async {
     if (_user == null) return;
-    isSyncingFromServer = true;
+    _isPerformingServerOperation = true;
     try {
       final results = await Future.wait([
         _collection('goals').get(),
@@ -54,13 +56,13 @@ class FirebaseSync {
       await _hiveRepo.cacheAllData(
           goals: goals, tasks: tasks, rewards: rewards);
     } finally {
-      isSyncingFromServer = false;
+      _isPerformingServerOperation = false;
     }
   }
 
   void startRealtimeListeners() {
     if (_user == null) return;
-    stopRealtimeListeners();
+    stopRealtimeListeners(); // Ensure old listeners are cleared
     _listenToCollection<Goal>(
         'goals', Goal.fromJson, _hiveRepo.addGoal, _hiveRepo.deleteGoal);
     _listenToCollection<Task>(
@@ -76,23 +78,28 @@ class FirebaseSync {
     Future<void> Function(String) deleteItem,
   ) {
     final sub = _collection(colName).snapshots().listen((snapshot) async {
-      isSyncingFromServer = true;
+      _isPerformingServerOperation = true; // Set flag for this snapshot's processing
       try {
         for (final change in snapshot.docChanges) {
           final data = change.doc.data();
-          if (data == null) continue;
+          if (data == null && change.type != DocumentChangeType.removed) {
+             print('Warning: Document data is null for change type ${change.type} on document ${change.doc.id}');
+             continue;
+          }
           switch (change.type) {
             case DocumentChangeType.added:
             case DocumentChangeType.modified:
-              await cacheItem(fromJson(data));
+              await cacheItem(fromJson(data!)); // Data is not null here
               break;
             case DocumentChangeType.removed:
               await deleteItem(change.doc.id);
               break;
           }
         }
+      } catch (e) {
+        print("Error processing Firestore snapshot for $colName: $e");
       } finally {
-        isSyncingFromServer = false;
+        _isPerformingServerOperation = false; // Reset flag
       }
     });
     _subscriptions.add(sub);
@@ -105,6 +112,9 @@ class FirebaseSync {
     _subscriptions.clear();
   }
 
+  // Exposed getter
+  bool get isPerformingServerOperation => _isPerformingServerOperation;
+
   Future<void> syncGoal(Goal g) async =>
       await _collection('goals').doc(g.id).set(g.toJson());
   Future<void> syncTask(Task t) async =>
@@ -114,32 +124,4 @@ class FirebaseSync {
   Future<void> deleteDocument(String id, String col) async =>
       await _collection(col).doc(id).delete();
 }
-
-/// The provider that sets up the local listeners.
-final syncControllerProvider = Provider.autoDispose<void>((ref) {
-  final hiveRepo = ref.watch(hiveRepositoryProvider);
-  final syncService = ref.watch(firebaseSyncProvider);
-  if (ref.watch(authStateProvider).value == null) return;
-
-  hiveRepo.goalsBox?.watch().listen((event) {
-    // MODIFIED: Checking the correct flag name.
-    if (syncService.isSyncingFromServer) return;
-    event.deleted
-        ? syncService.deleteDocument(event.key, 'goals')
-        : syncService.syncGoal(event.value);
-  });
-  hiveRepo.tasksBox?.watch().listen((event) {
-    // MODIFIED: Checking the correct flag name.
-    if (syncService.isSyncingFromServer) return;
-    event.deleted
-        ? syncService.deleteDocument(event.key, 'tasks')
-        : syncService.syncTask(event.value);
-  });
-  hiveRepo.rewardsBox?.watch().listen((event) {
-    // MODIFIED: Checking the correct flag name.
-    if (syncService.isSyncingFromServer) return;
-    event.deleted
-        ? syncService.deleteDocument(event.key, 'rewards')
-        : syncService.syncReward(event.value);
-  });
-});
+// Delete the old syncControllerProvider definition from here.

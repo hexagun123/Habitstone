@@ -5,7 +5,6 @@ version: 1.0.0+1
 environment:
   sdk: ">=3.0.0 <4.0.0"
   flutter: ">=3.0.0"
-
 dependencies:
   flutter:
     sdk: flutter
@@ -22,8 +21,8 @@ dependencies:
   go_router: ^16.0.0
   intl: ^0.20.2
   uuid: ^4.5.2
-  hive: 2.2.3
-  hive_flutter: 1.1.0
+  hive: ^2.2.3 # <--- CHANGE TO LATEST STABLE (e.g., ^2.2.3, but latest is often preferred)
+  hive_flutter: ^1.1.0 # <--- CHANGE TO LATEST STABLE (e.g., ^1.1.0, but latest is often preferred)
 
   cloud_firestore: ^5.6.11
 
@@ -31,7 +30,7 @@ dependencies:
   firebase_auth: ^5.7.0
   firebase_storage: ^12.4.9
 
-  isar_flutter_libs: ^4.0.0-dev.13
+  isar_flutter_libs: ^4.0.0-dev.13 # Also note Isar is a dev version, which can introduce instability
   collection: ^1.19.1
   csv: ^6.0.0
 
@@ -39,7 +38,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  hive_generator: 2.0.1
+  hive_generator: ^2.0.1 # <--- CHANGE TO LATEST STABLE (e.g., ^2.0.1, but latest is often preferred)
 
   flutter_lints: ^6.0.0
 
