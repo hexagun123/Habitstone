@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:streak/core/model/quote.dart';
+import 'package:showcaseview/showcaseview.dart';
+
+// --- Your Project's Core Imports ---
+import 'core/model/quote.dart';
 import 'core/model/goal.dart';
 import 'core/model/task.dart';
 import 'core/model/reward.dart';
@@ -13,7 +16,7 @@ import 'core/provider/theme.dart';
 import 'firebase_options.dart';
 import 'core/provider/sync.dart';
 import 'core/data/quote.dart';
-// Note: path_provider is no longer needed here since Hive.initFlutter() handles it.
+import 'core/data/showcase_key.dart'; // Import your keys
 
 void main() async {
   // 1. Ensure Flutter framework is ready.
@@ -24,8 +27,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // 3. Initialize Hive using the recommended method for Flutter.
-  // This handles finding the correct directory on both mobile and web.
+  // 3. Initialize Hive.
   await Hive.initFlutter();
 
   // 4. Register all your Hive adapters.
@@ -35,29 +37,76 @@ void main() async {
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(QuoteAdapter());
 
+  // NOTE: ShowcaseView.register() is now moved inside MyApp.
+
   // 5. Run the app within a ProviderScope.
   runApp(const ProviderScope(
     child: MyApp(),
   ));
 }
 
-class MyApp extends ConsumerWidget {
+// 1. Convert MyApp to a ConsumerStatefulWidget to use initState.
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // This is a great pattern. Watching the sync controller to start it early.
-    ref.watch(syncControllerProvider);
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
 
-    // Watch the app initializer provider. Your UI is already perfectly set up
-    // to handle its loading, error, and data states.
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    // 2. Read the router instance from your Riverpod provider.
+    // We use ref.read because this is a one-time action inside a lifecycle method.
+    final router = ref.read(routerProvider);
+
+    // 3. Register ShowcaseView and its global callbacks here.
+    // This setup runs only once when the app starts.
+    ShowcaseView.register(
+      enableAutoScroll: true,
+      scrollDuration: const Duration(milliseconds: 500),
+
+      // This global callback is our central controller for the automatic tour.
+      onComplete: (index, key) {
+        debugPrint('Showcase completed for key: $key');
+
+        if (key == ten) {
+          // ...automatically navigate to the new goal page.
+          router.push('/new-goal');
+
+          // After a short delay for the page transition animation...
+          Future.delayed(const Duration(milliseconds: 400), () {
+            // ...start the showcase for the keys on the new goal page.
+            ShowcaseView.get().startShowCase([eleven]);
+          });
+        }
+
+        if (key == eleven) {
+          // ...automatically navigate to the new goal page.
+          router.push('/new-task');
+
+          // After a short delay for the page transition animation...
+          Future.delayed(const Duration(milliseconds: 400), () {
+            // ...start the showcase for the keys on the new goal page.
+            ShowcaseView.get().startShowCase([twelve, thirteen, fourteen,fifteen]);
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // The build method logic remains the same.
+    ref.watch(syncControllerProvider);
     final appInit = ref.watch(appInitializerProvider);
     final router = ref.watch(routerProvider);
     final theme = ref.watch(currentThemeProvider);
     final quote = ref.watch(quoteProvider.notifier);
-
     quote.build();
-    // This .when() clause is the correct way to build your UI.
+
     return appInit.when(
       data: (_) => MaterialApp.router(
         title: 'Habitstone',

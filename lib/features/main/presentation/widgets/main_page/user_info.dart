@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/data/util.dart';
 import '../../../../../core/provider/auth.dart'; // Ensure this path is correct
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../../core/data/showcase_key.dart';
 
 class InfoText extends ConsumerWidget {
   const InfoText({super.key});
@@ -29,7 +31,8 @@ class InfoText extends ConsumerWidget {
             }
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => const Center(child: Text('Authentication error.')),
+          error: (err, stack) =>
+              const Center(child: Text('Authentication error.')),
         ),
       ),
     );
@@ -57,17 +60,21 @@ class InfoText extends ConsumerWidget {
         ),
         Expanded(
           child: Center(
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.login),
-              label: const Text('Sign In to Sync'),
-              onPressed: () => context.go('/sign-in'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
+              child: Showcase(
+                  key: five,
+                  title: "Login",
+                  description: "Sign in to sync your data across devices",
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.login),
+                    label: const Text('Sign In to Sync'),
+                    onPressed: () => context.go('/sign-in'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 24),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ))),
         ),
       ],
     );
@@ -126,19 +133,24 @@ class InfoText extends ConsumerWidget {
         const Spacer(),
         // The Sign Out button
         SizedBox(
-          width: double.infinity,
-          child: TextButton.icon(
-            icon: const Icon(Icons.logout),
-            label: const Text('Sign Out'),
-            onPressed: () {
-              ref.read(authServiceProvider).signOut();
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
+            width: double.infinity,
+            child: Showcase(
+              key: five,
+              title: "logout",
+              description:
+                  "You've managed to get the secret tutorial! Sort of an easter egg, anyways, this button is for logout",
+              child: TextButton.icon(
+                icon: const Icon(Icons.logout),
+                label: const Text('Sign Out'),
+                onPressed: () {
+                  ref.read(authServiceProvider).signOut();
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            )),
       ],
     );
   }

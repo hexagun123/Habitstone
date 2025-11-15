@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/provider/goal.dart';
 import '../../../../core/model/goal.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../core/data/showcase_key.dart';
 
 class NewGoalPage extends ConsumerWidget {
   const NewGoalPage({super.key});
@@ -14,10 +16,15 @@ class NewGoalPage extends ConsumerWidget {
         appBar: AppBar(
           title: const Text('New Goal'),
         ),
-        body: const SingleChildScrollView(
+        body: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(16.0),
-            child: NewGoalForm(),
+            child: Showcase(
+                key: eleven,
+                title: "new goal",
+                description:
+                    "Just fill in the title to complete a new goal, I recommand to write down all the goals first before doing anything else, as they are inter-dependent. Next step: click on the new-task button!",
+                child: NewGoalForm()),
           ),
         ));
   }

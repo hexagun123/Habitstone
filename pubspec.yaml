@@ -21,6 +21,7 @@ dependencies:
   go_router: ^16.0.0
   intl: ^0.20.2
   uuid: ^4.5.2
+  shared_preferences: ^2.5.3
   hive: ^2.2.3 # <--- CHANGE TO LATEST STABLE (e.g., ^2.2.3, but latest is often preferred)
   hive_flutter: ^1.1.0 # <--- CHANGE TO LATEST STABLE (e.g., ^1.1.0, but latest is often preferred)
 
@@ -32,6 +33,7 @@ dependencies:
 
   isar_flutter_libs: ^4.0.0-dev.13 # Also note Isar is a dev version, which can introduce instability
   collection: ^1.19.1
+  showcaseview: ^5.0.1
   csv: ^6.0.0
 
 dev_dependencies:

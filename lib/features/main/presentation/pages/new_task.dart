@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/provider/task.dart';
+import 'package:showcaseview/showcaseview.dart';
+
+import '../../../../core/data/showcase_key.dart';
 import '../../../../core/model/task.dart';
 import '../../../../core/provider/goal.dart';
+import '../../../../core/provider/task.dart';
 
 class NewTaskPage extends ConsumerWidget {
   const NewTaskPage({super.key});
@@ -55,7 +58,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
         setState(() {
           _appearanceCount = clampedValue;
         });
-        // Update text field if value was clamped
+
         if (value != clampedValue) {
           _appearanceController.text = clampedValue.toString();
           _appearanceController.selection = TextSelection.fromPosition(
@@ -110,7 +113,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
           ),
         );
 
-        // Clear form and reset to defaults
         _formKey.currentState?.reset();
         setState(() {
           _titleController.clear();
@@ -170,24 +172,26 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                               ),
                     ),
                     const SizedBox(height: 24),
-
-                    // Task Title
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Task Title',
-                        border: OutlineInputBorder(),
+                    Showcase(
+                      key: twelve,
+                      title: "new task",
+                      description:
+                          "Enter the task title here,task are recommanded to be short ones that you can complete in a short period of time, such as 45 mintues",
+                      child: TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Task Title',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a task title';
+                          }
+                          return null;
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a task title';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 16),
-
-                    // Description
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
@@ -197,188 +201,204 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                       maxLines: 4,
                     ),
                     const SizedBox(height: 24),
-
-                    // Appearance Count Section
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Appearance Count',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withAlpha(30),
-                                borderRadius: BorderRadius.circular(12),
+                    Showcase(
+                      key: thirteen,
+                      title: "appearance",
+                      description:
+                          "For each task you can set the amount of time that a task could appear, this is for simpilfying the work flow, as not a lot of people want to create a lot of tasks - it will be a mess.",
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Appearance Count',
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              child: Text(
-                                '$_appearanceCount time${_appearanceCount > 1 ? 's' : ''}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'How many times this task appears before completion',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withAlpha(153),
-                                  ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Number Input Field
-                        TextFormField(
-                          controller: _appearanceController,
-                          decoration: const InputDecoration(
-                            labelText: 'Enter number (1-100)',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.repeat),
-                          ),
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a number';
-                            }
-                            final numValue = int.tryParse(value);
-                            if (numValue == null || numValue < 1) {
-                              return 'Please enter a number greater than 0';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Slider
-                        Slider(
-                          value: _appearanceCount.toDouble(),
-                          min: 1,
-                          max: 100,
-                          divisions: 99,
-                          label: _appearanceCount.toString(),
-                          onChanged: _onAppearanceSliderChanged,
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-
-                    // Importance Slider
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Importance Level',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  size: 20,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withAlpha(30),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$_importance/10',
+                                child: Text(
+                                  '$_appearanceCount time${_appearanceCount > 1 ? 's' : ''}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium
                                       ?.copyWith(
                                         fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'How important this task is (affects priority)',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withAlpha(153),
-                                  ),
-                        ),
-                        const SizedBox(height: 12),
-                        Slider(
-                          value: _importance.toDouble(),
-                          min: 1,
-                          max: 10,
-                          divisions: 9,
-                          label: _importance.toString(),
-                          onChanged: (value) {
-                            setState(() {
-                              _importance = value.round();
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-
-                    // Goal Selection Section
-                    if (goals.isNotEmpty) ...[
-                      Text(
-                        'Link to Goals (optional)',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 12),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 200),
-                        child: SingleChildScrollView(
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: goals.map((goal) {
-                              final isSelected =
-                                  _selectedGoalIds.contains(goal.key);
-                              return FilterChip(
-                                label: Text(goal.title),
-                                selected: isSelected,
-                                onSelected: (_) =>
-                                    _toggleGoalSelection(goal.key!),
-                                selectedColor: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withAlpha(51),
-                                checkmarkColor:
-                                    Theme.of(context).colorScheme.primary,
-                                showCheckmark: true,
-                              );
-                            }).toList(),
+                              ),
+                            ],
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'How many times this task appears before completion',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withAlpha(153),
+                                    ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _appearanceController,
+                            decoration: const InputDecoration(
+                              labelText: 'Enter number (1-100)',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.repeat),
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a number';
+                              }
+                              final numValue = int.tryParse(value);
+                              if (numValue == null || numValue < 1) {
+                                return 'Please enter a number greater than 0';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          Slider(
+                            value: _appearanceCount.toDouble(),
+                            min: 1,
+                            max: 100,
+                            divisions: 99,
+                            label: _appearanceCount.toString(),
+                            onChanged: _onAppearanceSliderChanged,
+                          ),
+                          const SizedBox(height: 24),
+                        ],
                       ),
-                      const SizedBox(height: 24),
+                    ),
+                    Showcase(
+                      key: fourteen,
+                      title: "Importance",
+                      description:
+                          "foundation of random generation of tasks, the higher the importance the more likely that this task get generated first",
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Importance Level',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    size: 20,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$_importance/10',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'How important this task is (affects priority)',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withAlpha(153),
+                                    ),
+                          ),
+                          const SizedBox(height: 12),
+                          Slider(
+                            value: _importance.toDouble(),
+                            min: 1,
+                            max: 10,
+                            divisions: 9,
+                            label: _importance.toString(),
+                            onChanged: (value) {
+                              setState(() {
+                                _importance = value.round();
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                    if (goals.isNotEmpty) ...[
+                      Showcase(
+                          key: fifteen,
+                          title: "goal linking",
+                          description:
+                              "by subscribing a task to a goal, you could increase the streak of it by simply completing this task, a task could of-course, link to multiple goals.",
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Link to Goals (optional)',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 12),
+                                ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxHeight: 200),
+                                  child: SingleChildScrollView(
+                                    child: Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: goals.map((goal) {
+                                        final isSelected =
+                                            _selectedGoalIds.contains(goal.key);
+                                        return FilterChip(
+                                          label: Text(goal.title),
+                                          selected: isSelected,
+                                          onSelected: (bool selected) {
+                                            if (goal.key != null) {
+                                              _toggleGoalSelection(goal.key!);
+                                            }
+                                          },
+                                          selectedColor: Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withAlpha(51),
+                                          checkmarkColor: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          showCheckmark: true,
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                              ]))
                     ],
-
-                    // Action Buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -404,8 +424,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                 ),
               ),
             ),
-
-            // Goal creation prompt
             if (goals.isEmpty) ...[
               const SizedBox(height: 16),
               Card(

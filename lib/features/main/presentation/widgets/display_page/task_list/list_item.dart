@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:streak/core/data/quote.dart';
 import '../../../../../../core/provider/task.dart';
 import '../../../../../../core/provider/goal.dart';
 import '../../../../../../core/model/task.dart';

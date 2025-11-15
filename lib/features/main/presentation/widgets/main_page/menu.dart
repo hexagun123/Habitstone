@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../../core/data/showcase_key.dart';
 
 class NavigationMenu extends ConsumerWidget {
   final Function(String) onNavigate;
@@ -27,42 +29,67 @@ class NavigationMenu extends ConsumerWidget {
             Expanded(
               child: ListView(
                 children: [
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.add_task_outlined,
-                    title: 'New goal',
-                    onTap: () => onNavigate('new-goal'),
-                  ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.checklist_outlined,
-                    title: 'New Task',
-                    onTap: () => onNavigate('new-task'),
-                  ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.display_settings_outlined,
-                    title: 'My Lists',
-                    onTap: () => onNavigate('display'),
-                  ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.toys,
-                    title: 'New Reward',
-                    onTap: () => onNavigate('new-reward'),
-                  ),
+                  Showcase(
+                      key: six,
+                      title: "Goal",
+                      description:
+                          "This place is for setting up a new goal, try to make these goals something broad, general, that you want to work upon to maintain a habit of.",
+                      child: _buildMenuItem(
+                        context,
+                        icon: Icons.add_task_outlined,
+                        title: 'New goal',
+                        onTap: () => onNavigate('new-goal'),
+                      )),
+                  Showcase(
+                      key: seven,
+                      title: "Task",
+                      description:
+                          "This place is for creating a new task, try to make them as specific as possible",
+                      child: _buildMenuItem(
+                        context,
+                        icon: Icons.checklist_outlined,
+                        title: 'New Task',
+                        onTap: () => onNavigate('new-task'),
+                      )),
+                  Showcase(
+                      key: eight,
+                      title: "My list",
+                      description:
+                          "an overview of everything you have done, and the place to assign tasks, complete tasks and to modify other things.",
+                      child: _buildMenuItem(
+                        context,
+                        icon: Icons.display_settings_outlined,
+                        title: 'My Lists',
+                        onTap: () => onNavigate('display'),
+                      )),
+                  Showcase(
+                      key: nine,
+                      title: "reward",
+                      description:
+                          "This is the place to set reward for yourself, don't hesitate, you will deserve it!",
+                      child: _buildMenuItem(
+                        context,
+                        icon: Icons.toys,
+                        title: 'New Reward',
+                        onTap: () => onNavigate('new-reward'),
+                      )),
 
                   const SizedBox(height: 16),
                   const Divider(),
                   const SizedBox(height: 16),
                   //temp
 
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.settings_outlined,
-                    title: 'Settings',
-                    onTap: () => onNavigate('setting'),
-                  ),
+                  Showcase(
+                      key: ten,
+                      title: "setting",
+                      description:
+                          "This is the place to modify the setting, and to take another tutorial! Next step: click on the new-goal button!",
+                      child: _buildMenuItem(
+                        context,
+                        icon: Icons.settings_outlined,
+                        title: 'Settings',
+                        onTap: () => onNavigate('setting'),
+                      )),
                 ],
               ),
             ),
