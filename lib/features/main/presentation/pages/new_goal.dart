@@ -1,4 +1,6 @@
-// lib/features/main/presentation/pages/new_goal.dart
+/// This file defines the NewGoalPage, which provides the user interface
+/// for creating a new long-term goal. It includes a form for inputting
+/// goal details and a section with examples to guide the user.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,9 @@ import '../../../../core/model/goal.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../../../../core/data/showcase_key.dart';
 
+/// The main page widget for creating a new goal.
+///
+/// It provides the basic layout structure (Scaffold, AppBar) and includes the [NewGoalForm].
 class NewGoalPage extends ConsumerWidget {
   const NewGoalPage({super.key});
 
@@ -18,18 +23,20 @@ class NewGoalPage extends ConsumerWidget {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
+            // Showcase widget to highlight the form during the app's tutorial.
             child: Showcase(
                 key: eleven,
                 title: "new goal",
                 description:
                     "Just fill in the title to complete a new goal, I recommand to write down all the goals first before doing anything else, as they are inter-dependent. Next step: click on the new-task button!",
-                child: NewGoalForm()),
+                child: const NewGoalForm()),
           ),
         ));
   }
 }
 
+/// A stateful widget that contains the form for creating a new goal.
 class NewGoalForm extends ConsumerStatefulWidget {
   const NewGoalForm({super.key});
 
@@ -37,23 +44,37 @@ class NewGoalForm extends ConsumerStatefulWidget {
   ConsumerState<NewGoalForm> createState() => _NewGoalFormState();
 }
 
+/// The state associated with [NewGoalForm].
+///
+/// Manages the form's state, including text controllers for the goal's title
+/// and description, validation logic, and the submission process.
 class _NewGoalFormState extends ConsumerState<NewGoalForm> {
+  // A global key that uniquely identifies the Form widget and allows for validation.
   final _formKey = GlobalKey<FormState>();
+  // Controllers for managing the text input fields.
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  // Tracks the submission state to show a loading indicator and disable buttons.
   bool _isSubmitting = false;
 
   @override
   void dispose() {
+    // Clean up the controllers when the widget is disposed to prevent memory leaks.
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
+  /// Handles the goal creation process.
+  ///
+  /// This method validates the form, creates a new [Goal] object, calls the
+  /// [goalProvider] to save it, shows a success or error message to the user,
+  /// and finally resets the form before navigating back to the main page.
   Future<void> _createGoal() async {
+    // Return early if form validation fails.
     if (!_formKey.currentState!.validate()) return;
 
-    // Unfocus keyboard first
+    // Unfocus any active text fields to dismiss the keyboard.
     FocusScope.of(context).unfocus();
 
     setState(() => _isSubmitting = true);
@@ -64,10 +85,11 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
         description: _descriptionController.text.trim(),
       );
 
+      // Call the provider's method to create the goal.
       await ref.read(goalProvider.notifier).createGoal(newGoal);
 
       if (mounted) {
-        // Show success snackbar
+        // Show a success message to the user.
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Goal created successfully!'),
@@ -76,10 +98,10 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
           ),
         );
 
-        // Reset the form state
+        // Reset the form fields to their initial state.
         _formKey.currentState?.reset();
 
-        // Clear controllers
+        // Explicitly clear controllers after form reset.
         Future.delayed(Duration.zero, () {
           if (mounted) {
             setState(() {
@@ -89,11 +111,12 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
           }
         });
 
-        // Navigate back after creation
+        // Navigate back to the home page after successful creation.
         context.go('/');
       }
     } catch (e) {
       if (mounted) {
+        // Show an error message if creation fails.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
@@ -103,6 +126,7 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
         );
       }
     } finally {
+      // Ensure the submitting state is reset, even if an error occurred.
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
@@ -114,12 +138,14 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // The main card containing the form fields.
           Card(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Form header.
                   Text(
                     'Goal Details',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -127,6 +153,7 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
                         ),
                   ),
                   const SizedBox(height: 24),
+                  // Goal Title text field.
                   TextFormField(
                     controller: _titleController,
                     decoration: const InputDecoration(
@@ -142,6 +169,7 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
                     },
                   ),
                   const SizedBox(height: 16),
+                  // Goal Description text field.
                   TextFormField(
                     controller: _descriptionController,
                     decoration: const InputDecoration(
@@ -152,15 +180,18 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
                     maxLines: 4,
                   ),
                   const SizedBox(height: 24),
+                  // Form action buttons (Cancel, Create Goal).
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
+                        // Disable the button during submission.
                         onPressed: _isSubmitting ? null : () => context.pop(),
                         child: const Text('Cancel'),
                       ),
                       const SizedBox(width: 16),
                       ElevatedButton(
+                        // Disable the button and show an indicator during submission.
                         onPressed: _isSubmitting ? null : _createGoal,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
@@ -186,6 +217,7 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
             ),
           ),
           const SizedBox(height: 16),
+          // A section providing examples of goals to guide the user.
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
@@ -209,6 +241,9 @@ class _NewGoalFormState extends ConsumerState<NewGoalForm> {
   }
 }
 
+/// A private helper widget to display a single example goal item.
+///
+/// Used to provide users with ideas for what constitutes a good goal.
 class _ExampleGoalItem extends StatelessWidget {
   final String title;
   final String description;

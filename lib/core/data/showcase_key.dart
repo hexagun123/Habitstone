@@ -1,3 +1,6 @@
+// just a bunch of keys stored here for easy retrival
+// used for the showcaseview package
+
 import 'package:flutter/material.dart';
 final GlobalKey one = GlobalKey();
 final GlobalKey two = GlobalKey();

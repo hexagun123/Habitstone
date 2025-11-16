@@ -1,7 +1,13 @@
 // lib/theme/app_theme.dart
+// This file centralizes the application's theming logic.
+// It defines multiple theme modes, their corresponding color schemes, fonts,
+// and custom styles for various Flutter widgets. This allows for a consistent
+// look and feel across the app and provides an easy way to switch between themes.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// An enumeration of the available application themes.
 enum AppThemeMode {
   light,
   sciFiBlue,
@@ -9,10 +15,18 @@ enum AppThemeMode {
   modernGrey,
 }
 
+/// A utility class for managing and providing `ThemeData` for the application.
+///
+/// This class contains static methods and definitions for different visual themes.
+/// It separates color schemes from component styles, making the theme structure
+/// modular and easy to maintain.
 class AppTheme {
   // --- Common Component Styles (Dynamic - refer to ColorScheme properties) ---
+  // These private methods generate theme data for specific widgets using a
+  // provided ColorScheme. This ensures that UI components are styled consistently
+  // within any selected theme.
 
-  // Base text theme
+  /// Creates a base [TextTheme] using Google Fonts with colors from the provided [colorScheme].
   static TextTheme _baseTextTheme(ColorScheme colorScheme, String fontName) {
     return GoogleFonts.getTextTheme(
       fontName,
@@ -36,20 +50,20 @@ class AppTheme {
     );
   }
 
-  // Elevated Button Style
+  /// Creates an [ElevatedButtonThemeData] with styles derived from the [colorScheme].
   static ElevatedButtonThemeData _elevatedButtonTheme(ColorScheme colorScheme) {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: colorScheme.primary, // Button background
+        foregroundColor: colorScheme.onPrimary, // Text and icon color
       ),
     );
   }
 
-  // Input Decoration Theme
+  /// Creates an [InputDecorationTheme] for text fields based on the [colorScheme].
   static InputDecorationTheme _inputDecorationTheme(ColorScheme colorScheme) {
     return InputDecorationTheme(
       filled: true,
@@ -76,11 +90,12 @@ class AppTheme {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       hintStyle: TextStyle(
-          color: colorScheme.onSurface.withAlpha((255 * 0.6).round())),
+          color: colorScheme.onSurface
+              .withAlpha((255 * 0.6).round())), // Hint text with 60% opacity
     );
   }
 
-  // App Bar Theme
+  /// Creates an [AppBarTheme] using colors from the [colorScheme].
   static AppBarTheme _appBarTheme(ColorScheme colorScheme) {
     return AppBarTheme(
       elevation: 0,
@@ -95,7 +110,7 @@ class AppTheme {
     );
   }
 
-  // Card Theme
+  /// Creates a [CardThemeData] with styles derived from the [colorScheme].
   static CardThemeData _cardTheme(ColorScheme colorScheme) {
     return CardThemeData(
       elevation: 4,
@@ -105,11 +120,12 @@ class AppTheme {
       ),
       margin: const EdgeInsets.all(8),
       color: colorScheme.surfaceContainerHigh,
-      shadowColor: colorScheme.shadow.withAlpha((255 * 0.3).round()),
+      shadowColor: colorScheme.shadow
+          .withAlpha((255 * 0.3).round()), // Shadow with 30% opacity
     );
   }
 
-  // Floating Action Button Theme
+  /// Creates a [FloatingActionButtonThemeData] based on the [colorScheme].
   static FloatingActionButtonThemeData _fabTheme(ColorScheme colorScheme) {
     return FloatingActionButtonThemeData(
       backgroundColor: colorScheme.secondary,
@@ -117,18 +133,19 @@ class AppTheme {
     );
   }
 
-  // Bottom Navigation Bar Theme
+  /// Creates a [BottomNavigationBarThemeData] using the [colorScheme].
   static BottomNavigationBarThemeData _bottomNavBarTheme(
       ColorScheme colorScheme) {
     return BottomNavigationBarThemeData(
       backgroundColor: colorScheme.surface,
       selectedItemColor: colorScheme.primary,
-      unselectedItemColor: colorScheme.onSurface.withAlpha((255 * 0.6).round()),
+      unselectedItemColor: colorScheme.onSurface
+          .withAlpha((255 * 0.6).round()), // Unselected item with 60% opacity
     );
   }
 
   // --- Theme Definitions (Only ColorScheme and Font) ---
-
+  /// A map containing the core properties (color scheme and font name) for each [AppThemeMode].
   static const Map<AppThemeMode, Map<String, dynamic>> _themeData = {
     AppThemeMode.light: {
       'colorScheme': ColorScheme.light(
@@ -203,7 +220,13 @@ class AppTheme {
     },
   };
 
-  // --- Get Theme Method ---
+  // --- Public Getters ---
+  // These static methods provide a public interface to access theme properties.
+
+  /// Constructs and returns a full [ThemeData] object for the given [AppThemeMode].
+  ///
+  /// This method retrieves the base color scheme and font, then applies all the
+  /// custom component themes to build the final, complete theme.
   static ThemeData getTheme(AppThemeMode mode) {
     final theme = _themeData[mode]!;
     final colorScheme = theme['colorScheme'] as ColorScheme;
@@ -222,7 +245,7 @@ class AppTheme {
     );
   }
 
-  // --- Get Theme Name Method ---
+  /// Returns a user-friendly string name for the given [AppThemeMode].
   static String getThemeName(AppThemeMode mode) {
     switch (mode) {
       case AppThemeMode.light:
@@ -236,7 +259,8 @@ class AppTheme {
     }
   }
 
-  // --- Get Theme Icon Method ---
+  /// Returns an [IconData] representative of the given [AppThemeMode].
+  /// Useful for displaying theme options in a UI picker.
   static IconData getThemeIcon(AppThemeMode mode) {
     switch (mode) {
       case AppThemeMode.light:

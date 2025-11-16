@@ -1,10 +1,13 @@
-// core/data/util.dart
-// all the date time utilities
-// a helper class
+/// A utility class for handling common date and time operations.
+/// This class standardizes how dates are retrieved to ensure consistency
+/// in date-based logic, such as streak calculations, by ignoring time components.
 
 class DateUtil {
-  // get all the date time function here
-  // get now straight from here to avoid any utc errors
-  static DateTime temp = DateTime.now().toUtc();
-  static DateTime now() => DateTime(temp.year, temp.month, temp.day); // goes straight to days, w~
+  /// Returns a `DateTime` object representing the current date at midnight UTC.
+  ///
+  /// This method make time easier to deal with, as now there is only equal comparasents.
+  static DateTime now() {
+    DateTime temp = DateTime.now().toUtc(); // Get current time in UTC.
+    return DateTime(temp.year, temp.month, temp.day); // Return date part only.
+  }
 }

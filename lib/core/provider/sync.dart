@@ -1,81 +1,86 @@
-// core/provider/sync.dart
+/// This file sets up the data synchronization logic between the local Hive database
+/// and the remote Firebase Firestore database using Riverpod providers. It ensures
+/// that local data changes are pushed to the cloud and remote changes are pulled
+/// down, maintaining data consistency across the application.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart'; // REQUIRED for BoxEvent
-import '../provider/app.dart'; // For hiveRepositoryProvider
-import '../provider/auth.dart'; // For authStateProvider
-import '../data/sync.dart'; // For FirebaseSync class
-import '../model/goal.dart'; // For Goal type casting
-import '../model/task.dart'; // For Task type casting
-import '../model/reward.dart'; // For Reward type casting
+import 'package:hive_flutter/hive_flutter.dart';
+import '../provider/app.dart';
+import '../provider/auth.dart';
+import '../data/sync.dart';
+import '../model/goal.dart';
+import '../model/task.dart';
+import '../model/reward.dart';
 
-// Provider for the FirebaseSync service itself
+/// Provides an instance of the [FirebaseSync] service.
+/// This service encapsulates the core logic for interacting with Firebase Firestore,
+/// such as pushing updates, pulling data, and deleting documents.
 final firebaseSyncProvider = Provider<FirebaseSync>((ref) {
   final hiveRepo = ref.watch(hiveRepositoryProvider);
   return FirebaseSync(hiveRepo);
 });
 
-/// This provider initializes and manages the local Hive listeners
-/// that push changes to Firebase, respecting the sync state.
+/// This provider acts as the main controller for the synchronization process.
+/// It initializes and manages listeners for both local (Hive) and remote (Firebase)
+/// data changes. The `autoDispose` modifier ensures that all listeners are cleaned
+// up automatically when the provider is no longer in use, preventing memory leaks.
 final syncControllerProvider = Provider.autoDispose<void>((ref) {
   final hiveRepo = ref.watch(hiveRepositoryProvider);
   final syncService = ref.watch(firebaseSyncProvider);
 
+  // Retrieve the current user from the authentication state.
   final user = ref.watch(authStateProvider).value;
+
+  // If there is no authenticated user, halt all synchronization activities.
   if (user == null) {
-    // If user logs out or is null, stop all sync operations
-    syncService.stopRealtimeListeners();
-    // Potentially clear local data if it's user-specific and not for offline-first multi-user
-    // await hiveRepo.clearAllBoxes(); // Use with caution, depending on app logic
+    syncService.stopRealtimeListeners(); // Stop listening for remote changes.
     return;
   }
 
-  // When a user is logged in, start Firebase real-time listeners.
-  // Ensure they are stopped when this provider is disposed (e.g., user logs out).
+  // Ensure Firebase listeners are stopped when the user logs out or the app closes.
   ref.onDispose(() {
     syncService.stopRealtimeListeners();
   });
+  // Start listening for real-time updates from Firebase for the logged-in user.
   syncService.startRealtimeListeners();
 
-  // It's crucial to perform a full data pull from Firebase to Hive
-  // when the user signs in or the app starts with an authenticated user.
-  // This ensures the local cache is up-to-date before any local edits happen.
-  // This should ideally happen *once* after successful authentication.
-  // You might want to move this into an app initialization flow or auth state change listener.
-  // For now, doing it here will ensure it runs when the provider is initialized for an authenticated user.
+  /// Fetches all data from Firebase when a user is authenticated.
+  /// This initial pull ensures the local Hive database is up-to-date with the
+  /// server's state before any local modifications are made.
   ref.watch(authStateProvider).whenData((user) {
     if (user != null) {
-      // Only pull data if user is authenticated and not already syncing from server
+      // Check flag to prevent pulling data while another server operation is in progress.
       if (!syncService.isPerformingServerOperation) {
         syncService.pullAllData().catchError((e) {
-          print("Error pulling initial data: $e");
-          // Handle error, e.g., show a snackbar to the user
+          // Log any errors during the initial data fetch.
         });
       }
     }
   });
 
-  // --- GOAL LISTENER ---
+  /// --- GOAL LISTENER ---
+  /// Listens for local changes in the Hive 'goals' box.
+  /// When a change is detected, it triggers the corresponding synchronization
+  /// action (update, add, or delete) to Firebase.
   hiveRepo.goalsBox?.watch().listen((BoxEvent event) {
-    // If FirebaseSync is currently processing a server-initiated change,
-    // we should ignore this local Hive change to prevent a sync loop.
+    // Prevents an infinite loop by ignoring local changes that were initiated by the server.
     if (syncService.isPerformingServerOperation) {
       return;
     }
 
     if (event.deleted) {
+      // If a goal is deleted locally, delete it from Firebase.
       syncService.deleteDocument(event.key, 'goals');
     } else {
+      // If a goal is added or updated, sync its data to Firebase.
       if (event.value != null) {
         syncService.syncGoal(event.value as Goal);
-      } else {
-        print(
-            "Warning: Hive goal event with null value for key ${event.key}, type ${event.deleted ? 'deleted' : 'modified/added'}");
       }
     }
   });
 
-  // --- TASK LISTENER ---
+  /// --- TASK LISTENER ---
+  /// Listens for local changes in the Hive 'tasks' box and syncs them to Firebase.
   hiveRepo.tasksBox?.watch().listen((BoxEvent event) {
     if (syncService.isPerformingServerOperation) {
       return;
@@ -86,14 +91,12 @@ final syncControllerProvider = Provider.autoDispose<void>((ref) {
     } else {
       if (event.value != null) {
         syncService.syncTask(event.value as Task);
-      } else {
-        print(
-            "Warning: Hive task event with null value for key ${event.key}, type ${event.deleted ? 'deleted' : 'modified/added'}");
       }
     }
   });
 
-  // --- REWARD LISTENER ---
+  /// --- REWARD LISTENER ---
+  /// Listens for local changes in the Hive 'rewards' box and syncs them to Firebase.
   hiveRepo.rewardsBox?.watch().listen((BoxEvent event) {
     if (syncService.isPerformingServerOperation) {
       return;
@@ -104,9 +107,6 @@ final syncControllerProvider = Provider.autoDispose<void>((ref) {
     } else {
       if (event.value != null) {
         syncService.syncReward(event.value as Reward);
-      } else {
-        print(
-            "Warning: Hive reward event with null value for key ${event.key}, type ${event.deleted ? 'deleted' : 'modified/added'}");
       }
     }
   });
