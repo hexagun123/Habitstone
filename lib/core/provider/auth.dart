@@ -23,7 +23,7 @@ final firebaseSyncProvider = Provider<FirebaseSync>((ref) {
 /// These values are passed to the application at build time using the
 /// `--dart-define` flag.
 const String webClientId = String.fromEnvironment('WEB_CLIENT_ID');
-const String desktopClientId = String.fromEnvironment('WEB_CLIENT_ID');
+const String desktopClientId = String.fromEnvironment('DESKTOP_CLIENT_ID');
 const String desktopClientSecret =
     String.fromEnvironment('DESKTOP_CLIENT_SECRET');
 
@@ -44,7 +44,7 @@ final googleSignInProvider = Provider<GoogleSignIn>((ref) {
         clientId: desktopClientId,
         clientSecret: desktopClientSecret,
         scopes: ['email', 'profile'],
-        redirectPort: 3000);
+        redirectPort: 5000);
   } else {
     // Default configuration for mobile (iOS/Android).
     params = const GoogleSignInParams(
