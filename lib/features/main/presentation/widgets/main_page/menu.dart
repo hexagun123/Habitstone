@@ -1,9 +1,24 @@
+// features/main/presentation/widgets/main_page/menu.dart
+// This file defines the `NavigationMenu` widget, a primary UI component for
+// navigating between the main sections of the application. It is integrated
+// with the `ShowcaseView` package to provide an interactive tutorial for
+// first-time users.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:showcaseview/showcaseview.dart';
+
 import '../../../../../core/data/showcase_key.dart';
 
+/// A navigation widget displayed as a card on the main screen.
+///
+/// This widget presents a list of tappable items that allow the user to
+/// navigate to different features like creating goals, tasks, rewards, or
+/// viewing their lists. It uses an `onNavigate` callback to delegate the
+//  actual navigation logic to its parent widget.
 class NavigationMenu extends ConsumerWidget {
+  /// A callback function that is invoked with a route name when a menu
+  /// item is tapped.
   final Function(String) onNavigate;
 
   const NavigationMenu({
@@ -19,6 +34,7 @@ class NavigationMenu extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- Section Title ---
             Text(
               'Navigation',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -26,71 +42,80 @@ class NavigationMenu extends ConsumerWidget {
                   ),
             ),
             const SizedBox(height: 16),
+
+            // --- Scrollable Menu Items ---
             Expanded(
               child: ListView(
                 children: [
+                  // Each navigation item is wrapped in a `Showcase` widget. This
+                  // integrates it into the app's interactive tutorial, highlighting
+                  // the feature and explaining its purpose to new users.
                   Showcase(
-                      key: six,
-                      title: "Goal",
-                      description:
-                          "This place is for setting up a new goal, try to make these goals something broad, general, that you want to work upon to maintain a habit of.",
-                      child: _buildMenuItem(
-                        context,
-                        icon: Icons.add_task_outlined,
-                        title: 'New goal',
-                        onTap: () => onNavigate('new-goal'),
-                      )),
+                    key: six, // Unique key for this tutorial step.
+                    title: "New Goal",
+                    description:
+                        "Set broad, overarching goals you want to work towards.",
+                    child: _buildMenuItem(
+                      context,
+                      icon: Icons.add_task_outlined,
+                      title: 'New Goal',
+                      onTap: () => onNavigate('new-goal'),
+                    ),
+                  ),
                   Showcase(
-                      key: seven,
-                      title: "Task",
-                      description:
-                          "This place is for creating a new task, try to make them as specific as possible",
-                      child: _buildMenuItem(
-                        context,
-                        icon: Icons.checklist_outlined,
-                        title: 'New Task',
-                        onTap: () => onNavigate('new-task'),
-                      )),
+                    key: seven,
+                    title: "New Task",
+                    description:
+                        "Create specific, actionable tasks to achieve your goals.",
+                    child: _buildMenuItem(
+                      context,
+                      icon: Icons.checklist_outlined,
+                      title: 'New Task',
+                      onTap: () => onNavigate('new-task'),
+                    ),
+                  ),
+                  Showcase(
+                    key: nine,
+                    title: "New Reward",
+                    description:
+                        "Define rewards for yourself for making progress.",
+                    child: _buildMenuItem(
+                      context,
+                      icon: Icons.toys,
+                      title: 'New Reward',
+                      onTap: () => onNavigate('new-reward'),
+                    ),
+                  ),
+                  Showcase(
+                    key: eight,
+                    title: "My Lists",
+                    description:
+                        "View, manage, and complete your goals and tasks.",
+                    child: _buildMenuItem(
+                      context,
+                      icon: Icons.display_settings_outlined,
+                      title: 'My Lists',
+                      onTap: () => onNavigate('display'),
+                    ),
+                  ),
 
-                  Showcase(
-                      key: nine,
-                      title: "reward",
-                      description:
-                          "This is the place to set reward for yourself, don't hesitate, you will deserve it!",
-                      child: _buildMenuItem(
-                        context,
-                        icon: Icons.toys,
-                        title: 'New Reward',
-                        onTap: () => onNavigate('new-reward'),
-                      )),
-                  Showcase(
-                      key: eight,
-                      title: "My list",
-                      description:
-                          "an overview of everything you have done, and the place to assign tasks, complete tasks and to modify other things.",
-                      child: _buildMenuItem(
-                        context,
-                        icon: Icons.display_settings_outlined,
-                        title: 'My Lists',
-                        onTap: () => onNavigate('display'),
-                      )),
-
+                  // Visual separator for clarity.
                   const SizedBox(height: 16),
                   const Divider(),
                   const SizedBox(height: 16),
-                  //temp
 
                   Showcase(
-                      key: ten,
-                      title: "setting",
-                      description:
-                          "This is the place to modify the setting, and to take another tutorial! Next step: click on the new-goal button!",
-                      child: _buildMenuItem(
-                        context,
-                        icon: Icons.settings_outlined,
-                        title: 'Settings',
-                        onTap: () => onNavigate('setting'),
-                      )),
+                    key: ten,
+                    title: "Settings",
+                    description:
+                        "Customize app settings or retake this tutorial. Next: Tap 'New Goal'!",
+                    child: _buildMenuItem(
+                      context,
+                      icon: Icons.settings_outlined,
+                      title: 'Settings',
+                      onTap: () => onNavigate('setting'),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -100,12 +125,18 @@ class NavigationMenu extends ConsumerWidget {
     );
   }
 
+  /// A private helper method to build a consistent menu item.
+  ///
+  /// This encapsulates the styling and layout for each navigation row,
+  /// ensuring a uniform look and feel across the menu. Using a helper method
+  /// reduces code duplication and improves maintainability.
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
   }) {
+    // InkWell provides the material splash effect on tap.
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -113,12 +144,14 @@ class NavigationMenu extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Row(
           children: [
+            // The icon for the menu item.
             Icon(
               icon,
               size: 20,
               color: Theme.of(context).colorScheme.onSurface.withAlpha(178),
             ),
             const SizedBox(width: 12),
+            // The text label for the menu item.
             Text(
               title,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(

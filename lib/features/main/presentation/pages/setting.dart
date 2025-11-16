@@ -1,4 +1,5 @@
-// lib/features/main/presentation/pages/setting.dart
+/// This file defines the SettingPage, providing a UI for users to configure
+/// application settings like theme, task randomization weight, and to restart the tutorial.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,13 +10,20 @@ import '../../../../core/provider/setting.dart';
 import '../../../../core/provider/theme.dart';
 import '../../../../core/theme/app_theme.dart';
 
+/// A screen that allows the user to modify application settings.
+///
+/// This `ConsumerWidget` watches theme and settings providers to display current
+/// values and provides controls to update them. It also includes an option
+/// to restart the app's feature tour.
 class SettingPage extends ConsumerWidget {
   const SettingPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch providers to get current state and rebuild on change.
     final currentTheme = ref.watch(themeProvider);
     final currentSettings = ref.watch(settingsProvider);
+    // Read the notifier to call methods that change the state.
     final settingsNotifier = ref.read(settingsProvider.notifier);
 
     return Scaffold(
@@ -27,16 +35,19 @@ class SettingPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Group settings items within a single Card for a cohesive look.
             Card(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Column(
                   children: [
+                    // Showcase widget for the "Theme" setting during the tutorial.
                     Showcase(
                       key: twentySix,
                       title: "Theme",
                       description:
                           "Welcome to the settings! You could change the theme of the app by clicking on this button.",
+                      // Menu item for changing the application theme.
                       child: _buildMenuItem(
                         context,
                         icon: getThemeIcon(currentTheme),
@@ -48,11 +59,13 @@ class SettingPage extends ConsumerWidget {
                       ),
                     ),
                     const Divider(height: 1),
+                    // Showcase widget for the "Weight" setting.
                     Showcase(
                       key: twentySeven,
                       title: "Weight",
                       description:
                           "The special attribute that I mentioned in randomly generating tasks, if you would like the easy tasks first, reduce the weight, if you would like the hard tasks first, increase the weight.",
+                      // Slider for adjusting the task randomization weight.
                       child: _buildWeightSlider(
                         context,
                         currentWeight: currentSettings.weight,
@@ -62,11 +75,13 @@ class SettingPage extends ConsumerWidget {
                       ),
                     ),
                     const Divider(height: 1),
+                    // Showcase widget for the "Restart Tutorial" button.
                     Showcase(
                       key: twentyEight,
                       title: "Tutorial",
                       description:
                           "You have reached the end of the tutorial. If you want to review it again, just click this button.",
+                      // Menu item to restart the application tutorial.
                       child: _buildMenuItem(
                         context,
                         icon: Icons.school_outlined,
@@ -74,10 +89,9 @@ class SettingPage extends ConsumerWidget {
                         onTap: () {
                           // Navigate back to the main page.
                           GoRouter.of(context).go('/');
-
-                          // After a short delay to allow for the page transition,
-                          // start the showcase on the main page.
-                          Future.delayed(const Duration(milliseconds: 400), () {
+                          // Delay is needed to allow the UI to transition before starting the showcase.
+                          Future.delayed(const Duration(milliseconds: 400),
+                              () {
                             ShowcaseView.get().startShowCase([
                               one,
                               two,
@@ -104,6 +118,7 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
+  /// A helper widget to build a consistent menu item with an icon, title, and an onTap callback.
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
@@ -135,6 +150,7 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
+  /// A helper widget to build the slider for adjusting the task randomization weight.
   Widget _buildWeightSlider(
     BuildContext context, {
     required int currentWeight,
@@ -145,6 +161,7 @@ class SettingPage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header for the slider section.
           Row(
             children: [
               Icon(
@@ -162,16 +179,18 @@ class SettingPage extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
+          // The slider control.
           Slider(
             value: currentWeight.toDouble(),
             min: 1,
             max: 10,
-            divisions: 9,
+            divisions: 9, // Allows for integer steps from 1 to 10.
             label: currentWeight.toString(),
             onChanged: (value) {
               onWeightChanged(value.toInt());
             },
           ),
+          // Informational text below the slider.
           Text(
             'Adjust weight setting (1-10)',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(

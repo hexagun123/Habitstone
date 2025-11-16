@@ -1,3 +1,6 @@
+/// This file defines the UI and logic for the "New Task" page, allowing users
+/// to create and configure new tasks. It includes a form for inputting task details
+/// like title, description, appearance count, importance, and linking to existing goals.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +11,8 @@ import '../../../../core/model/task.dart';
 import '../../../../core/provider/goal.dart';
 import '../../../../core/provider/task.dart';
 
+/// The main page widget for creating a new task.
+/// It provides the basic layout structure (Scaffold and AppBar).
 class NewTaskPage extends ConsumerWidget {
   const NewTaskPage({super.key});
 
@@ -25,6 +30,7 @@ class NewTaskPage extends ConsumerWidget {
   }
 }
 
+/// A stateful widget that contains the form for creating a new task.
 class NewTaskForm extends ConsumerStatefulWidget {
   const NewTaskForm({super.key});
 
@@ -32,23 +38,33 @@ class NewTaskForm extends ConsumerStatefulWidget {
   ConsumerState<NewTaskForm> createState() => _NewTaskFormState();
 }
 
+/// The state associated with [NewTaskForm].
+/// It manages the form's state, including text controllers, validation,
+/// and submission logic.
 class _NewTaskFormState extends ConsumerState<NewTaskForm> {
+  // A global key that uniquely identifies the Form widget and allows validation.
   final _formKey = GlobalKey<FormState>();
+  // Controllers for managing the text input fields.
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _appearanceController = TextEditingController(text: '1');
-  bool _isSubmitting = false;
-  List<String> _selectedGoalIds = [];
-
-  int _appearanceCount = 1;
-  int _importance = 5;
+  // State variables for form logic.
+  bool _isSubmitting =
+      false; // Tracks submission state to show loading indicator.
+  List<String> _selectedGoalIds = []; // Stores keys of linked goals.
+  int _appearanceCount = 1; // Stores the value for the appearance slider/field.
+  int _importance = 5; // Stores the value for the importance slider.
 
   @override
   void initState() {
     super.initState();
+    // Listen for changes in the appearance text field to sync state.
     _appearanceController.addListener(_onAppearanceTextChanged);
   }
 
+  /// Synchronizes the `_appearanceCount` state variable with the text field.
+  /// It parses the text, clamps the value between 1 and 100, and updates
+  /// the text field if the parsed value was outside this range.
   void _onAppearanceTextChanged() {
     final text = _appearanceController.text;
     if (text.isNotEmpty) {
@@ -59,8 +75,10 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
           _appearanceCount = clampedValue;
         });
 
+        // If the entered value was out of bounds, update the text field.
         if (value != clampedValue) {
           _appearanceController.text = clampedValue.toString();
+          // Move cursor to the end of the text.
           _appearanceController.selection = TextSelection.fromPosition(
             TextPosition(offset: _appearanceController.text.length),
           );
@@ -69,6 +87,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     }
   }
 
+  /// Updates the `_appearanceCount` and the corresponding text field when the slider is changed.
   void _onAppearanceSliderChanged(double value) {
     final intValue = value.round();
     setState(() {
@@ -79,6 +98,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
 
   @override
   void dispose() {
+    // Clean up controllers to prevent memory leaks.
     _titleController.dispose();
     _descriptionController.dispose();
     _appearanceController.removeListener(_onAppearanceTextChanged);
@@ -86,10 +106,14 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     super.dispose();
   }
 
+  /// Handles the task creation process.
+  /// It validates the form, creates a new Task object, calls the provider
+  /// to save it, shows feedback to the user, and resets the form.
   Future<void> _createTask() async {
+    // Abort if the form is not valid.
     if (!_formKey.currentState!.validate()) return;
 
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).unfocus(); // Dismiss keyboard.
     setState(() => _isSubmitting = true);
 
     try {
@@ -99,12 +123,15 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
         goalIds: _selectedGoalIds,
         appearanceCount: _appearanceCount,
         importance: _importance,
-        display: false,
+        display:
+            false, // New tasks are added to the pool, not displayed directly.
       );
 
+      // Call the provider to handle the creation logic.
       await ref.read(taskProvider.notifier).createTask(newTask);
 
       if (mounted) {
+        // Show success message.
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Task created successfully!'),
@@ -113,6 +140,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
           ),
         );
 
+        // Reset the form to its initial state for the next entry.
         _formKey.currentState?.reset();
         setState(() {
           _titleController.clear();
@@ -125,6 +153,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
       }
     } catch (e) {
       if (mounted) {
+        // Show error message on failure.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
@@ -134,10 +163,12 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
         );
       }
     } finally {
+      // Ensure the submitting state is reset regardless of outcome.
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
+  /// Toggles the selection state of a goal chip.
   void _toggleGoalSelection(String goalId) {
     setState(() {
       if (_selectedGoalIds.contains(goalId)) {
@@ -150,6 +181,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch the goal provider to get the list of available goals.
     final goals = ref.watch(goalProvider);
 
     return SingleChildScrollView(
@@ -158,6 +190,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Main form card
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -172,6 +205,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                               ),
                     ),
                     const SizedBox(height: 24),
+                    // Task Title field
                     Showcase(
                       key: twelve,
                       title: "new task",
@@ -192,6 +226,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    // Task Description field
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
@@ -201,6 +236,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                       maxLines: 4,
                     ),
                     const SizedBox(height: 24),
+                    // Appearance Count section
                     Showcase(
                       key: thirteen,
                       title: "appearance",
@@ -285,6 +321,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                         ],
                       ),
                     ),
+                    // Importance Level section
                     Showcase(
                       key: fourteen,
                       title: "Importance",
@@ -350,6 +387,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                         ],
                       ),
                     ),
+                    // Goal Linking section (conditional)
                     if (goals.isNotEmpty) ...[
                       Showcase(
                           key: fifteen,
@@ -399,6 +437,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                 const SizedBox(height: 24),
                               ]))
                     ],
+                    // Form action buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -413,8 +452,8 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2), // Loading indicator
                                 )
                               : const Text('Create Task'),
                         ),
@@ -424,6 +463,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                 ),
               ),
             ),
+            // "No Goals" prompt (conditional)
             if (goals.isEmpty) ...[
               const SizedBox(height: 16),
               Card(
