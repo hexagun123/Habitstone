@@ -79,9 +79,6 @@ class _MyAppState extends ConsumerState<MyApp> {
   /// This method centralizes the tutorial's logic, defining an automated,
   /// multi-page tour that guides new users through the app's core features.
   void _initializeShowcaseView() {
-    // Read the router once for navigation, as it won't change during this lifecycle.
-    final router = ref.read(routerProvider);
-
     ShowcaseView.register(
       enableAutoScroll: true,
       scrollDuration: const Duration(milliseconds: 500),
@@ -91,6 +88,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       // screen and starts the subsequent set of showcases.
       onComplete: (index, key) {
         debugPrint('Showcase completed for key: $key');
+
+        // Read the router once for navigation, as it won't change during this lifecycle.
+        final router = ref.read(routerProvider);
 
         // Defines the sequence of navigation and showcase activation.
         if (key == ten) {
@@ -126,7 +126,8 @@ class _MyAppState extends ConsumerState<MyApp> {
             ]);
           });
         }
-        if (key == twentyThree) {
+        if (key == twentyFive) {
+          router.go('/');
           router.push('/setting');
           Future.delayed(const Duration(milliseconds: 400), () {
             ShowcaseView.get()

@@ -75,7 +75,7 @@ class NavigationMenu extends ConsumerWidget {
                     ),
                   ),
                   Showcase(
-                    key: nine,
+                    key: eight,
                     title: "New Reward",
                     description:
                         "Define rewards for yourself for making progress.",
@@ -87,7 +87,7 @@ class NavigationMenu extends ConsumerWidget {
                     ),
                   ),
                   Showcase(
-                    key: eight,
+                    key: nine,
                     title: "My Lists",
                     description:
                         "View, manage, and complete your goals and tasks.",
