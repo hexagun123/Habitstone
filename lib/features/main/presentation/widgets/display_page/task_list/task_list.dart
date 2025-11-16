@@ -6,7 +6,8 @@ import 'list_item.dart';
 import 'empty.dart';
 import 'popup.dart';
 import '../../general/randomizer.dart';
-import '../../../../../../core/data/quote.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../../../core/data/showcase_key.dart';
 
 class TaskList extends ConsumerWidget {
   const TaskList({super.key});
@@ -34,15 +35,27 @@ class TaskList extends ConsumerWidget {
                 ),
                 Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.shuffle),
-                      onPressed: () => showTaskPopup(context, ref),
-                      tooltip: 'Add Random Task from Pool',
+                    Showcase(
+                      key: twentyFour,
+                      title: "Random generation",
+                      description:
+                          "Click this button will bring you to the random task page, this feature generates a task on base of importance, as well as a special choice in the setting",
+                      child: IconButton(
+                        icon: const Icon(Icons.shuffle),
+                        onPressed: () => showTaskPopup(context, ref),
+                        tooltip: 'Add Random Task from Pool',
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () => _showAddTaskPopup(context, ref),
-                      tooltip: 'Add Task from Pool',
+                    Showcase(
+                      key: twentyFive,
+                      title: "Direct assignment",
+                      description:
+                          "If you have something urgent and want to get it out of the way, use this feature to assign the task directly to complete them, it is recommanded to not assign too much tasks at once, otherwise it gets overwhealming",
+                      child: IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () => _showAddTaskPopup(context, ref),
+                        tooltip: 'Add Task from Pool',
+                      ),
                     ),
                     Text(
                       '${displayedTasks.length} tasks',

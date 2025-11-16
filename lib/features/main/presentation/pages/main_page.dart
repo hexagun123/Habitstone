@@ -30,8 +30,6 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   void _checkFirstLaunch() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool("launch", true);
-    // Use `?? true` to default to true if the key doesn't exist yet.
     final isFirstLaunch = prefs.getBool("launch") ?? true;
 
     if (isFirstLaunch && mounted) {

@@ -51,17 +51,7 @@ class NavigationMenu extends ConsumerWidget {
                         title: 'New Task',
                         onTap: () => onNavigate('new-task'),
                       )),
-                  Showcase(
-                      key: eight,
-                      title: "My list",
-                      description:
-                          "an overview of everything you have done, and the place to assign tasks, complete tasks and to modify other things.",
-                      child: _buildMenuItem(
-                        context,
-                        icon: Icons.display_settings_outlined,
-                        title: 'My Lists',
-                        onTap: () => onNavigate('display'),
-                      )),
+
                   Showcase(
                       key: nine,
                       title: "reward",
@@ -72,6 +62,17 @@ class NavigationMenu extends ConsumerWidget {
                         icon: Icons.toys,
                         title: 'New Reward',
                         onTap: () => onNavigate('new-reward'),
+                      )),
+                  Showcase(
+                      key: eight,
+                      title: "My list",
+                      description:
+                          "an overview of everything you have done, and the place to assign tasks, complete tasks and to modify other things.",
+                      child: _buildMenuItem(
+                        context,
+                        icon: Icons.display_settings_outlined,
+                        title: 'My Lists',
+                        onTap: () => onNavigate('display'),
                       )),
 
                   const SizedBox(height: 16),

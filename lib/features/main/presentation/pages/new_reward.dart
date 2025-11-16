@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/model/reward.dart';
 import '../../../../core/provider/reward.dart';
 
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../core/data/showcase_key.dart';
+
 class RewardPage extends ConsumerWidget {
   const RewardPage({super.key});
 
@@ -108,19 +111,25 @@ class _AddRewardFormState extends ConsumerState<RewardForm> {
                         ),
                   ),
                   const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Reward Title',
-                      border: OutlineInputBorder(),
-                      hintText: 'e.g., Watch a Movie',
+                  Showcase(
+                    key: sixteen,
+                    title: "reward",
+                    description:
+                        "Rewards are what you earn after completing some work, however, it doesn't have to be anything crazy, a 5 minute rest could be a reward as well.",
+                    child: TextFormField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        labelText: 'Reward Title',
+                        border: OutlineInputBorder(),
+                        hintText: 'e.g., Watch a Movie',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a reward title';
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a reward title';
-                      }
-                      return null;
-                    },
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -135,35 +144,49 @@ class _AddRewardFormState extends ConsumerState<RewardForm> {
                   const SizedBox(height: 24),
 
                   // --- Rarity Slider ---
-                  Text(
-                    'Rarity: ${_rarityValue.toInt()}',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Slider(
-                    value: _rarityValue,
-                    min: 1,
-                    max: 10,
-                    divisions: 9,
-                    label: _rarityValue.toInt().toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        _rarityValue = value;
-                      });
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      'A lower number is more common. A higher number is rarer.',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
+                  Showcase(
+                    key: seventeen,
+                    title: "Rarity",
+                    description:
+                        "Rarity, by its name, is the frequency in which a reward would appear, it is based on your own choice, but it is recommanded that 5 minute rest should be setted somewhere around 1, and that watch a film is setted somewhere around 5-6",
+                    child: Column(children: [
+                      Text(
+                        'Rarity: ${_rarityValue.toInt()}',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Slider(
+                        value: _rarityValue,
+                        min: 1,
+                        max: 10,
+                        divisions: 9,
+                        label: _rarityValue.toInt().toString(),
+                        onChanged: (double value) {
+                          setState(() {
+                            _rarityValue = value;
+                          });
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          'A lower number is more common. A higher number is rarer.',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ]),
                   ),
                   const SizedBox(height: 16),
 
                   // --- Time Slider ---
-                  Text(
-                    'Time: ${_timeValue.toInt()} minutes',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  Showcase(
+                    key: eighteen,
+                    title: "Timer",
+                    description:
+                        "This is the timer for the reward,so you don't have to record the time elsewhere. It is recommanded that reward taking more time should have higher rarity.",
+                    child: Text(
+                      'Time: ${_timeValue.toInt()} minutes',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ),
                   Slider(
                     value: _timeValue,

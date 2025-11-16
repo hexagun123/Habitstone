@@ -6,6 +6,8 @@ import '../widgets/display_page/chart_section.dart';
 import '../widgets/display_page/goal_list.dart';
 import '../widgets/display_page/task_list/task_list.dart';
 import '../widgets/display_page/reward_list.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../core/data/showcase_key.dart';
 
 class DisplayPage extends ConsumerWidget {
   const DisplayPage({super.key});
@@ -21,15 +23,15 @@ class DisplayPage extends ConsumerWidget {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              const SummarySection(),
+              Showcase(key:nineteen,title:"Summary",description:"Quick summary of what you have accomplished",child:SummarySection()),
               const SizedBox(height: 24),
-              const ChartSection(),
+              Showcase(key:twenty,title:"Chart",description:"Another chart for you to visualise the achievement",child:ChartSection()),
               const SizedBox(height: 24),
-              const GoalList(),
+              Showcase(key:twentyOne,title:"Goals",description:"A description of what you've setted for your goal, and a place to manipulate them",child:GoalList(),),
               const SizedBox(height: 24),
-              const RewardList(),
+              Showcase(key:twentyTwo,title:"Reward",description:"A place for you to see the different rewards and delete them" ,child:RewardList(),),
               const SizedBox(height: 24),
-              const TaskList(),
+              Showcase(key:twentyThree,title:"Tasks",description:"A place for you to add task to complete, and manipulate the tasks. You can assign task in two ways: manually or randomly" ,child:TaskList(),),
             ],
           ),
         ));

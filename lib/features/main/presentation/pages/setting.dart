@@ -1,9 +1,13 @@
 // lib/features/main/presentation/pages/setting.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/provider/theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:showcaseview/showcaseview.dart';
+
+import '../../../../core/data/showcase_key.dart';
 import '../../../../core/provider/setting.dart';
+import '../../../../core/provider/theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class SettingPage extends ConsumerWidget {
   const SettingPage({super.key});
@@ -28,22 +32,67 @@ class SettingPage extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Column(
                   children: [
-                    _buildMenuItem(
-                      context,
-                      icon: getThemeIcon(currentTheme),
-                      title: 'Theme: ${AppTheme.getThemeName(currentTheme)}',
-                      onTap: () {
-                        final nextTheme = getNextTheme(currentTheme);
-                        ref.read(themeProvider.notifier).setTheme(nextTheme);
-                      },
+                    Showcase(
+                      key: twentySix,
+                      title: "Theme",
+                      description:
+                          "Welcome to the settings! You could change the theme of the app by clicking on this button.",
+                      child: _buildMenuItem(
+                        context,
+                        icon: getThemeIcon(currentTheme),
+                        title: 'Theme: ${AppTheme.getThemeName(currentTheme)}',
+                        onTap: () {
+                          final nextTheme = getNextTheme(currentTheme);
+                          ref.read(themeProvider.notifier).setTheme(nextTheme);
+                        },
+                      ),
                     ),
                     const Divider(height: 1),
-                    _buildWeightSlider(
-                      context,
-                      currentWeight: currentSettings.weight,
-                      onWeightChanged: (weight) {
-                        settingsNotifier.updateWeight(weight);
-                      },
+                    Showcase(
+                      key: twentySeven,
+                      title: "Weight",
+                      description:
+                          "The special attribute that I mentioned in randomly generating tasks, if you would like the easy tasks first, reduce the weight, if you would like the hard tasks first, increase the weight.",
+                      child: _buildWeightSlider(
+                        context,
+                        currentWeight: currentSettings.weight,
+                        onWeightChanged: (weight) {
+                          settingsNotifier.updateWeight(weight);
+                        },
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Showcase(
+                      key: twentyEight,
+                      title: "Tutorial",
+                      description:
+                          "You have reached the end of the tutorial. If you want to review it again, just click this button.",
+                      child: _buildMenuItem(
+                        context,
+                        icon: Icons.school_outlined,
+                        title: 'Restart Tutorial',
+                        onTap: () {
+                          // Navigate back to the main page.
+                          GoRouter.of(context).go('/');
+
+                          // After a short delay to allow for the page transition,
+                          // start the showcase on the main page.
+                          Future.delayed(const Duration(milliseconds: 400), () {
+                            ShowcaseView.get().startShowCase([
+                              one,
+                              two,
+                              three,
+                              four,
+                              five,
+                              six,
+                              seven,
+                              eight,
+                              nine,
+                              ten
+                            ]);
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),

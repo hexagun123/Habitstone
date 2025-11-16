@@ -37,8 +37,6 @@ void main() async {
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(QuoteAdapter());
 
-  // NOTE: ShowcaseView.register() is now moved inside MyApp.
-
   // 5. Run the app within a ProviderScope.
   runApp(const ProviderScope(
     child: MyApp(),
@@ -90,7 +88,46 @@ class _MyAppState extends ConsumerState<MyApp> {
           // After a short delay for the page transition animation...
           Future.delayed(const Duration(milliseconds: 400), () {
             // ...start the showcase for the keys on the new goal page.
-            ShowcaseView.get().startShowCase([twelve, thirteen, fourteen,fifteen]);
+            ShowcaseView.get()
+                .startShowCase([twelve, thirteen, fourteen, fifteen]);
+          });
+        }
+        if (key == fifteen) {
+          // ...automatically navigate to the new goal page.
+          router.push('/new-reward');
+
+          // After a short delay for the page transition animation...
+          Future.delayed(const Duration(milliseconds: 400), () {
+            // ...start the showcase for the keys on the new goal page.
+            ShowcaseView.get().startShowCase([sixteen, seventeen, eighteen]);
+          });
+        }
+        if (key == eighteen) {
+          // ...automatically navigate to the new goal page.
+          router.push('/display');
+
+          // After a short delay for the page transition animation...
+          Future.delayed(const Duration(milliseconds: 400), () {
+            // ...start the showcase for the keys on the new goal page.
+            ShowcaseView.get().startShowCase([
+              nineteen,
+              twenty,
+              twentyOne,
+              twentyTwo,
+              twentyThree,
+              twentyFour,
+              twentyFive
+            ]);
+          });
+        }
+        if (key == twentyThree) {
+          // ...automatically navigate to the new goal page.
+          router.push('/setting');
+
+          // After a short delay for the page transition animation...
+          Future.delayed(const Duration(milliseconds: 400), () {
+            // ...start the showcase for the keys on the new goal page.
+            ShowcaseView.get().startShowCase([twentySix, twentySeven, twentyEight]);
           });
         }
       },
