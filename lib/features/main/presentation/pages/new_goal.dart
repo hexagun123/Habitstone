@@ -27,9 +27,8 @@ class NewGoalPage extends ConsumerWidget {
             // Showcase widget to highlight the form during the app's tutorial.
             child: Showcase(
                 key: eleven,
-                title: "new goal",
-                description:
-                    "Just fill in the title to complete a new goal, I recommand to write down all the goals first before doing anything else, as they are inter-dependent. Next step: click on the new-task button!",
+                title: title_eleven,
+                description: description_eleven,
                 child: const NewGoalForm()),
           ),
         ));

@@ -44,9 +44,8 @@ class SettingPage extends ConsumerWidget {
                     // Showcase widget for the "Theme" setting during the tutorial.
                     Showcase(
                       key: twentySix,
-                      title: "Theme",
-                      description:
-                          "Welcome to the settings! You could change the theme of the app by clicking on this button.",
+                      title: title_twentySix,
+                      description: description_twentySix,
                       // Menu item for changing the application theme.
                       child: _buildMenuItem(
                         context,
@@ -62,9 +61,8 @@ class SettingPage extends ConsumerWidget {
                     // Showcase widget for the "Weight" setting.
                     Showcase(
                       key: twentySeven,
-                      title: "Weight",
-                      description:
-                          "The special attribute that I mentioned in randomly generating tasks, if you would like the easy tasks first, reduce the weight, if you would like the hard tasks first, increase the weight.",
+                      title: title_twentySeven,
+                      description: description_twentySeven,
                       // Slider for adjusting the task randomization weight.
                       child: _buildWeightSlider(
                         context,
@@ -78,9 +76,8 @@ class SettingPage extends ConsumerWidget {
                     // Showcase widget for the "Restart Tutorial" button.
                     Showcase(
                       key: twentyEight,
-                      title: "Tutorial",
-                      description:
-                          "You have reached the end of the tutorial. If you want to review it again, just click this button.",
+                      title: title_twentyEight,
+                      description: description_twentyEight,
                       // Menu item to restart the application tutorial.
                       child: _buildMenuItem(
                         context,
@@ -90,8 +87,7 @@ class SettingPage extends ConsumerWidget {
                           // Navigate back to the main page.
                           GoRouter.of(context).go('/');
                           // Delay is needed to allow the UI to transition before starting the showcase.
-                          Future.delayed(const Duration(milliseconds: 400),
-                              () {
+                          Future.delayed(const Duration(milliseconds: 400), () {
                             ShowcaseView.get().startShowCase([
                               one,
                               two,

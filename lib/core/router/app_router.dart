@@ -2,7 +2,6 @@
 /// It defines all the navigation paths and implements authentication-based
 /// redirection logic with the help of Riverpod for state management.
 
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,12 +19,11 @@ import '../../../features/main/presentation/pages/sign_in.dart';
 /// This provider watches the authentication state and uses it to manage routing rules.
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
-  final authStream = ref.watch(authStateProvider.stream);
+  ref.watch(authStateProvider);
 
   return GoRouter(
     initialLocation: '/', // The default route when the app starts.
     // Listens to the authentication stream to rebuild the navigation stack on auth changes.
-    refreshListenable: GoRouterRefreshStream(authStream),
     routes: [
       // Main application page.
       GoRoute(
@@ -88,16 +86,3 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
   );
 });
-
-/// A custom `ChangeNotifier` that bridges a `Stream` to a `Listenable`.
-/// GoRouter's `refreshListenable` requires a `Listenable`, but Riverpod providers
-/// expose a `Stream`. This class listens to the stream and calls `notifyListeners()`
-/// for each event, triggering GoRouter to re-evaluate its routes.
-class GoRouterRefreshStream extends ChangeNotifier {
-  /// Creates an instance that listens to the given stream.
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    notifyListeners();
-    // Subscribe to the stream and notify listeners upon receiving an event.
-    stream.asBroadcastStream().listen((_) => notifyListeners());
-  }
-}

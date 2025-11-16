@@ -50,9 +50,9 @@ class TaskList extends ConsumerWidget {
                     // Showcase widget for the "Random Task" feature tour.
                     Showcase(
                       key: twentyFour,
-                      title: "Random generation",
+                      title: title_twentyFour,
                       description:
-                          "Click this button will bring you to the random task page, this feature generates a task on base of importance, as well as a special choice in the setting",
+                          description_twentyFour,
                       // Button to trigger the random task generation popup.
                       child: IconButton(
                         icon: const Icon(Icons.shuffle),
@@ -63,9 +63,9 @@ class TaskList extends ConsumerWidget {
                     // Showcase widget for the "Add Task" feature tour.
                     Showcase(
                       key: twentyFive,
-                      title: "Direct assignment",
+                      title: title_twentyFive,
                       description:
-                          "If you have something urgent and want to get it out of the way, use this feature to assign the task directly to complete them, it is recommanded to not assign too much tasks at once, otherwise it gets overwhealming",
+                          description_twentyFive,
                       // Button to show the popup for adding a task directly.
                       child: IconButton(
                         icon: const Icon(Icons.add),

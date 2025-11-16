@@ -51,10 +51,9 @@ class NavigationMenu extends ConsumerWidget {
                   // integrates it into the app's interactive tutorial, highlighting
                   // the feature and explaining its purpose to new users.
                   Showcase(
-                    key: six, // Unique key for this tutorial step.
-                    title: "New Goal",
-                    description:
-                        "Set broad, overarching goals you want to work towards.",
+                    key: six,
+                    title: title_six,
+                    description: description_six,
                     child: _buildMenuItem(
                       context,
                       icon: Icons.add_task_outlined,
@@ -64,9 +63,8 @@ class NavigationMenu extends ConsumerWidget {
                   ),
                   Showcase(
                     key: seven,
-                    title: "New Task",
-                    description:
-                        "Create specific, actionable tasks to achieve your goals.",
+                    title: title_seven,
+                    description: description_seven,
                     child: _buildMenuItem(
                       context,
                       icon: Icons.checklist_outlined,
@@ -76,9 +74,8 @@ class NavigationMenu extends ConsumerWidget {
                   ),
                   Showcase(
                     key: eight,
-                    title: "New Reward",
-                    description:
-                        "Define rewards for yourself for making progress.",
+                    title: title_eight,
+                    description: description_eight,
                     child: _buildMenuItem(
                       context,
                       icon: Icons.toys,
@@ -88,9 +85,8 @@ class NavigationMenu extends ConsumerWidget {
                   ),
                   Showcase(
                     key: nine,
-                    title: "My Lists",
-                    description:
-                        "View, manage, and complete your goals and tasks.",
+                    title: title_nine,
+                    description: description_nine,
                     child: _buildMenuItem(
                       context,
                       icon: Icons.display_settings_outlined,
@@ -106,9 +102,8 @@ class NavigationMenu extends ConsumerWidget {
 
                   Showcase(
                     key: ten,
-                    title: "Settings",
-                    description:
-                        "Customize app settings or retake this tutorial. Next: Tap 'New Goal'!",
+                    title: title_ten,
+                    description: description_ten,
                     child: _buildMenuItem(
                       context,
                       icon: Icons.settings_outlined,

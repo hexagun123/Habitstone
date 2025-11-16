@@ -138,9 +138,8 @@ class _AddRewardFormState extends ConsumerState<RewardForm> {
                   // Reward Title field.
                   Showcase(
                     key: sixteen,
-                    title: "reward",
-                    description:
-                        "Rewards are what you earn after completing some work, however, it doesn't have to be anything crazy, a 5 minute rest could be a reward as well.",
+                    title: title_sixteen,
+                    description: description_sixteen,
                     child: TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
@@ -172,9 +171,9 @@ class _AddRewardFormState extends ConsumerState<RewardForm> {
                   // Rarity Slider Section.
                   Showcase(
                     key: seventeen,
-                    title: "Rarity",
+                    title: title_seventeen,
                     description:
-                        "Rarity, by its name, is the frequency in which a reward would appear, it is based on your own choice, but it is recommanded that 5 minute rest should be setted somewhere around 1, and that watch a film is setted somewhere around 5-6",
+                        description_seventeen,
                     child: Column(children: [
                       Text(
                         'Rarity: ${_rarityValue.toInt()}',
@@ -206,9 +205,9 @@ class _AddRewardFormState extends ConsumerState<RewardForm> {
                   // Time Slider Section.
                   Showcase(
                     key: eighteen,
-                    title: "Timer",
+                    title: title_eighteen,
                     description:
-                        "This is the timer for the reward,so you don't have to record the time elsewhere. It is recommanded that reward taking more time should have higher rarity.",
+                        description_eighteen,
                     child: Text(
                       'Time: ${_timeValue.toInt()} minutes',
                       style: Theme.of(context).textTheme.titleMedium,

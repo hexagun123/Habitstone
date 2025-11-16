@@ -79,13 +79,11 @@ class InfoText extends ConsumerWidget {
               ),
         ),
         Expanded(
-          // Center the button vertically within the remaining space.
           child: Center(
-            // This `Showcase` widget integrates the sign-in button into the app tutorial.
             child: Showcase(
-              key: five, // A unique key to identify this tutorial step.
-              title: "Login",
-              description: "Sign in to sync your data across devices",
+              key: five,
+              title: title_five,
+              description: description_five,
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.login),
                 label: const Text('Sign In to Sync'),
@@ -167,9 +165,8 @@ class InfoText extends ConsumerWidget {
           // This `Showcase` is an easter egg for the tutorial if the user is logged in.
           child: Showcase(
             key: five,
-            title: "Sign Out",
-            description:
-                "You can sign out of your account using this button.",
+            title: title_five,
+            description: description_five,
             child: TextButton.icon(
               icon: const Icon(Icons.logout),
               label: const Text('Sign Out'),

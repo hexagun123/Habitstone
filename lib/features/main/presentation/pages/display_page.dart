@@ -42,42 +42,42 @@ class DisplayPage extends ConsumerWidget {
               // Displays a quick summary of user accomplishments.
               Showcase(
                   key: nineteen,
-                  title: "Summary",
-                  description: "Quick summary of what you have accomplished",
+                  title: title_nineteen,
+                  description: description_nineteen,
                   child: SummarySection()),
               const SizedBox(height: 24), // Vertical spacing
               // Visualizes user achievement data in a chart format.
               Showcase(
                   key: twenty,
-                  title: "Chart",
+                  title: title_twenty,
                   description:
-                      "Another chart for you to visualise the achievement",
+                      description_twenty,
                   child: ChartSection()),
               const SizedBox(height: 24), // Vertical spacing
               // Lists the user's goals and allows for their manipulation.
               Showcase(
                 key: twentyOne,
-                title: "Goals",
+                title: title_twentyOne,
                 description:
-                    "A description of what you've setted for your goal, and a place to manipulate them",
+                    description_twentyOne,
                 child: GoalList(),
               ),
               const SizedBox(height: 24), // Vertical spacing
               // Lists the available rewards and allows for their deletion.
               Showcase(
                 key: twentyTwo,
-                title: "Reward",
+                title: title_twentyTwo,
                 description:
-                    "A place for you to see the different rewards and delete them",
+                    description_twentyTwo,
                 child: RewardList(),
               ),
               const SizedBox(height: 24), // Vertical spacing
               // Manages user tasks, allowing for creation, completion, and manipulation.
               Showcase(
                 key: twentyThree,
-                title: "Tasks",
+                title: title_twentyThree,
                 description:
-                    "A place for you to add task to complete, and manipulate the tasks. You can assign task in two ways: manually or randomly",
+                    description_twentyThree,
                 child: TaskList(),
               ),
             ],

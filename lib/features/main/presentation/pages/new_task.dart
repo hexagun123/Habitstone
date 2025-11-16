@@ -1,6 +1,7 @@
-/// This file defines the UI and logic for the "New Task" page, allowing users
-/// to create and configure new tasks. It includes a form for inputting task details
-/// like title, description, appearance count, importance, and linking to existing goals.
+/// This file defines the UI and logic for the "New Task" page.
+/// It allows users to create tasks with details such as title, description,
+/// appearance count, importance, and links to existing goals.
+/// The form includes validation and state management for a seamless user experience.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,7 +13,7 @@ import '../../../../core/provider/goal.dart';
 import '../../../../core/provider/task.dart';
 
 /// The main page widget for creating a new task.
-/// It provides the basic layout structure (Scaffold and AppBar).
+/// It sets up the basic layout structure with a Scaffold and AppBar.
 class NewTaskPage extends ConsumerWidget {
   const NewTaskPage({super.key});
 
@@ -30,7 +31,7 @@ class NewTaskPage extends ConsumerWidget {
   }
 }
 
-/// A stateful widget that contains the form for creating a new task.
+/// A stateful widget that encapsulates the form for creating a new task.
 class NewTaskForm extends ConsumerStatefulWidget {
   const NewTaskForm({super.key});
 
@@ -38,22 +39,24 @@ class NewTaskForm extends ConsumerStatefulWidget {
   ConsumerState<NewTaskForm> createState() => _NewTaskFormState();
 }
 
-/// The state associated with [NewTaskForm].
-/// It manages the form's state, including text controllers, validation,
-/// and submission logic.
+/// Manages the state for [NewTaskForm].
+/// This includes handling form controllers, validation, user input,
+/// and the task submission process.
 class _NewTaskFormState extends ConsumerState<NewTaskForm> {
-  // A global key that uniquely identifies the Form widget and allows validation.
+  // A global key to uniquely identify the Form widget and enable validation.
   final _formKey = GlobalKey<FormState>();
-  // Controllers for managing the text input fields.
+  // Text editing controllers for the form's input fields.
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _appearanceController = TextEditingController(text: '1');
-  // State variables for form logic.
-  bool _isSubmitting =
-      false; // Tracks submission state to show loading indicator.
-  List<String> _selectedGoalIds = []; // Stores keys of linked goals.
-  int _appearanceCount = 1; // Stores the value for the appearance slider/field.
-  int _importance = 5; // Stores the value for the importance slider.
+  // Tracks the form submission state to prevent multiple submissions.
+  bool _isSubmitting = false;
+  // Stores the database keys of goals linked to this task.
+  List<String> _selectedGoalIds = [];
+  // The number of times the task should appear.
+  int _appearanceCount = 1;
+  // The importance rating of the task, used for prioritization.
+  int _importance = 5;
 
   @override
   void initState() {
@@ -62,8 +65,8 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     _appearanceController.addListener(_onAppearanceTextChanged);
   }
 
-  /// Synchronizes the `_appearanceCount` state variable with the text field.
-  /// It parses the text, clamps the value between 1 and 100, and updates
+  /// Synchronizes the `_appearanceCount` state with the text field input.
+  /// Parses the text, clamps the value between 1 and 100, and updates
   /// the text field if the parsed value was outside this range.
   void _onAppearanceTextChanged() {
     final text = _appearanceController.text;
@@ -75,7 +78,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
           _appearanceCount = clampedValue;
         });
 
-        // If the entered value was out of bounds, update the text field.
         if (value != clampedValue) {
           _appearanceController.text = clampedValue.toString();
           // Move cursor to the end of the text.
@@ -87,7 +89,8 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     }
   }
 
-  /// Updates the `_appearanceCount` and the corresponding text field when the slider is changed.
+  /// Updates the `_appearanceCount` and the corresponding text field
+  /// when the user interacts with the appearance slider.
   void _onAppearanceSliderChanged(double value) {
     final intValue = value.round();
     setState(() {
@@ -98,7 +101,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
 
   @override
   void dispose() {
-    // Clean up controllers to prevent memory leaks.
+    // Dispose of controllers to free up resources and prevent memory leaks.
     _titleController.dispose();
     _descriptionController.dispose();
     _appearanceController.removeListener(_onAppearanceTextChanged);
@@ -106,12 +109,14 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     super.dispose();
   }
 
-  /// Handles the task creation process.
-  /// It validates the form, creates a new Task object, calls the provider
-  /// to save it, shows feedback to the user, and resets the form.
+  /// Handles the entire task creation process.
+  ///
+  /// It first validates the form. If valid, it constructs a new [Task] object
+  /// from the form data, calls the [taskProvider] to persist it, shows a
+  /// success or error SnackBar, and finally resets the form for a new entry.
   Future<void> _createTask() async {
-    // Abort if the form is not valid.
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate())
+      return; // Abort if form is not valid.
 
     FocusScope.of(context).unfocus(); // Dismiss keyboard.
     setState(() => _isSubmitting = true);
@@ -127,11 +132,11 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
             false, // New tasks are added to the pool, not displayed directly.
       );
 
-      // Call the provider to handle the creation logic.
+      // Use the provider to handle task creation logic.
       await ref.read(taskProvider.notifier).createTask(newTask);
 
       if (mounted) {
-        // Show success message.
+        // Show a success message.
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Task created successfully!'),
@@ -153,7 +158,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
       }
     } catch (e) {
       if (mounted) {
-        // Show error message on failure.
+        // Show an error message on failure.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
@@ -169,6 +174,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   }
 
   /// Toggles the selection state of a goal chip.
+  /// Adds or removes the goal's ID from the `_selectedGoalIds` list.
   void _toggleGoalSelection(String goalId) {
     setState(() {
       if (_selectedGoalIds.contains(goalId)) {
@@ -181,7 +187,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
 
   @override
   Widget build(BuildContext context) {
-    // Watch the goal provider to get the list of available goals.
+    // Watch the goal provider to get the list of available goals for linking.
     final goals = ref.watch(goalProvider);
 
     return SingleChildScrollView(
@@ -190,7 +196,8 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Main form card
+            // --- Main Form Card ---
+            // Encapsulates the entire form within a styled Card.
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -205,18 +212,20 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                               ),
                     ),
                     const SizedBox(height: 24),
-                    // Task Title field
+
+                    // --- Task Title Field ---
+                    // A Showcase widget to guide new users.
                     Showcase(
                       key: twelve,
-                      title: "new task",
-                      description:
-                          "Enter the task title here,task are recommanded to be short ones that you can complete in a short period of time, such as 45 mintues",
+                      title: title_twelve,
+                      description: description_twelve,
                       child: TextFormField(
                         controller: _titleController,
                         decoration: const InputDecoration(
                           labelText: 'Task Title',
                           border: OutlineInputBorder(),
                         ),
+                        // Validator ensures the title is not empty.
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a task title';
@@ -226,22 +235,24 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Task Description field
+
+                    // --- Task Description Field ---
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
                         labelText: 'Description',
                         border: OutlineInputBorder(),
                       ),
-                      maxLines: 4,
+                      maxLines: 4, // Allows for a multi-line description.
                     ),
                     const SizedBox(height: 24),
-                    // Appearance Count section
+
+                    // --- Appearance Count Section ---
+                    // Allows users to set how many times a task should be generated.
                     Showcase(
                       key: thirteen,
-                      title: "appearance",
-                      description:
-                          "For each task you can set the amount of time that a task could appear, this is for simpilfying the work flow, as not a lot of people want to create a lot of tasks - it will be a mess.",
+                      title: title_thirteen,
+                      description: description_thirteen,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -252,6 +263,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                 'Appearance Count',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
+                              // A decorative chip to display the current count.
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 4),
@@ -278,6 +290,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                             ],
                           ),
                           const SizedBox(height: 8),
+                          // Helper text to explain the purpose of this field.
                           Text(
                             'How many times this task appears before completion',
                             style:
@@ -289,6 +302,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                     ),
                           ),
                           const SizedBox(height: 12),
+                          // Text field for direct numeric input.
                           TextFormField(
                             controller: _appearanceController,
                             decoration: const InputDecoration(
@@ -309,11 +323,12 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                             },
                           ),
                           const SizedBox(height: 16),
+                          // Slider for quick, visual selection of the count.
                           Slider(
                             value: _appearanceCount.toDouble(),
                             min: 1,
                             max: 100,
-                            divisions: 99,
+                            divisions: 99, // Allows for discrete steps.
                             label: _appearanceCount.toString(),
                             onChanged: _onAppearanceSliderChanged,
                           ),
@@ -321,12 +336,14 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                         ],
                       ),
                     ),
-                    // Importance Level section
+
+                    // --- Importance Level Section ---
+                    // Determines the task's priority in random generation.
                     Showcase(
                       key: fourteen,
-                      title: "Importance",
+                      title: title_fourteen,
                       description:
-                          "foundation of random generation of tasks, the higher the importance the more likely that this task get generated first",
+                          description_fourteen,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -337,6 +354,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                 'Importance Level',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
+                              // Displays the current importance rating.
                               Row(
                                 children: [
                                   Icon(
@@ -360,6 +378,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                             ],
                           ),
                           const SizedBox(height: 8),
+                          // Helper text for the importance slider.
                           Text(
                             'How important this task is (affects priority)',
                             style:
@@ -371,6 +390,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                     ),
                           ),
                           const SizedBox(height: 12),
+                          // Slider for setting the importance level.
                           Slider(
                             value: _importance.toDouble(),
                             min: 1,
@@ -387,14 +407,17 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                         ],
                       ),
                     ),
-                    // Goal Linking section (conditional)
-                    if (goals.isNotEmpty) ...[
-                      Showcase(
-                          key: fifteen,
-                          title: "goal linking",
-                          description:
-                              "by subscribing a task to a goal, you could increase the streak of it by simply completing this task, a task could of-course, link to multiple goals.",
-                          child: Column(
+
+                    // --- Goal Linking Section ---
+                    // Conditionally displays either a list of goals or a prompt to create one.
+                    Showcase(
+                      key: fifteen,
+                      title: title_fifteen,
+                      description:
+                          description_fifteen,
+                      child: goals.isNotEmpty
+                          // STATE 1: Display goal selection chips if goals exist.
+                          ? Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -403,6 +426,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                       Theme.of(context).textTheme.titleMedium,
                                 ),
                                 const SizedBox(height: 12),
+                                // Scrollable container for goal chips.
                                 ConstrainedBox(
                                   constraints:
                                       const BoxConstraints(maxHeight: 200),
@@ -410,6 +434,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                     child: Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
+                                      // Map each goal to a selectable FilterChip.
                                       children: goals.map((goal) {
                                         final isSelected =
                                             _selectedGoalIds.contains(goal.key);
@@ -435,9 +460,49 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                   ),
                                 ),
                                 const SizedBox(height: 24),
-                              ]))
-                    ],
-                    // Form action buttons
+                              ],
+                            )
+                          // STATE 2: Display a prompt to create goals if none exist.
+                          : Card(
+                              elevation: 0,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'No Goals Available',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Create goals first to link them to tasks.',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    // Button to navigate to the "New Goal" page.
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton.icon(
+                                        icon: const Icon(Icons.add),
+                                        label: const Text('Create Goal'),
+                                        onPressed: () =>
+                                            context.push('/new-goal'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                    ),
+                    // --- Form Action Buttons ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -448,12 +513,13 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                         const SizedBox(width: 16),
                         ElevatedButton(
                           onPressed: _isSubmitting ? null : _createTask,
+                          // Show a loading indicator or text based on submission state.
                           child: _isSubmitting
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2), // Loading indicator
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Text('Create Task'),
                         ),
@@ -463,38 +529,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                 ),
               ),
             ),
-            // "No Goals" prompt (conditional)
-            if (goals.isEmpty) ...[
-              const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'No Goals Available',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Create goals first to link them to tasks',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          icon: const Icon(Icons.add),
-                          label: const Text('Create Goal'),
-                          onPressed: () => context.push('/new-goal'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
       ),

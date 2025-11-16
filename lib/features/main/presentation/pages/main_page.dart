@@ -69,9 +69,8 @@ class _MainPageState extends ConsumerState<MainPage> {
     // The root of the tutorial showcase
     return Showcase(
       key: one,
-      title: "Welcome to HabitStone!",
-      description:
-          "This is your main dashboard where you can see your progress.",
+      title: title_one,
+      description: description_one,
       child: Scaffold(
         body: SafeArea(
           // Provides padding for the entire page content
@@ -89,9 +88,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                       // Showcase for the main statistics panel
                       child: Showcase(
                           key: two,
-                          title: "Statistics",
-                          description:
-                              "This is where you can see your goals in the format of graphs.",
+                          title: title_two,
+                          description: description_two,
                           child: const MainPanel()),
                     ),
                   ),
@@ -108,9 +106,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                             // Showcase for the user information area
                             child: Showcase(
                               key: three,
-                              title: "Information",
-                              description:
-                                  "This is the place for authentication and your user information.",
+                              title: title_three,
+                              description: description_three,
                               child: InfoText(),
                             )),
                         const SizedBox(height: 16), // Vertical spacing
@@ -119,9 +116,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                           // Showcase for the main navigation menu
                           child: Showcase(
                               key: four,
-                              title: "Navigation",
-                              description:
-                                  "This is the menu for navigation between features.",
+                              title: title_four,
+                              description: description_four,
                               child: NavigationMenu(
                                 // Navigate to the selected route using go_router
                                 onNavigate: (route) => context.pushNamed(route),
@@ -143,9 +139,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                         // Showcase for the main statistics panel
                         child: Showcase(
                             key: two,
-                            title: "Statistics",
-                            description:
-                                "This is where you can see your goals in the format of graphs.",
+                            title: title_two,
+                            description: description_two,
                             child: const MainPanel()),
                       ),
                       // Constrains the size of the info text on smaller screens
@@ -155,9 +150,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                         // Showcase for the user information area
                         child: Showcase(
                           key: three,
-                          title: "Information",
-                          description:
-                              "This is the place for authentication and your user information.",
+                          title: title_three,
+                          description: description_three,
                           child: InfoText(),
                         ),
                       ),
@@ -169,9 +163,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                         // Showcase for the main navigation menu
                         child: Showcase(
                             key: four,
-                            title: "Navigation",
-                            description:
-                                "This is the menu for navigation between features.",
+                            title: title_four,
+                            description: description_four,
                             child: NavigationMenu(
                               // Navigate to the selected route using go_router
                               onNavigate: (route) => context.pushNamed(route),
