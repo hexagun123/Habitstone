@@ -42,7 +42,7 @@ class FirebaseSync {
   Future<void> pullAllData() async {
     if (_user == null) return;
     _isPerformingServerOperation =
-        true; // Signal that a server operation is starting.
+        true; 
     try {
       // Fetch all collections in parallel for efficiency.
       final results = await Future.wait([
@@ -63,7 +63,7 @@ class FirebaseSync {
           .docs
           .map((d) => Reward.fromJson(d.data() as Map<String, dynamic>))
           .toList();
-      // Cache all the fetched data in the local Hive database.
+      // Replace data in the local Hive with remote
       await _hiveRepo.cacheAllData(
           goals: goals, tasks: tasks, rewards: rewards);
     } finally {

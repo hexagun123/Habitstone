@@ -1,8 +1,6 @@
 // features/main/presentation/widgets/main_page/menu.dart
-// This file defines the `NavigationMenu` widget, a primary UI component for
-// navigating between the main sections of the application. It is integrated
-// with the `ShowcaseView` package to provide an interactive tutorial for
-// first-time users.
+// navigation menu widget, a section of the main_page, 
+// I put it here because putting it in a single file would become too massive.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,21 +8,15 @@ import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../../core/data/showcase_key.dart';
 
-/// A navigation widget displayed as a card on the main screen.
-///
-/// This widget presents a list of tappable items that allow the user to
-/// navigate to different features like creating goals, tasks, rewards, or
-/// viewing their lists. It uses an `onNavigate` callback to delegate the
-//  actual navigation logic to its parent widget.
+// navigation menu itself
 class NavigationMenu extends ConsumerWidget {
-  /// A callback function that is invoked with a route name when a menu
-  /// item is tapped.
+  // A callback function, basically either push or pushnamed that is fed into this class
   final Function(String) onNavigate;
 
   const NavigationMenu({
     super.key,
     required this.onNavigate,
-  });
+  }); // constructor
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,7 +26,7 @@ class NavigationMenu extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Section Title ---
+            // title
             Text(
               'Navigation',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -43,22 +35,20 @@ class NavigationMenu extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // --- Scrollable Menu Items ---
+            // Items
             Expanded(
               child: ListView(
                 children: [
-                  // Each navigation item is wrapped in a `Showcase` widget. This
-                  // integrates it into the app's interactive tutorial, highlighting
-                  // the feature and explaining its purpose to new users.
+                  // Showcase for each item
                   Showcase(
-                    key: six,
-                    title: title_six,
-                    description: description_six,
+                    key: six, // a key for reference
+                    title: title_six, // a title from the const list
+                    description: description_six, // a description from the const list
                     child: _buildMenuItem(
                       context,
                       icon: Icons.add_task_outlined,
                       title: 'New Goal',
-                      onTap: () => onNavigate('new-goal'),
+                      onTap: () => onNavigate('new-goal'), // the call backfunction
                     ),
                   ),
                   Showcase(
@@ -95,9 +85,8 @@ class NavigationMenu extends ConsumerWidget {
                     ),
                   ),
 
-                  // Visual separator for clarity.
                   const SizedBox(height: 16),
-                  const Divider(),
+                  const Divider(), // a massive line like this: ______________
                   const SizedBox(height: 16),
 
                   Showcase(
@@ -120,18 +109,14 @@ class NavigationMenu extends ConsumerWidget {
     );
   }
 
-  /// A private helper method to build a consistent menu item.
-  ///
-  /// This encapsulates the styling and layout for each navigation row,
-  /// ensuring a uniform look and feel across the menu. Using a helper method
-  /// reduces code duplication and improves maintainability.
+// some settings for each menu item
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
     required String title,
-    required VoidCallback onTap,
+    required VoidCallback onTap, // the call back, technically because I used this template everywhere for all sorts of lists it is not dedicated
   }) {
-    // InkWell provides the material splash effect on tap.
+    // fancy animation button
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -139,14 +124,12 @@ class NavigationMenu extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Row(
           children: [
-            // The icon for the menu item.
             Icon(
               icon,
               size: 20,
               color: Theme.of(context).colorScheme.onSurface.withAlpha(178),
             ),
             const SizedBox(width: 12),
-            // The text label for the menu item.
             Text(
               title,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(

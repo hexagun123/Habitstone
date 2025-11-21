@@ -26,7 +26,7 @@ class SignInScreen extends ConsumerWidget {
     final Widget signInButton;
 
     if (kIsWeb) {
-      // For web, use the specialized button from the package.
+      // specialized button for web only - says the package...
       final googleSignIn = ref.watch(googleSignInProvider);
       signInButton = SizedBox(
         height: 50,

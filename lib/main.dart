@@ -1,16 +1,12 @@
 // main.dart
-// This file serves as the primary entry point for the Habitstone application.
-// It handles the critical initialization sequence for all core services,
-// including Firebase, the local Hive database, and state management, before
-// launching the user interface.
+// This is the main entry point
+// nothing special, just some initialization, showcase running, and run the main app
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:showcaseview/showcaseview.dart';
-
-// --- Project-Specific Core Imports ---
 import 'core/data/quote.dart';
 import 'core/data/showcase_key.dart';
 import 'core/model/goal.dart';
@@ -24,75 +20,80 @@ import 'core/provider/theme.dart';
 import 'core/router/app_router.dart';
 import 'firebase_options.dart';
 
-/// The main function and application entry point.
-///
-/// This asynchronous function ensures that all required services are initialized
-/// in the correct order before the Flutter application is run. This prevents
-//  runtime errors related to uninitialized dependencies.
+// main function
+// async because everything can come in late
 void main() async {
-  // Ensure the Flutter framework's bindings are initialized before using plugins.
+  // initalise flutter bindings for libarary
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize the connection to Firebase for backend services.
+  // init firebase dependent on the platform - good to do otherwise things crash
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize the Hive database for local on-device storage.
+  // init hive
   await Hive.initFlutter();
 
-  // Register Hive adapters to enable serialization of custom data models.
+  // Register typeadapters for hive: translate binary into hive objects
   Hive.registerAdapter(GoalAdapter());
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(RewardAdapter());
   Hive.registerAdapter(SettingsAdapter());
   Hive.registerAdapter(QuoteAdapter());
 
-  // Launch the application within a ProviderScope to enable Riverpod state management.
+  // 3,2,1 launch yay! In a provider scope so provider works
   runApp(const ProviderScope(
     child: MyApp(),
   ));
 }
 
-/// The root widget of the application.
-///
-/// This is a [ConsumerStatefulWidget] to access the `initState` lifecycle
-/// method, which is necessary for performing one-time setup tasks like
-/// configuring the app's interactive tutorial.
+// Needs a state for the showcase to work
+// so it is in a consumer stateful widget now
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
+  // create a state for showcase
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-/// The state associated with the [MyApp] widget.
 class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
-    _initializeShowcaseView();
+    _initializeShowcaseView(); // calls the function
   }
 
-  /// Configures the global settings for the ShowcaseView interactive tutorial.
-  ///
-  /// This method centralizes the tutorial's logic, defining an automated,
-  /// multi-page tour that guides new users through the app's core features.
+  /// Head quarter
   void _initializeShowcaseView() {
     ShowcaseView.register(
-      enableAutoScroll: true,
-      scrollDuration: const Duration(milliseconds: 500),
+        globalFloatingActionWidget: (context) {
+    return FloatingActionWidget(
+      top: 40,
+      right: 10,
+      child: TextButton(
+        onPressed: () {
+          // This stops the tutorial
+          ShowcaseView.get().dismiss();
+        },
+        child: const Text(
+          "Skip", 
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  },
+      enableAutoScroll:
+          true, // so when the showcase is offpage it scrolls to it
+      scrollDuration:
+          const Duration(milliseconds: 500), // how long the scroll is
 
-      // This callback programmatically controls the flow of the tutorial.
-      // When one showcase step completes, it navigates to the next relevant
-      // screen and starts the subsequent set of showcases.
+      // on complete
       onComplete: (index, key) {
-        debugPrint('Showcase completed for key: $key');
-
-        // Read the router once for navigation, as it won't change during this lifecycle.
+        // grabbing the router provider here so that we can navigate pages
         final router = ref.read(routerProvider);
 
-        // Defines the sequence of navigation and showcase activation.
+        // set of if statements to check when to switch pages
         if (key == ten) {
           router.push('/new-goal');
           Future.delayed(const Duration(milliseconds: 400), () {
@@ -138,26 +139,21 @@ class _MyAppState extends ConsumerState<MyApp> {
     );
   }
 
-  /// Builds the main application widget tree.
-  ///
-  /// This method listens to the state of application providers and constructs
-  /// the UI accordingly. It uses an `AsyncValue.when` clause to gracefully
-  /// handle loading and error states during app initialization.
+  /// builds everything up
   @override
   Widget build(BuildContext context) {
-    // Watch essential providers to trigger rebuilds on state changes.
+    // Watch providers... yeah
     ref.watch(
         syncControllerProvider); // Keeps the background sync service active.
     final appInit = ref.watch(appInitializerProvider);
     final router = ref.watch(routerProvider);
     final theme = ref.watch(currentThemeProvider);
 
-    // Ensure the daily quote is loaded.
+    // watch the quote provider and tells it to pull the quotes from csv/check hive on startup
     ref.watch(quoteProvider.notifier).build();
 
-    // Handle the different states of the asynchronous app initialization.
     return appInit.when(
-      // On successful initialization, display the main app.
+      // success, just build
       data: (_) => MaterialApp.router(
         title: 'Habitstone',
         theme: theme,
@@ -167,11 +163,13 @@ class _MyAppState extends ConsumerState<MyApp> {
 
       // While initializing, show a loading indicator.
       loading: () => const MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+        home: Scaffold(
+            body:
+                Center(child: Text('yeah the app is loading, be patient...'))), // only is visable if your laptop or wifi is really bad
         debugShowCheckedModeBanner: false,
       ),
 
-      // If an error occurs, display an informative error screen.
+      // If there is an error, somehow? there is an error screen
       error: (err, stack) => MaterialApp(
         home: Scaffold(
           body: Center(
