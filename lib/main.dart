@@ -67,22 +67,23 @@ class _MyAppState extends ConsumerState<MyApp> {
   /// Head quarter
   void _initializeShowcaseView() {
     ShowcaseView.register(
-        globalFloatingActionWidget: (context) {
-    return FloatingActionWidget(
-      top: 40,
-      right: 10,
-      child: TextButton(
-        onPressed: () {
-          // This stops the tutorial
-          ShowcaseView.get().dismiss();
-        },
-        child: const Text(
-          "Skip", 
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  },
+      globalFloatingActionWidget: (context) {
+        return FloatingActionWidget(
+          top: 10,
+          right: 10,
+          child: ElevatedButton(
+            onPressed: () {
+              // This stops the tutorial
+              ShowcaseView.get().dismiss();
+            },
+            child: const Text(
+              "Skip",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
+      },
       enableAutoScroll:
           true, // so when the showcase is offpage it scrolls to it
       scrollDuration:
@@ -164,8 +165,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       // While initializing, show a loading indicator.
       loading: () => const MaterialApp(
         home: Scaffold(
-            body:
-                Center(child: Text('yeah the app is loading, be patient...'))), // only is visable if your laptop or wifi is really bad
+            body: Center(
+                child: Text(
+                    'yeah the app is loading, be patient...'))), // only is visable if your laptop or wifi is really bad
         debugShowCheckedModeBanner: false,
       ),
 

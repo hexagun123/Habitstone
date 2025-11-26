@@ -133,6 +133,7 @@ class HiveRepository {
     await clearAllBoxes(); // Clear existing data before caching.
     // Use putAll for efficient bulk insertion.
     await _goalsBox?.putAll({for (var g in goals) g.id: g});
+    
     await _tasksBox?.putAll({for (var t in tasks) t.id: t});
     await _rewardsBox?.putAll({for (var r in rewards) r.id: r});
   }

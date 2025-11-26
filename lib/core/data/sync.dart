@@ -6,6 +6,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart'; // Needed for BoxEvent
 import '../model/goal.dart';
 import '../model/task.dart';
 import '../model/reward.dart';
@@ -22,7 +23,7 @@ class FirebaseSync {
   // changes, as they are being initiated by a server operation.
   bool _isPerformingServerOperation = false;
 
-  // Holds all active stream subscriptions to be cancelled later.
+  // Holds all active stream subscriptions (both Firebase and Hive) to be cancelled later.
   final List<StreamSubscription> _subscriptions = [];
 
   FirebaseSync(this._hiveRepo);
@@ -41,8 +42,7 @@ class FirebaseSync {
   /// This is typically called on user login to populate the local Hive cache.
   Future<void> pullAllData() async {
     if (_user == null) return;
-    _isPerformingServerOperation =
-        true; 
+    _isPerformingServerOperation = true;
     try {
       // Fetch all collections in parallel for efficiency.
       final results = await Future.wait([
@@ -74,39 +74,44 @@ class FirebaseSync {
 
   /// --- Real-time Listener Management ---
 
-  /// Initializes real-time listeners for all user data collections.
-  /// Any changes in Firestore will be automatically pushed to the local Hive cache.
+  /// Initializes real-time listeners for BOTH Firebase collections and Local Hive boxes.
+  /// This ensures that:
+  /// 1. Remote changes in Firestore are pushed to Hive.
+  /// 2. Local changes in Hive (via UI) are pushed to Firestore.
   void startRealtimeListeners() {
     if (_user == null) return;
-    stopRealtimeListeners(); // Ensure old listeners are cleared before starting new ones.
-    _listenToCollection<Goal>(
+    stopRealtimeListeners(); // Ensure old listeners are cleared.
+
+    // 1. Listen to Remote Firebase Changes
+    _listenToRemoteCollection<Goal>(
         'goals', Goal.fromJson, _hiveRepo.addGoal, _hiveRepo.deleteGoal);
-    _listenToCollection<Task>(
+    _listenToRemoteCollection<Task>(
         'tasks', Task.fromJson, _hiveRepo.addTask, _hiveRepo.deleteTask);
-    _listenToCollection<Reward>('rewards', Reward.fromJson, _hiveRepo.addReward,
-        _hiveRepo.deleteReward);
+    _listenToRemoteCollection<Reward>('rewards', Reward.fromJson,
+        _hiveRepo.addReward, _hiveRepo.deleteReward);
+
+    // 2. Listen to Local Hive Changes
+    _listenToLocalBox<Goal>(_hiveRepo.goalsBox, 'goals', syncGoal);
+    _listenToLocalBox<Task>(_hiveRepo.tasksBox, 'tasks', syncTask);
+    _listenToLocalBox<Reward>(_hiveRepo.rewardsBox, 'rewards', syncReward);
   }
 
   /// A generic method to listen for changes in a specific Firestore collection.
-  ///
-  /// [colName]: The name of the collection to listen to.
-  /// [fromJson]: A factory constructor to convert a JSON map to an object of type T.
-  /// [cacheItem]: A function to add/update the item in the local Hive cache.
-  /// [deleteItem]: A function to delete the item from the local Hive cache.
-  void _listenToCollection<T>(
+  void _listenToRemoteCollection<T>(
     String colName,
     T Function(Map<String, dynamic>) fromJson,
     Future<void> Function(T) cacheItem,
     Future<void> Function(String) deleteItem,
   ) {
     final sub = _collection(colName).snapshots().listen((snapshot) async {
-      _isPerformingServerOperation =
-          true; // Set flag for this batch of changes.
+      // IMPORTANT: We set this flag to TRUE so the Local Hive Listener knows
+      // these changes came from the server and should NOT be pushed back.
+      _isPerformingServerOperation = true;
       try {
         for (final change in snapshot.docChanges) {
           final data = change.doc.data();
           if (data == null && change.type != DocumentChangeType.removed) {
-            continue; // Skip invalid data for add/modified events.
+            continue;
           }
           switch (change.type) {
             case DocumentChangeType.added:
@@ -121,15 +126,45 @@ class FirebaseSync {
       } catch (e) {
         // Log errors during snapshot processing.
       } finally {
-        _isPerformingServerOperation =
-            false; // Reset flag once all changes are processed.
+        // Reset flag so user interactions can be synced again.
+        _isPerformingServerOperation = false;
       }
     });
-    _subscriptions.add(sub); // Store the subscription to be cancelled later.
+    _subscriptions.add(sub);
   }
 
-  /// Cancels all active Firestore stream subscriptions.
-  /// This is crucial to call on user logout to prevent memory leaks and errors.
+  /// A generic method to listen for changes in a specific Hive Box.
+  /// [box]: The Hive box to watch.
+  /// [collectionName]: The Firestore collection to sync to.
+  /// [uploadMethod]: The specific method to upload the object (e.g., syncGoal).
+  void _listenToLocalBox<T>(
+    Box<T>? box,
+    String collectionName,
+    Future<void> Function(T) uploadMethod,
+  ) {
+    if (box == null) return;
+
+    final sub = box.watch().listen((BoxEvent event) {
+      // CRITICAL: If the change happened because of _listenToRemoteCollection,
+      // we stop here to prevent an infinite loop.
+      if (_isPerformingServerOperation) return;
+
+      if (event.deleted) {
+        // If deleted locally, delete remotely.
+        // Hive keys are usually Strings in this app, but safe cast ensures no crash.
+        deleteDocument(event.key.toString(), collectionName);
+      } else {
+        // If added/updated locally, upload to Firestore.
+        // event.value is the Object (Goal/Task/Reward).
+        if (event.value != null && event.value is T) {
+          uploadMethod(event.value as T);
+        }
+      }
+    });
+    _subscriptions.add(sub);
+  }
+
+  /// Cancels all active Firestore and Hive stream subscriptions.
   void stopRealtimeListeners() {
     for (final sub in _subscriptions) {
       sub.cancel();
@@ -140,7 +175,7 @@ class FirebaseSync {
   /// --- Public API for Syncing and State ---
 
   /// Public getter to allow other parts of the app to check if a server
-  /// operation is in progress, useful for preventing sync loops.
+  /// operation is in progress.
   bool get isPerformingServerOperation => _isPerformingServerOperation;
 
   /// Pushes a single `Goal` object to Firestore.
