@@ -1,6 +1,4 @@
-/// This file manages the state and loading of inspirational quotes for the application.
-/// It uses Riverpod for state management, Hive for local caching, and loads
-/// initial data from a CSV file located in the assets folder.
+/// lib/core/data/quote.dart
 
 import 'dart:async';
 import 'dart:math';

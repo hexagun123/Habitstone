@@ -1,5 +1,4 @@
-// just a bunch of keys stored here for easy retrival
-// used for the showcaseview package
+/// lib/core/data/showcase_key.dart
 
 import 'package:flutter/material.dart';
 

@@ -1,6 +1,5 @@
-/// A utility class for handling common date and time operations.
-/// This class standardizes how dates are retrieved to ensure consistency
-/// in date-based logic, such as streak calculations, by ignoring time components.
+// core/data/util.dart
+
 
 class DateUtil {
   /// Returns a `DateTime` object representing the current date at midnight UTC.

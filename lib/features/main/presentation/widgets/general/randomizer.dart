@@ -48,7 +48,7 @@ class TaskPopup extends ConsumerWidget {
         ElevatedButton(
           onPressed: () async {
             // Call the weighted task activation method from the task notifier.
-            final success = await taskNotifier.activateWeightedTask();
+            final success = await taskNotifier.activateRandomTask();
 
             // Check if a task was successfully activated.
             if (success) {

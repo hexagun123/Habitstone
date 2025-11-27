@@ -107,7 +107,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   /// The weight of each task is determined by its importance and how many times
   /// it has appeared, adjusted by a user setting. This ensures a balanced
   /// distribution of tasks over time.
-  Task? getWeightedTask() {
+  Task? getRandomTask() {
     final activeTasks = hiddenTasks;
     if (activeTasks.isEmpty) return null;
     if (activeTasks.length == 1) return activeTasks.first;
@@ -146,7 +146,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     final appearance = task.appearanceCount;
     final importance = task.importance;
     // An exponent derived from user settings to control appearance influence.
-    final exponent = (5 - settingWeight).toDouble();
+    final exponent = (settingWeight - 5).toDouble();
     // A component based on how many times the task has appeared.
     final appearanceComponent = pow(appearance, exponent) * 8;
     // A component based on the task's inherent importance.
@@ -157,8 +157,8 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   }
 
   /// Selects a task using the weighted algorithm and activates it.
-  Future<bool> activateWeightedTask() async {
-    final task = getWeightedTask();
+  Future<bool> activateRandomTask() async {
+    final task = getRandomTask();
     if (task != null) {
       await activateTask(task);
       return true;

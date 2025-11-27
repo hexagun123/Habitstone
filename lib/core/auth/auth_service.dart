@@ -1,6 +1,4 @@
-/// This file provides an authentication service for handling user sign-in and sign-out.
-/// It acts as a wrapper around Firebase Authentication and Google Sign-In,
-/// centralizing all authentication logic into a single, manageable class.
+/// AuthService
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';

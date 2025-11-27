@@ -187,7 +187,7 @@ class TaskList extends ConsumerWidget {
                         try {
                           // 2. Await the function so try/catch can actually catch the error
                           print("DEBUG: Calling activateWeightedTask()...");
-                          await taskNotifier.activateWeightedTask();
+                          await taskNotifier.activateRandomTask();
 
                           print(
                               "DEBUG: Randomization successful. Closing dialog.");

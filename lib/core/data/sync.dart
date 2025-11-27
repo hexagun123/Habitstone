@@ -1,7 +1,5 @@
-/// This file contains the core logic for two-way data synchronization between
-/// the local Hive database and the remote Firebase Firestore database. The `FirebaseSync`
-/// class manages fetching data, listening for real-time updates, and pushing local
-/// changes to the cloud.
+// core/data/sync.dart
+
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';

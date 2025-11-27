@@ -1,7 +1,4 @@
-/// This file defines the `HiveRepository`, a centralized class for managing all
-/// interactions with the local Hive database. It encapsulates CRUD operations
-/// for all data models (Goals, Tasks, Rewards, Settings) and handles the
-/// initialization and clearing of Hive boxes.
+/// lib/core/data/hive.dart
 
 import 'dart:async';
 import 'package:hive/hive.dart';
