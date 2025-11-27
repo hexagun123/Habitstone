@@ -93,7 +93,11 @@ class TaskListItem extends ConsumerWidget {
                   );
                   // Display each linked goal as a Chip.
                   return Chip(
-                    label: Text(goal.title),
+                    label: Text(
+                      goal.title,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ),
                     backgroundColor:
                         Theme.of(context).colorScheme.primaryContainer,
                   );
