@@ -188,7 +188,7 @@ class SettingPage extends ConsumerWidget {
           ),
           // Informational text below the slider.
           Text(
-            'Adjust weight setting (1-10)',
+            'Weight above 5 does the tasks with more apparence first, and vice versa',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withAlpha(153),
                 ),
