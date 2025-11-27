@@ -92,6 +92,7 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
   /// - If a goal was *not* `updated` yesterday, its streak is broken and reset to 0.
   Future<void> streakCheck() async {
     final now = DateUtil.now();
+    await _refresh();
     for (final goal in state) {
       Goal? updatedGoal;
       final lastUpdate = goal.lastUpdate;

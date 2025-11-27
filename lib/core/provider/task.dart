@@ -65,6 +65,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     if (task.activate()) {
       await updateTask(task);
     }
+    await _refresh();
   }
 
   /// Handles the logic for when a user marks a task as complete.
@@ -75,6 +76,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   Future<void> markTaskDone(Task task) async {
     final goalNotifier = _ref.read(goalProvider.notifier);
     final goals = _ref.read(goalProvider);
+    await _refresh();
 
     // Update streaks for all associated goals that haven't been updated today.
     for (String goalId in task.goalIds) {

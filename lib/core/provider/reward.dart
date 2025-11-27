@@ -51,6 +51,7 @@ class RewardNotifier extends StateNotifier<List<Reward>> {
   /// Rewards with a lower rarity value (e.g., 1 for "Common") have a higher
   /// chance of being selected.
   Reward? getRandomReward() {
+    _refresh();
     if (state.isEmpty) {
       return null; // No rewards to choose from.
     }
@@ -62,8 +63,10 @@ class RewardNotifier extends StateNotifier<List<Reward>> {
     // Rarity is inverted (1-10 scale): lower rarity number means higher weight (11 - rarity).
     int totalWeight = 0;
     for (final reward in state) {
-      final rarity = reward.rarity > 0 ? reward.rarity : 1; // Ensure rarity is at least 1.
-      totalWeight += 11 - rarity; // Common (1) gets 10 weight, Legendary (10) gets 1.
+      final rarity =
+          reward.rarity > 0 ? reward.rarity : 1; // Ensure rarity is at least 1.
+      totalWeight +=
+          11 - rarity; // Common (1) gets 10 weight, Legendary (10) gets 1.
     }
 
     // If all rewards have invalid rarity leading to zero weight, pick one at random.

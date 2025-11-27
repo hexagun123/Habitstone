@@ -3,6 +3,7 @@
 /// for all data models (Goals, Tasks, Rewards, Settings) and handles the
 /// initialization and clearing of Hive boxes.
 
+import 'dart:async';
 import 'package:hive/hive.dart';
 import '../model/goal.dart';
 import '../model/task.dart';
@@ -22,33 +23,69 @@ class HiveRepository {
   static const String _settingsKey = 'current_settings';
 
   // --- Private Box Instances ---
-  // These will hold the opened Hive boxes after initialization.
   Box<Goal>? _goalsBox;
   Box<Task>? _tasksBox;
   Box<Reward>? _rewardsBox;
   Box<Map>? _dailyBox;
   Box<Settings>? _settingsBox;
 
+  // --- Initialization State Management ---
+  // A completer to signal when initialization is fully finished.
+  final Completer<void> _initCompleter = Completer<void>();
+
+  /// Returns a Future that completes when init() has finished.
+  /// Used by other services (like Sync) to ensure they don't access null boxes.
+  Future<void> get waitForInitialization => _initCompleter.future;
+
   /// Initializes the repository by opening all required Hive boxes.
-  /// This method must be called once at application startup before any other
-  /// repository methods are used.
+  /// This method must be called once at application startup.
   Future<void> init() async {
+    // If already initialized or initializing, don't run again.
+    if (_initCompleter.isCompleted) return;
+
+    print("HiveRepository: Initializing boxes...");
+
+    // Open all boxes
     _goalsBox = await Hive.openBox<Goal>(_goalsBoxName);
     _tasksBox = await Hive.openBox<Task>(_tasksBoxName);
     _rewardsBox = await Hive.openBox<Reward>(_rewardsBoxName);
     _dailyBox = await Hive.openBox<Map>(_dailyBoxName);
     _settingsBox = await Hive.openBox<Settings>(_settingsBoxName);
+
+    print("HiveRepository: Initialization Complete. Boxes are open.");
+
+    // Signal completion
+    if (!_initCompleter.isCompleted) {
+      _initCompleter.complete();
+    }
+  }
+
+  /// --- Helper to check initialization ---
+  /// Throws or logs if a box is accessed before init() is complete.
+  bool _checkBox(Box? box, String name) {
+    if (box == null || !box.isOpen) {
+      print(
+          "HiveRepository Error: Attempted to access $name but it is CLOSED or NULL. Call init() first.");
+      return false;
+    }
+    return true;
   }
 
   /// --- Settings Management ---
 
   /// Persists the provided `Settings` object to the settings box.
-  Future<void> _saveSettings(Settings s) async =>
-      await _settingsBox?.put(_settingsKey, s);
+  Future<void> _saveSettings(Settings s) async {
+    if (_checkBox(_settingsBox, 'SettingsBox')) {
+      await _settingsBox!.put(_settingsKey, s);
+    }
+  }
 
   /// Retrieves the current `Settings` object. If none exists, it creates,
   /// saves, and returns a default `Settings` object.
   Settings getSettings() {
+    // Return default if accessed too early to prevent crash
+    if (_settingsBox == null || !_settingsBox!.isOpen) return Settings.create();
+
     final s = _settingsBox?.get(_settingsKey);
     if (s == null) {
       final d = Settings.create();
@@ -70,24 +107,57 @@ class HiveRepository {
 
   // Goal operations
   List<Goal> getGoals() => _goalsBox?.values.toList() ?? [];
-  Future<void> addGoal(Goal g) async => await _goalsBox?.put(g.id, g);
-  Future<void> updateGoal(String id, Goal g) async =>
-      await _goalsBox?.put(id, g);
-  Future<void> deleteGoal(String id) async => await _goalsBox?.delete(id);
+
+  Future<void> addGoal(Goal g) async {
+    if (_checkBox(_goalsBox, 'GoalsBox')) {
+      await _goalsBox!.put(g.id, g);
+      print("HiveRepository: Added Goal ${g.id}");
+    }
+  }
+
+  Future<void> updateGoal(String id, Goal g) async {
+    if (_checkBox(_goalsBox, 'GoalsBox')) await _goalsBox!.put(id, g);
+  }
+
+  Future<void> deleteGoal(String id) async {
+    if (_checkBox(_goalsBox, 'GoalsBox')) await _goalsBox!.delete(id);
+  }
 
   // Task operations
   List<Task> getTasks() => _tasksBox?.values.toList() ?? [];
-  Future<void> addTask(Task t) async => await _tasksBox?.put(t.id, t);
-  Future<void> updateTask(String id, Task t) async =>
-      await _tasksBox?.put(id, t);
-  Future<void> deleteTask(String id) async => await _tasksBox?.delete(id);
+
+  Future<void> addTask(Task t) async {
+    if (_checkBox(_tasksBox, 'TasksBox')) {
+      await _tasksBox!.put(t.id, t);
+      print("HiveRepository: Added Task ${t.id}");
+    }
+  }
+
+  Future<void> updateTask(String id, Task t) async {
+    if (_checkBox(_tasksBox, 'TasksBox')) await _tasksBox!.put(id, t);
+  }
+
+  Future<void> deleteTask(String id) async {
+    if (_checkBox(_tasksBox, 'TasksBox')) await _tasksBox!.delete(id);
+  }
 
   // Reward operations
   List<Reward> getRewards() => _rewardsBox?.values.toList() ?? [];
-  Future<void> addReward(Reward r) async => await _rewardsBox?.put(r.id, r);
-  Future<void> updateReward(String id, Reward r) async =>
-      await _rewardsBox?.put(id, r);
-  Future<void> deleteReward(String id) async => await _rewardsBox?.delete(id);
+
+  Future<void> addReward(Reward r) async {
+    if (_checkBox(_rewardsBox, 'RewardsBox')) {
+      await _rewardsBox!.put(r.id, r);
+      print("HiveRepository: Added Reward ${r.id}");
+    }
+  }
+
+  Future<void> updateReward(String id, Reward r) async {
+    if (_checkBox(_rewardsBox, 'RewardsBox')) await _rewardsBox!.put(id, r);
+  }
+
+  Future<void> deleteReward(String id) async {
+    if (_checkBox(_rewardsBox, 'RewardsBox')) await _rewardsBox!.delete(id);
+  }
 
   /// --- Box Getters ---
   /// Provide direct access to the boxes, useful for `watch()` functionality.
@@ -98,22 +168,22 @@ class HiveRepository {
   /// --- Daily Progress Tracking ---
 
   /// Increments the task completion count for a given date string.
-  Future<void> recordTaskCompletion(String d) async =>
+  Future<void> recordTaskCompletion(String d) async {
+    if (_checkBox(_dailyBox, 'DailyBox')) {
       await _dailyBox!.put(d, {'count': getTaskCompletionCount(d) + 1});
+    }
+  }
 
   /// Retrieves the task completion count for a specific date string.
   /// Defaults to the current day if the date is null.
   int getTaskCompletionCount(String? d) {
+    if (_dailyBox == null || !_dailyBox!.isOpen) return 0;
     d ??= DateUtil.now().toString();
     final data = _dailyBox!.get(d, defaultValue: {'count': 0}) as Map;
     return data['count'] as int;
   }
 
   /// --- Data Maintenance & Caching ---
-
-  /// Deletes the settings box from disk. A recovery mechanism for corrupted data.
-  Future<void> clearCorruptedSettings() async =>
-      await _settingsBox?.deleteFromDisk();
 
   /// Clears all user-specific data (goals, tasks, rewards) from the database.
   /// Typically used during user logout.
@@ -132,9 +202,11 @@ class HiveRepository {
   }) async {
     await clearAllBoxes(); // Clear existing data before caching.
     // Use putAll for efficient bulk insertion.
-    await _goalsBox?.putAll({for (var g in goals) g.id: g});
-    
-    await _tasksBox?.putAll({for (var t in tasks) t.id: t});
-    await _rewardsBox?.putAll({for (var r in rewards) r.id: r});
+    if (_goalsBox != null)
+      await _goalsBox!.putAll({for (var g in goals) g.id: g});
+    if (_tasksBox != null)
+      await _tasksBox!.putAll({for (var t in tasks) t.id: t});
+    if (_rewardsBox != null)
+      await _rewardsBox!.putAll({for (var r in rewards) r.id: r});
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'dart:developer';
 
 import '../../../../core/data/showcase_key.dart';
 import '../../../../core/model/task.dart';
@@ -49,10 +50,13 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _appearanceController = TextEditingController(text: '1');
+
   // Tracks the form submission state to prevent multiple submissions.
   bool _isSubmitting = false;
-  // Stores the database keys of goals linked to this task.
+
+  // Stores the database IDs of goals linked to this task.
   List<String> _selectedGoalIds = [];
+
   // The number of times the task should appear.
   int _appearanceCount = 1;
   // The importance rating of the task, used for prioritization.
@@ -110,10 +114,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   }
 
   /// Handles the entire task creation process.
-  ///
-  /// It first validates the form. If valid, it constructs a new [Task] object
-  /// from the form data, calls the [taskProvider] to persist it, shows a
-  /// success or error SnackBar, and finally resets the form for a new entry.
   Future<void> _createTask() async {
     if (!_formKey.currentState!.validate())
       return; // Abort if form is not valid.
@@ -175,12 +175,18 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
 
   /// Toggles the selection state of a goal chip.
   /// Adds or removes the goal's ID from the `_selectedGoalIds` list.
+  /// Includes DEBUG logs to verify functionality.
   void _toggleGoalSelection(String goalId) {
+    print("DEBUG: Toggling Goal ID: '$goalId' (Type: ${goalId.runtimeType})");
+    print("DEBUG: Current Selection before toggle: $_selectedGoalIds");
+
     setState(() {
       if (_selectedGoalIds.contains(goalId)) {
         _selectedGoalIds.remove(goalId);
+        print("DEBUG: Removed ID. Selection is now: $_selectedGoalIds");
       } else {
         _selectedGoalIds.add(goalId);
+        print("DEBUG: Added ID. Selection is now: $_selectedGoalIds");
       }
     });
   }
@@ -214,7 +220,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                     const SizedBox(height: 24),
 
                     // --- Task Title Field ---
-                    // A Showcase widget to guide new users.
                     Showcase(
                       key: twelve,
                       title: title_twelve,
@@ -248,7 +253,6 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                     const SizedBox(height: 24),
 
                     // --- Appearance Count Section ---
-                    // Allows users to set how many times a task should be generated.
                     Showcase(
                       key: thirteen,
                       title: title_thirteen,
@@ -338,12 +342,10 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                     ),
 
                     // --- Importance Level Section ---
-                    // Determines the task's priority in random generation.
                     Showcase(
                       key: fourteen,
                       title: title_fourteen,
-                      description:
-                          description_fourteen,
+                      description: description_fourteen,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -413,8 +415,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                     Showcase(
                       key: fifteen,
                       title: title_fifteen,
-                      description:
-                          description_fifteen,
+                      description: description_fifteen,
                       child: goals.isNotEmpty
                           // STATE 1: Display goal selection chips if goals exist.
                           ? Column(
@@ -436,15 +437,16 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                       runSpacing: 8,
                                       // Map each goal to a selectable FilterChip.
                                       children: goals.map((goal) {
+                                        // FIX: Use goal.id explicitly to ensure we have a String
+                                        final String goalId = goal.id;
                                         final isSelected =
-                                            _selectedGoalIds.contains(goal.key);
+                                            _selectedGoalIds.contains(goalId);
+
                                         return FilterChip(
                                           label: Text(goal.title),
                                           selected: isSelected,
                                           onSelected: (bool selected) {
-                                            if (goal.key != null) {
-                                              _toggleGoalSelection(goal.key!);
-                                            }
+                                            _toggleGoalSelection(goalId);
                                           },
                                           selectedColor: Theme.of(context)
                                               .colorScheme
