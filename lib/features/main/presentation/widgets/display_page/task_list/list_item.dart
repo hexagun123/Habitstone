@@ -89,7 +89,7 @@ class TaskListItem extends ConsumerWidget {
                 children: task.goalIds.map((goalId) {
                   // Find the goal object corresponding to the goalId.
                   final goal = goals.firstWhere(
-                    (g) => g.key == goalId,
+                    (g) => g.id == goalId,
                   );
                   // Display each linked goal as a Chip.
                   return Chip(

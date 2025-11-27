@@ -1,5 +1,5 @@
 // features/main/presentation/widgets/main_page/chart_panel.dart
-// The main panel is a radar chart, with stats, 
+// The main panel is a radar chart, with stats,
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,6 @@ class MainPanel extends ConsumerWidget {
                   ),
             ),
             const SizedBox(height: 24),
-
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -159,7 +158,7 @@ class MainPanel extends ConsumerWidget {
             dataEntries: goals
                 .map((goal) => RadarEntry(value: goal.streak.toDouble()))
                 .toList(),
-            fillColor: colorScheme.primary.withAlpha(77), 
+            fillColor: colorScheme.primary.withAlpha(77),
             borderColor: colorScheme.primary,
             borderWidth: 2,
           ),
@@ -179,18 +178,22 @@ class MainPanel extends ConsumerWidget {
           fontWeight: FontWeight.bold,
         ),
         // --- Grid & Ticks ---
-        tickCount: (maxValue / 5).ceil(), // Number of concentric grid lines.
+        tickCount: (maxValue + 1).ceil(), // Number of concentric grid lines.
         ticksTextStyle: TextStyle(
-          color: colorScheme.onSurface.withAlpha(178), // (70%)
+          color: colorScheme.onSurface.withAlpha(100), // (70%)
           fontSize: 10,
         ),
-        gridBorderData: BorderSide(
+        tickBorderData: BorderSide(
           color: colorScheme.outline.withAlpha(51), // (20%)
           width: 1,
         ),
-        radarBorderData: BorderSide(
-          color: colorScheme.outline.withAlpha(77), // (30%)
+        gridBorderData: BorderSide(
+          color: colorScheme.outline.withAlpha(100), // (20%)
+          width: 1,
         ),
+        radarBorderData: BorderSide(
+            color: colorScheme.outline.withAlpha(150), // (30%)
+            width: 2),
       ),
       duration: const Duration(milliseconds: 400),
     );

@@ -54,7 +54,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
   // Tracks the form submission state to prevent multiple submissions.
   bool _isSubmitting = false;
 
-  // Stores the database IDs of goals linked to this task.
+  // Stores the database IDs (Strings) of goals linked to this task.
   List<String> _selectedGoalIds = [];
 
   // The number of times the task should appear.
@@ -125,7 +125,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
       final newTask = Task(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
-        goalIds: _selectedGoalIds,
+        goalIds: _selectedGoalIds, // Passing the List<String> IDs
         appearanceCount: _appearanceCount,
         importance: _importance,
         display:
@@ -173,20 +173,17 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
     }
   }
 
-  /// Toggles the selection state of a goal chip.
+  /// Toggles the selection state of a goal chip using its ID.
   /// Adds or removes the goal's ID from the `_selectedGoalIds` list.
-  /// Includes DEBUG logs to verify functionality.
   void _toggleGoalSelection(String goalId) {
-    print("DEBUG: Toggling Goal ID: '$goalId' (Type: ${goalId.runtimeType})");
-    print("DEBUG: Current Selection before toggle: $_selectedGoalIds");
+    // DEBUG: Ensure we are working with the string ID
+    print("DEBUG: Toggling Goal ID: '$goalId'");
 
     setState(() {
       if (_selectedGoalIds.contains(goalId)) {
         _selectedGoalIds.remove(goalId);
-        print("DEBUG: Removed ID. Selection is now: $_selectedGoalIds");
       } else {
         _selectedGoalIds.add(goalId);
-        print("DEBUG: Added ID. Selection is now: $_selectedGoalIds");
       }
     });
   }
@@ -437,7 +434,7 @@ class _NewTaskFormState extends ConsumerState<NewTaskForm> {
                                       runSpacing: 8,
                                       // Map each goal to a selectable FilterChip.
                                       children: goals.map((goal) {
-                                        // FIX: Use goal.id explicitly to ensure we have a String
+                                        // CRITICAL: We explicitly use the goal.id (String) here.
                                         final String goalId = goal.id;
                                         final isSelected =
                                             _selectedGoalIds.contains(goalId);
