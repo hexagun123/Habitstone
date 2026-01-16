@@ -1,21 +1,14 @@
-/// This file defines the NewTaskPopUp widget, a reusable UI component
-/// used within dialogs to represent a single, selectable task from the hidden pool.
+// Just a popup for the task list
+// secondary widget
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/model/task.dart';
 
-/// A widget that displays details of a single task in a list format,
-/// typically within a popup or dialog.
-///
-/// It shows the task's title, description (if available), and the remaining
-/// number of times it can appear. Tapping the widget triggers a callback
-/// to activate the task.
 class NewTaskPopUp extends ConsumerWidget {
-  /// The task object containing the data to be displayed.
   final Task task;
 
-  /// The callback function to be executed when the user taps on this widget
-  /// to activate the task.
+  /// The callback function to activate the task
+  /// just having it here in case the function changes
   final VoidCallback onActivate;
 
 
