@@ -149,7 +149,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     final exponent = (settingWeight - 5).toDouble();
     // A component based on how many times the task has appeared.
     final appearanceComponent = pow(appearance, exponent) * 8;
-    // A component based on the task's inherent importance.
+    // A component based on the task's inhrent importance.
     final importanceComponent = importance * 12;
     final totalWeight = (appearanceComponent + importanceComponent).toInt();
     // Clamp the weight to a reasonable range.

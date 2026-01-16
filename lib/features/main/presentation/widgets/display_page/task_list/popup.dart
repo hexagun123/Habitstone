@@ -18,28 +18,21 @@ class NewTaskPopUp extends ConsumerWidget {
   /// to activate the task.
   final VoidCallback onActivate;
 
-  /// The callback function for a randomization action. Note: This is passed
-  /// but not used in the current UI of this specific widget.
-  final VoidCallback onRandomize;
 
   const NewTaskPopUp({
     super.key,
     required this.task,
     required this.onActivate,
-    required this.onRandomize,
   });
 
-  /// Describes the part of the user interface represented by this widget.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       child: Column(
         children: [
-          // A standard list item layout for displaying task information.
+          // A list layout
           ListTile(
-            // The main title of the task.
             title: Text(task.title),
-            // Subtitle area for additional details like description and appearance count.
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -53,13 +46,10 @@ class NewTaskPopUp extends ConsumerWidget {
                 ),
               ],
             ),
-            // Defines the action to perform when the list tile is tapped.
             onTap: () {
-              // Execute the provided activation callback.
+              // Execute callback
               onActivate();
-              // Close the dialog.
               Navigator.pop(context);
-              // Show a confirmation message to the user.
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Added "${task.title}" to tasks'),
