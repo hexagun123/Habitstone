@@ -17,7 +17,7 @@ class QuoteAdapter extends TypeAdapter<Quote> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Quote(
-      title: fields[0] as String,
+      author: fields[0] as String,
       quote: fields[1] as String,
     );
   }
@@ -27,7 +27,7 @@ class QuoteAdapter extends TypeAdapter<Quote> {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.title)
+      ..write(obj.author)
       ..writeByte(1)
       ..write(obj.quote);
   }

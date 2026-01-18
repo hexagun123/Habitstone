@@ -1,6 +1,4 @@
-/// This file configures authentication services for the application using Riverpod.
-/// It sets up Google Sign-In for multiple platforms, provides an authentication service,
-/// and orchestrates data synchronization based on the user's authentication state.
+// everything about authentication and firebase
 
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -11,9 +9,8 @@ import '../auth/auth_service.dart';
 import '../data/sync.dart';
 import 'app.dart';
 
-/// Provides the [FirebaseSync] service instance.
-/// This service handles the logic for synchronizing data between the local
-/// Hive database and the remote Firebase Firestore.
+/// a provider for the syncing between local and cloud
+/// just watching the hive repo and 
 final firebaseSyncProvider = Provider<FirebaseSync>((ref) {
   final hiveRepo = ref.watch(hiveRepositoryProvider);
   return FirebaseSync(hiveRepo);

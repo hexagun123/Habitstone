@@ -66,7 +66,7 @@ class QuoteNotifier extends AsyncNotifier<List<Quote>> {
         final row = listData[i];
         if (row.length >= 2) {
           quotesToStore.add(
-            Quote(quote: row[0].toString(), title: row[1].toString()),
+            Quote(quote: row[0].toString(), author: row[1].toString()),
           );
         }
       }
