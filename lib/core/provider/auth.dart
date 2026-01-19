@@ -1,6 +1,7 @@
 // everything about authentication and firebase
 
 import 'dart:io' show Platform;
+import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,40 +11,46 @@ import '../data/sync.dart';
 import 'app.dart';
 
 /// a provider for the syncing between local and cloud
-/// just watching the hive repo and 
+/// just watching the hive repo so that we can call the data functions
 final firebaseSyncProvider = Provider<FirebaseSync>((ref) {
   final hiveRepo = ref.watch(hiveRepositoryProvider);
   return FirebaseSync(hiveRepo);
 });
 
-/// Defines compile-time constants for Google Sign-In client IDs.
-/// These values are passed to the application at build time using the
-/// `--dart-define` flag.
+/// all the environment variables
+/// please if you want to run anything just get api from firebase and throw them here
+/// I baked my env variables in when compiling, this is why it is fromEnvironment
 const String webClientId = String.fromEnvironment('WEB_CLIENT_ID');
 const String desktopClientId = String.fromEnvironment('DESKTOP_CLIENT_ID');
 const String desktopClientSecret =
     String.fromEnvironment('DESKTOP_CLIENT_SECRET');
 
-/// Configures and provides the [GoogleSignIn] instance.
-/// It uses platform-specific parameters to correctly initialize Google Sign-In
-/// for web, desktop (Windows, Linux, macOS), and mobile platforms.
+/// Google signin, very convient as there is quite a lot of google users :D
+/// this function only does the config though
+/// the actual functions are in AuthService, the one below
 final googleSignInProvider = Provider<GoogleSignIn>((ref) {
   GoogleSignInParams params;
   if (kIsWeb) {
-    // Configuration for web platforms.
+    // web config
     params = GoogleSignInParams(
       clientId: webClientId,
       scopes: ['email', 'profile'],
     );
   } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    // Configuration for desktop platforms.
+    // desktop config
     params = GoogleSignInParams(
         clientId: desktopClientId,
         clientSecret: desktopClientSecret,
         scopes: ['email', 'profile'],
-        redirectPort: 5000);
+        redirectPort:
+            5000); // I've only allowed 5000 on my firebase as it is pretty common
+    // this could be any other ports that is whitelisted on firebase
   } else {
-    // Default configuration for mobile (iOS/Android).
+    // putting this here just incase if I want a local app for mobile later
+    // however, apple store is quite expensive
+    // and android developer is broken for me
+    // soo.....
+
     params = const GoogleSignInParams(
       scopes: ['email', 'profile'],
     );
@@ -51,60 +58,54 @@ final googleSignInProvider = Provider<GoogleSignIn>((ref) {
   return GoogleSignIn(params: params);
 });
 
-/// Provides the [AuthService] instance.
-/// This service abstracts the underlying authentication logic, wrapping
-/// Firebase Auth and Google Sign-In functionalities.
+/// the link to AuthService, my all in one authentication file
 final authServiceProvider = Provider<AuthService>((ref) {
   final googleSignIn = ref.watch(googleSignInProvider);
   return AuthService(googleSignIn);
 });
 
-/// A controller provider that listens to Google Sign-In authentication state changes
-/// to orchestrate critical data synchronization and cleanup tasks.
-/// This provider does not return a value but manages side effects based on auth state.
+/// Auth data syncing + a data listener after login
+
 final authStateControllerProvider = Provider((ref) {
   final googleSignIn = ref.watch(googleSignInProvider);
   final authService = ref.watch(authServiceProvider);
   final syncService = ref.watch(firebaseSyncProvider);
   final hiveRepo = ref.watch(hiveRepositoryProvider);
 
-  // Listens to the raw authentication state from the Google Sign-In plugin.
+  // check all the loggin state
   final sub = googleSignIn.authenticationState.listen((credentials) async {
     try {
       if (credentials != null) {
-        // --- ON LOGIN ---
-        // When Google credentials are available, sign in to Firebase.
+        // sign in to firebase if the user logged in
         final user =
             await authService.signInToFirebaseWithCredentials(credentials);
         if (user != null) {
-          // First, pull all data from Firebase to ensure local cache is up-to-date.
+          // override the local data with the firebase ones
           await syncService.pullAllData();
-          // Second, start real-time listeners for ongoing updates from Firebase.
+
+          // start real-time syncing between local and firebase
           syncService.startRealtimeListeners();
         }
       } else {
-        // --- ON LOGOUT ---
-        // When credentials become null, the user has signed out.
-        // First, stop listening to remote changes to prevent errors.
+        // stop the listener for the continues sync to prevent leaks
         syncService.stopRealtimeListeners();
-        // Second, clear all user-specific data from the local Hive database.
+
+        // it will clear all entries after logout for now, we will see if people like it or not
         await hiveRepo.clearAllBoxes();
       }
     } catch (e) {
-      // Catch and log any unexpected errors during the auth/sync process.
+      // incase something goes wrong
+      printToConsole(e.toString());
     }
   });
 
-  // Ensure the stream subscription is cancelled when the provider is disposed.
+  // displose the subscription to listening firebase
   ref.onDispose(() => sub.cancel());
 });
 
-/// Provides the authentication state of the Firebase user.
-/// This is the primary provider that UI components should watch to react to
-/// sign-in or sign-out events. It exposes the `authStateChanges` stream
-/// from the AuthService.
+
+/// just tells the ui if we are signed in or not
 final authStateProvider = StreamProvider<User?>((ref) {
-  // Watch the controller to ensure the auth-driven side effects are active.
   ref.watch(authStateControllerProvider);
   return ref.watch(authServiceProvider).authStateChanges;
 });

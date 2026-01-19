@@ -1,7 +1,5 @@
 // lib/providers/goal.dart
-// This file defines the state management logic for goals using Riverpod.
-// It includes the `GoalNotifier` which handles business logic such as creating,
-// updating, deleting goals, and managing their daily streaks.
+// all the goal management functions
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,46 +9,39 @@ import '../data/util.dart';
 import 'app.dart';
 import '../data/hive.dart';
 
-/// Provider that exposes the [GoalNotifier] and its state (`List<Goal>`).
-/// This allows the UI to interact with the goals and listen for changes.
+// watch the goal states
+// we have it here to be retrieved from other files, its not used in this file 
 final goalProvider = StateNotifierProvider<GoalNotifier, List<Goal>>((ref) {
   return GoalNotifier(ref.watch(hiveRepositoryProvider), ref);
 });
 
-/// Manages the state of the goal list (`List<Goal>`).
-///
-/// This notifier is the central point for all goal-related operations.
-/// It interacts with the persistence layer ([HiveRepository]) to store and
-/// retrieve goal data and coordinates with the [TaskNotifier] when goals
-/// are deleted.
+/// Manages the states of the goal list
 class GoalNotifier extends StateNotifier<List<Goal>> {
   final HiveRepository _repository;
-  final Ref _ref;
+  final Ref _ref; // deprecated, but we can still use it for now
 
-  /// Initializes the notifier by loading the initial list of goals from the repository.
+  /// Initializes the notifier by loading from the hive repo (which should be the one on app.dart)
   GoalNotifier(this._repository, this._ref) : super(_repository.getGoals());
 
-  /// Refreshes the state by fetching the latest goal list from the repository.
-  /// This ensures the in-memory state is synchronized with the persistent storage.
+  /// refreshing the states by fetching the newest goals from the repo
   Future<void> _refresh() async => state = [..._repository.getGoals()];
 
-  /// Persists a new goal and updates the state.
+  /// create a new goal and updates the state.
   Future<void> createGoal(Goal goal) async {
     await _repository.addGoal(goal);
     await _refresh();
   }
 
-  /// Updates an existing goal in the repository and refreshes the state.
+  /// update an existing goal in the repository and refreshes the state.
   Future<void> updateGoal(Goal updatedGoal) async {
     await _repository.updateGoal(updatedGoal.id, updatedGoal);
     await _refresh();
   }
 
-  /// Deletes a goal and cleans up its references in any associated tasks.
-  ///
-  /// This method first iterates through all tasks to remove the ID of the
+  /// To delete a goal, we iterates through all tasks to remove the ID of the
   /// deleted goal from their `goalIds` list. After cleaning up the references,
   /// it deletes the goal from the repository and refreshes the state.
+
   Future<void> deleteGoal(Goal goal) async {
     final String goalIdToDelete = goal.id;
     final tasks = _ref.read(taskProvider);
@@ -63,43 +54,47 @@ class GoalNotifier extends StateNotifier<List<Goal>> {
         await taskNotifier.updateTask(task);
       }
     }
+
     // Delete the goal itself from storage.
     await _repository.deleteGoal(goalIdToDelete);
     await _refresh();
   }
 
-  /// Increments the streak count for a given goal.
-  ///
-  /// This action is only performed if the goal has not already been updated today,
-  /// preventing multiple streak increments on the same day. It also marks the
-  /// goal as updated for the current day.
+  /// Incrementing streaks is only performed if the goal has not already been updated today,
+  /// preventing multiple streak increments on the same day. 
+  /// we basically just do copyWith and change some values
+
   Future<void> addStreak(Goal goal) async {
     if (!goal.updated) {
       Goal updatedGoal = goal.copyWith(
         streak: goal.streak + 1,
         updated: true,
-        lastUpdate: DateUtil.now(),
+        lastUpdate: DateUtil.now(), // returns utc time, see util.dart
       );
       await updateGoal(updatedGoal);
     }
   }
 
-  /// Performs a daily check on all goals to maintain streak integrity.
-  ///
-  /// This method should be called once daily (e.g., on app startup). It iterates
-  /// through each goal and checks if its `lastUpdate` was before the current day.
-  /// - If a goal was `updated` yesterday, its `updated` flag is reset for the new day.
-  /// - If a goal was *not* `updated` yesterday, its streak is broken and reset to 0.
+  /// Checking the streak
+  /// This method should be called on startup. 
+  /// It iterates through each goal and checks if its `lastUpdate` was before the current day.
+  /// - If a goal was updated yesterday, its `updated` flag is reset for the new day.
+  /// - If a goal was not updated yesterday, its streak is broken and reset to 0.
+
   Future<void> streakCheck() async {
     final now = DateUtil.now();
     await _refresh();
+
+    // loop the goals
     for (final goal in state) {
       Goal? updatedGoal;
       final lastUpdate = goal.lastUpdate;
 
-      // Use DateUtils.isSameDay for a robust comparison that ignores time of day.
+      // using the flutter dateutils package for checks
       if (DateUtils.isSameDay(lastUpdate, now) == false) {
+
         if (!goal.updated) {
+          // if not updated
           // Streak is broken because a day was missed.
           updatedGoal = goal.copyWith(
             streak: 0,
