@@ -1,8 +1,6 @@
 // lib/providers/task.dart
-// This file defines the state management for tasks using Riverpod.
-// It includes the main `TaskNotifier` which handles all business logic related to tasks,
-// such as CRUD operations, completion logic, and a weighted random selection algorithm.
-// It also defines several derived providers for UI consumption.
+
+// this files holds the CRUD and essential operations for Tasks
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
@@ -14,23 +12,17 @@ import 'setting.dart';
 import '../data/hive.dart';
 import 'package:collection/collection.dart';
 
-/// Provider that exposes the [TaskNotifier] to the application.
-/// This allows UI widgets to listen to the list of tasks and interact with the notifier.
+/// watches the hive repository for the tasks
 final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
   return TaskNotifier(ref.watch(hiveRepositoryProvider), ref);
 });
 
-/// Manages the state of the task list (`List<Task>`).
-///
-/// This notifier is responsible for all operations related to tasks, including
-/// creating, updating, deleting, and processing task completions. It interfaces
-
-/// with a [HiveRepository] for data persistence.
+/// manages the possible list of tasks that is created by the user
 class TaskNotifier extends StateNotifier<List<Task>> {
   final HiveRepository _repository;
-  final Ref _ref;
+  final Ref _ref; // deprecated but usable
 
-  /// Initializes the notifier by loading the initial list of tasks from the repository.
+  // get current state of the tasks from the repository
   TaskNotifier(this._repository, this._ref) : super(_repository.getTasks());
 
   /// Refreshes the state by fetching the latest task list from the repository.
@@ -69,7 +61,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   }
 
   /// Handles the logic for when a user marks a task as complete.
-  ///
+
   /// This method updates the streaks of any associated goals, records the
   /// completion for the current day, and then either deletes the task or
   /// hides it based on its properties.
@@ -103,7 +95,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   }
 
   /// Selects a random task from the hidden tasks based on a weighted algorithm.
-  ///
+
   /// The weight of each task is determined by its importance and how many times
   /// it has appeared, adjusted by a user setting. This ensures a balanced
   /// distribution of tasks over time.
@@ -145,13 +137,17 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   int _calculateTaskWeight(Task task, int settingWeight) {
     final appearance = task.appearanceCount;
     final importance = task.importance;
+
     // An exponent derived from user settings to control appearance influence.
     final exponent = (settingWeight - 5).toDouble();
-    // A component based on how many times the task has appeared.
+
+    // A part of the generation based on how many times the task has appeared.
     final appearanceComponent = pow(appearance, exponent) * 8;
-    // A component based on the task's inhrent importance.
+
+    // A part of the generation based on the task's inhrent importance.
     final importanceComponent = importance * 12;
     final totalWeight = (appearanceComponent + importanceComponent).toInt();
+
     // Clamp the weight to a reasonable range.
     return totalWeight.clamp(1, 1000);
   }
@@ -167,17 +163,24 @@ class TaskNotifier extends StateNotifier<List<Task>> {
   }
 }
 
-// --- Derived Providers ---
-
 /// Provides the count of tasks that are currently displayed (i.e., not completed).
+/// for finding which tasks to display in tasks list and task generation
 final tasksNotCompletedCountProvider = Provider<int>(
     (ref) => ref.watch(taskProvider.notifier).displayedTasks.length);
 
 /// Provides a list of task completion counts for the last 7 days.
+/// for displaying statistics
 final weeklyCompletionsProvider =
     FutureProvider<List<DailyCompletion>>((ref) async {
+
+  // find the repo
   final repository = ref.watch(hiveRepositoryProvider);
+
+  // find the time
   final now = DateUtil.now();
+
+  // finding the tasks completed from the repository
+  // by retrieving with the date
   List<DailyCompletion> completions = [];
   for (int i = 6; i >= 0; i--) {
     final date = now.subtract(Duration(days: i));
@@ -188,20 +191,27 @@ final weeklyCompletionsProvider =
 });
 
 /// Provides the total number of goals.
+/// for displaying statistics
 final totalGoalsProvider =
     Provider<int>((ref) => ref.watch(goalProvider).length);
 
 /// Computes and provides the longest streak among all goals.
+/// for displaying statistics
 final longestStreakProvider = Provider<int>((ref) {
   final goals = ref.watch(goalProvider);
   if (goals.isEmpty) return 0;
+
+  // only return the maximum streak value
   return goals.map((g) => g.streak).reduce(max);
 });
 
 /// Provides the number of tasks completed today.
 final tasksCompletedTodayProvider = Provider<int>((ref) {
   final repository = ref.watch(hiveRepositoryProvider);
+
   // Passing null gets the count for the current day.
+  // although passing the current day is also fine
+  // but why not?
   return repository.getTaskCompletionCount(null);
 });
 
