@@ -175,7 +175,7 @@ class HiveRepository {
   /// Defaults to the current day if the date is null.
   int getTaskCompletionCount(String? d) {
     if (_dailyBox == null || !_dailyBox!.isOpen) return 0;
-    d ??= DateUtil.now().toString();
+    d ??= Util.now().toString();
     final data = _dailyBox!.get(d, defaultValue: {'count': 0}) as Map;
     return data['count'] as int;
   }

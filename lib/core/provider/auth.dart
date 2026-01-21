@@ -1,7 +1,6 @@
 // everything about authentication and firebase
 
 import 'dart:io' show Platform;
-import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -95,7 +94,7 @@ final authStateControllerProvider = Provider((ref) {
       }
     } catch (e) {
       // incase something goes wrong
-      printToConsole(e.toString());
+      print(e.toString());
     }
   });
 

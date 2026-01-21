@@ -11,7 +11,6 @@ final hiveRepositoryProvider = Provider<HiveRepository>((ref) {
 
 /// initalizer provider with all nessecary information to be retrieved on startup
 final appInitializerProvider = FutureProvider<void>((ref) async {
-
   final repo = ref.read(hiveRepositoryProvider);
 
   // await the init of the repo
@@ -19,5 +18,4 @@ final appInitializerProvider = FutureProvider<void>((ref) async {
 
   // read the streak for once
   await ref.read(goalProvider.notifier).streakCheck();
-
 });

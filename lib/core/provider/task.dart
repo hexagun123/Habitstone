@@ -80,7 +80,7 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     }
 
     // Record the completion and invalidate dependent providers to trigger UI updates.
-    final today = DateUtil.now().toString();
+    final today = Util.now().toString();
     await _repository.recordTaskCompletion(today);
     _ref.invalidate(tasksCompletedTodayProvider);
     _ref.invalidate(weeklyCompletionsProvider);
@@ -177,7 +177,7 @@ final weeklyCompletionsProvider =
   final repository = ref.watch(hiveRepositoryProvider);
 
   // find the time
-  final now = DateUtil.now();
+  final now = Util.now();
 
   // finding the tasks completed from the repository
   // by retrieving with the date

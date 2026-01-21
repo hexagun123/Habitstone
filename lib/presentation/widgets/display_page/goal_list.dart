@@ -115,6 +115,12 @@ class GoalList extends ConsumerWidget {
           // Save button updates the goal and closes the dialog.
           FilledButton(
             onPressed: () {
+              if (titleController.text.trim().isEmpty) {
+                const snackBar =
+                    SnackBar(content: Text('Please enter a title'));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                return;
+              }
               // Create a new goal object with the updated details.
               final updatedGoal = goal.copyWith(
                 title: titleController.text,
@@ -150,7 +156,7 @@ class GoalListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final today = DateUtil.now();
+    final today = Util.now();
     final lastUpdateDate = goal.lastUpdate;
     // Determine if the goal needs an update for the current day.
     final needsUpdate = lastUpdateDate.isBefore(today) || !goal.updated;

@@ -137,18 +137,10 @@ class MainPanel extends ConsumerWidget {
     );
   }
 
-  // Big boi radar chart
+  // massive radar chart
   Widget _buildRadarChart(List<Goal> goals, BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    // Determine the max for the chart scale
-    // fold iterate through the goals to determine the maximum streak (compressed for loop)
-    final maxStreak =
-        goals.fold(0, (max, goal) => goal.streak > max ? goal.streak : max);
-
-    // make the max cap at 5, if it is smaller just make it five so we dont have a size one graph
-    final maxValue = maxStreak > 5 ? maxStreak.toDouble() : 5.0;
 
     return RadarChart(
       RadarChartData(
@@ -177,8 +169,8 @@ class MainPanel extends ConsumerWidget {
           fontSize: 12,
           fontWeight: FontWeight.bold,
         ),
-        // --- Grid & Ticks ---
-        tickCount: (maxValue + 1).ceil(), // Number of concentric grid lines.
+        // Grid and ticks
+        tickCount: 10,
         ticksTextStyle: TextStyle(
           color: colorScheme.onSurface.withAlpha(100), // (70%)
           fontSize: 10,

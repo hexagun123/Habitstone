@@ -2,13 +2,11 @@
 // and the remote Firebase database
 // It defines Firebase as the single source of truth
 
-import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../provider/app.dart';
 import '../provider/auth.dart';
-import '../data/sync.dart';
 import '../model/goal.dart';
 import '../model/task.dart';
 import '../model/reward.dart';
@@ -45,7 +43,7 @@ final syncControllerProvider = Provider.autoDispose<void>((ref) {
       // Check flag to prevent pulling data while another server operation is in progress.
       if (!syncService.isPerformingServerOperation) {
         syncService.pullAllData().catchError((e) {
-          printToConsole(e); // in case of any error
+          print(e); // in case of any error
         });
       }
     }

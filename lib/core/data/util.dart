@@ -1,7 +1,7 @@
 // core/data/util.dart
 
 
-class DateUtil {
+class Util {
   /// Returns a `DateTime` object representing the current date at midnight UTC.
   ///
   /// This method make time easier to deal with, as now there is only equal comparasents.

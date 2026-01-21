@@ -78,7 +78,7 @@ class ChartSection extends ConsumerWidget {
                             sideTitles: SideTitles(
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
-                                final now = DateUtil.now();
+                                final now = Util.now();
                                 // Calculate the specific date for each bar based on its index.
                                 final targetDate = now.subtract(
                                     Duration(days: 6 - value.toInt()));

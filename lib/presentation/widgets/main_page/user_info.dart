@@ -50,7 +50,7 @@ class InfoText extends ConsumerWidget {
 
   /// Builds the UI to be displayed for a guest. Just includes a signin button
   Widget _buildGuestUI(BuildContext context) {
-    final now = DateUtil.now(); // Get current date.
+    final now = Util.now(); // Get current date.
     final formatter = DateFormat('EEEE, MMMM d, y'); // Format for display.
 
     return Column(
@@ -138,7 +138,7 @@ class InfoText extends ConsumerWidget {
                   const SizedBox(height: 2),
                   // date
                   Text(
-                    formatter.format(DateUtil.now()),
+                    formatter.format(Util.now()),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context)
                               .colorScheme

@@ -1,6 +1,6 @@
-/// This file defines the data model for a `Goal`.
-/// It includes the Hive type adapter for local storage, serialization logic
-/// for Firebase, and utility methods for managing goal properties.
+// This file defines the data model for a `Goal`.
+// It includes the Hive type adapter for local storage, serialization logic
+// for Firebase, and utility methods for managing goal properties.
 
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
@@ -57,7 +57,7 @@ class Goal extends HiveObject {
     final newId = id ?? const Uuid().v4(); // Generate a UUID if no id is given.
     // Set a default lastUpdate far in the past to ensure streak logic works correctly on creation.
     final newLastUpdate =
-        lastUpdate ?? DateUtil.now().subtract(const Duration(days: 10));
+        lastUpdate ?? Util.now().subtract(const Duration(days: 10));
 
     // Call the private constructor to create the instance.
     return Goal._(
