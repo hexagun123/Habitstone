@@ -10,7 +10,7 @@ import 'dart:developer';
 
 import '../../../../../core/data/showcase_key.dart';
 import '../../../../../core/model/task.dart';
-import '../../../../../core/provider/goal.dart';
+import '../../core/provider/goals.dart';
 import '../../../../../core/provider/task.dart';
 
 /// The main page widget for creating a new task.

@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../../core/data/showcase_key.dart';
-import '../../../../../core/provider/setting.dart';
+import '../../core/provider/settings.dart';
 import '../../../../../core/provider/theme.dart';
 import '../../../../../core/theme/app_theme.dart';
 

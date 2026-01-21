@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/model/reward.dart';
-import '../../../../../core/provider/reward.dart';
+import '../../core/provider/rewards.dart';
 
 import 'package:showcaseview/showcaseview.dart';
 import '../../../../../core/data/showcase_key.dart';

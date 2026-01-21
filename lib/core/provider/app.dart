@@ -2,7 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/hive.dart';
-import 'goal.dart';
+import 'goals.dart';
 
 /// single repo instance so i don't have to have hive instances everywhere
 final hiveRepositoryProvider = Provider<HiveRepository>((ref) {

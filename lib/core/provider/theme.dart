@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_theme.dart';
-import '../provider/setting.dart';
+import 'settings.dart';
 
 /// provides the current theme mode stored in settings
 final themeProvider = StateNotifierProvider<ThemeNotifier, AppThemeMode>((ref) {

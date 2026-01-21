@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../../core/provider/goal.dart';
+import '../../core/provider/goals.dart';
 import '../../../../../core/model/goal.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../../../../../core/data/showcase_key.dart';

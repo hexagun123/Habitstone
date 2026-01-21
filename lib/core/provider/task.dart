@@ -5,10 +5,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
 import '../model/task.dart';
-import 'goal.dart';
+import 'goals.dart';
 import '../data/util.dart';
 import 'app.dart';
-import 'setting.dart';
+import 'settings.dart';
 import '../data/hive.dart';
 import 'package:collection/collection.dart';
 

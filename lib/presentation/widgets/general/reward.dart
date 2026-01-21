@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/data/quote.dart';
 import '../../../../../../core/model/reward.dart';
-import '../../../../../../core/provider/reward.dart';
+import '../../../core/provider/rewards.dart';
 
 void showRewardPopup(BuildContext context, WidgetRef ref) {
 
