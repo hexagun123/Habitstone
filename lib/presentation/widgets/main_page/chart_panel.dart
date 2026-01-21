@@ -5,8 +5,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../core/model/goal.dart';
-import '../../../../../core/provider/goal.dart';
+import '../../../../../../core/model/goal.dart';
+import '../../../../../../core/provider/goal.dart';
 
 // A dashboard that is responsive to the amount of goals you have
 class MainPanel extends ConsumerWidget {

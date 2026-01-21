@@ -11,9 +11,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../../../../core/data/showcase_key.dart';
-import '../../../../../core/data/util.dart';
-import '../../../../../core/provider/auth.dart';
+import '../../../../../../core/data/showcase_key.dart';
+import '../../../../../../core/data/util.dart';
+import '../../../../../../core/provider/auth.dart';
 
 // widget for user info
 class InfoText extends ConsumerWidget {

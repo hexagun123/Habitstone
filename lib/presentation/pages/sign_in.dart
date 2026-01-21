@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
-import '../../../../core/provider/auth.dart';
+import '../../../../../core/provider/auth.dart';
 
 /// A screen that allows users to sign in using their Google account.
 ///

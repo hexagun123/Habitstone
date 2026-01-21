@@ -5,8 +5,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../core/model/reward.dart';
-import '../../../../../core/provider/reward.dart';
+import '../../../../../../core/model/reward.dart';
+import '../../../../../../core/provider/reward.dart';
 
 /// A widget that displays the complete list of user-defined rewards in a card.
 ///

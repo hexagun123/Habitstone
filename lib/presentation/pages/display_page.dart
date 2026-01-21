@@ -6,13 +6,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:streak/features/main/presentation/widgets/display_page/summary_section.dart';
+import '../widgets/display_page/summary_section.dart';
 import '../widgets/display_page/chart_section.dart';
 import '../widgets/display_page/goal_list.dart';
 import '../widgets/display_page/task_list/task_list.dart';
 import '../widgets/display_page/reward_list.dart';
 import 'package:showcaseview/showcaseview.dart';
-import '../../../../core/data/showcase_key.dart';
+import '../../../../../core/data/showcase_key.dart';
 
 /// A widget that displays a collection of user data panels.
 ///

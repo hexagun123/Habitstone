@@ -3,13 +3,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../../core/provider/task.dart';
+import '../../../../../../../core/provider/task.dart';
 import 'list_item.dart';
 import 'empty.dart';
 import 'popup.dart';
 import '../../general/randomizer.dart';
 import 'package:showcaseview/showcaseview.dart';
-import '../../../../../../core/data/showcase_key.dart';
+import '../../../../../../../core/data/showcase_key.dart';
 
 
 class TaskList extends ConsumerWidget {

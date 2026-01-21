@@ -3,9 +3,9 @@
 /// linked goals, and provides actions like marking as done or deleting.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../../core/provider/task.dart';
-import '../../../../../../core/provider/goal.dart';
-import '../../../../../../core/model/task.dart';
+import '../../../../../../../core/provider/task.dart';
+import '../../../../../../../core/provider/goal.dart';
+import '../../../../../../../core/model/task.dart';
 import '../../general/reward.dart';
 
 /// A widget that displays an individual task with expandable details.

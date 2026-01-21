@@ -10,9 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/main_page/chart_panel.dart';
 import '../widgets/main_page/user_info.dart';
 import '../widgets/main_page/menu.dart';
-import '../../../../responsive.dart';
+import '../../../../../responsive.dart';
 import 'package:showcaseview/showcaseview.dart';
-import '../../../../core/data/showcase_key.dart';
+import '../../../../../core/data/showcase_key.dart';
 
 /// A stateful widget that constructs the main page of the application.
 /// It utilizes `ConsumerStatefulWidget` for potential integration with Riverpod state management

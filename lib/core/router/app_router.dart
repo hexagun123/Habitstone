@@ -7,13 +7,13 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../provider/auth.dart';
-import '../../../features/main/presentation/pages/new_goal.dart';
-import '../../../features/main/presentation/pages/main_page.dart';
-import '../../../features/main/presentation/pages/new_task.dart';
-import '../../../features/main/presentation/pages/display_page.dart';
-import '../../../features/main/presentation/pages/new_reward.dart';
-import '../../../features/main/presentation/pages/setting.dart';
-import '../../../features/main/presentation/pages/sign_in.dart';
+import '../../presentation/pages/new_goal.dart';
+import '../../presentation/pages/main_page.dart';
+import '../../presentation/pages/new_task.dart';
+import '../../presentation/pages/display_page.dart';
+import '../../presentation/pages/new_reward.dart';
+import '../../presentation/pages/setting.dart';
+import '../../presentation/pages/sign_in.dart';
 
 /// Provides the GoRouter instance to the widget tree.
 /// This provider watches the authentication state and uses it to manage routing rules.

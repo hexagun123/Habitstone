@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../core/data/quote.dart';
-import '../../../../../core/provider/task.dart';
+import '../../../../../../core/data/quote.dart';
+import '../../../../../../core/provider/task.dart';
 
 class TaskPopup extends ConsumerWidget {
   const TaskPopup({super.key});

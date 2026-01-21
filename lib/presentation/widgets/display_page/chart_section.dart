@@ -4,8 +4,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import '../../../../../core/provider/task.dart';
-import '../../../../../core/data/util.dart';
+import '../../../../../../core/provider/task.dart';
+import '../../../../../../core/data/util.dart';
 
 /// A widget that displays the weekly task completion data in a bar chart.
 class ChartSection extends ConsumerWidget {

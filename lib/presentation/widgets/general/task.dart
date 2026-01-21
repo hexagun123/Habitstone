@@ -5,9 +5,9 @@
 
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../core/model/task.dart';
-import '../../../../../core/provider/setting.dart';
-import '../../../../../core/provider/task.dart';
+import '../../../../../../core/model/task.dart';
+import '../../../../../../core/provider/setting.dart';
+import '../../../../../../core/provider/task.dart';
 
 /// An extension that adds weighted random selection logic to the [TaskNotifier].
 ///

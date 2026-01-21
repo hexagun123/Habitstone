@@ -8,10 +8,10 @@ import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'dart:developer';
 
-import '../../../../core/data/showcase_key.dart';
-import '../../../../core/model/task.dart';
-import '../../../../core/provider/goal.dart';
-import '../../../../core/provider/task.dart';
+import '../../../../../core/data/showcase_key.dart';
+import '../../../../../core/model/task.dart';
+import '../../../../../core/provider/goal.dart';
+import '../../../../../core/provider/task.dart';
 
 /// The main page widget for creating a new task.
 /// It sets up the basic layout structure with a Scaffold and AppBar.

@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/model/reward.dart';
-import '../../../../core/provider/reward.dart';
+import '../../../../../core/model/reward.dart';
+import '../../../../../core/provider/reward.dart';
 
 import 'package:showcaseview/showcaseview.dart';
-import '../../../../core/data/showcase_key.dart';
+import '../../../../../core/data/showcase_key.dart';
 
 /// The main page widget for adding a new reward.
 /// It sets up the Scaffold, AppBar, and contains the [RewardForm].

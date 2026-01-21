@@ -5,7 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../core/provider/task.dart';
+import '../../../../../../core/provider/task.dart';
 import 'stat_card.dart';
 
 /// A widget that displays a row of key statistics about the user's progress.

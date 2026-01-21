@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../../../../core/data/showcase_key.dart';
+import '../../../../../../core/data/showcase_key.dart';
 
 // navigation menu itself
 class NavigationMenu extends ConsumerWidget {

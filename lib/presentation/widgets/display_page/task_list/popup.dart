@@ -2,7 +2,7 @@
 // secondary widget
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../../core/model/task.dart';
+import '../../../../../../../core/model/task.dart';
 
 class NewTaskPopUp extends ConsumerWidget {
   final Task task;
